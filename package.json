@@ -16,7 +16,7 @@
   "homepage": "https://remarkablegames.org/rez-store/",
   "dependencies": {
     "phaser": "4.2.1",
-    "phaser-jsx": "1.0.3"
+    "phaser-jsx": "1.0.4"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",

@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { render } from 'phaser-jsx';
 
-import { Hud } from '../components';
+import { Chrome, Flash, Hud, Stamp } from '../components';
 import { KEY, LAYOUT, LEVELS } from '../constants';
 import { PhotoRestorer } from '../gameobjects';
 import type { HudController } from '../types';
@@ -28,7 +28,7 @@ export class Game extends Phaser.Scene {
     const background = createBackgroundTexture(this);
     this.add.image(0, 0, background.key).setOrigin(0);
 
-    this.createChrome();
+    render(<Chrome level={this.level} />, this);
     this.createPhotoFrame();
     this.createHudPanel();
 
@@ -72,40 +72,6 @@ export class Game extends Phaser.Scene {
     this.hud?.setElapsed(elapsedSeconds);
     this.hud?.setStage('complete');
     this.playCompletionEffects();
-  }
-
-  private createChrome(): void {
-    const left = LAYOUT.PHOTO.X - LAYOUT.PHOTO.WIDTH / 2;
-
-    this.add.text(left, 28, 'REZ STORE', {
-      fontFamily: '"Courier New", Courier, monospace',
-      fontSize: 14,
-      color: '#c8a566',
-      letterSpacing: 4,
-    });
-
-    this.add.text(left, 44, 'Photograph Restoration', {
-      fontFamily: 'Georgia, "Times New Roman", serif',
-      fontSize: 32,
-      color: '#f1e6d2',
-      padding: { bottom: 1 },
-    });
-
-    this.add.rectangle(left, 90, 48, 2, 0xc8a566, 0.55).setOrigin(0, 0.5);
-
-    this.add
-      .text(
-        LAYOUT.PHOTO.X,
-        LAYOUT.PHOTO.Y + LAYOUT.PHOTO.HEIGHT / 2 + LAYOUT.PHOTO.BORDER + 20,
-        `MEMORY NO. ${String(this.level + 1).padStart(3, '0')}   /   HANDLE WITH CARE`,
-        {
-          fontFamily: '"Courier New", Courier, monospace',
-          fontSize: 14,
-          color: '#897b66',
-          letterSpacing: 1.5,
-        },
-      )
-      .setOrigin(0.5, 0);
   }
 
   private createPhotoFrame(): void {
@@ -170,51 +136,13 @@ export class Game extends Phaser.Scene {
   }
 
   private playCompletionEffects(): void {
-    const stamp = this.add
-      .text(
-        LAYOUT.PHOTO.X + LAYOUT.PHOTO.WIDTH / 2 - 26,
-        LAYOUT.PHOTO.Y + LAYOUT.PHOTO.HEIGHT / 2 - 24,
-        'RESTORED',
-        {
-          fontFamily: 'Georgia, "Times New Roman", serif',
-          fontSize: 24,
-          color: '#a8402f',
-          stroke: '#a8402f',
-          strokeThickness: 1,
-          letterSpacing: 3,
-        },
-      )
-      .setOrigin(1, 1)
-      .setAngle(-7)
-      .setAlpha(0)
-      .setScale(1.5);
-
-    this.tweens.add({
-      targets: stamp,
-      alpha: 0.85,
-      scale: 1,
-      duration: 450,
-      ease: 'Back.easeOut',
-    });
-
-    const flash = this.add.rectangle(
-      LAYOUT.PHOTO.X,
-      LAYOUT.PHOTO.Y,
-      LAYOUT.PHOTO.WIDTH,
-      LAYOUT.PHOTO.HEIGHT,
-      0xffe6b0,
-      0.16,
+    render(
+      <>
+        <Stamp />
+        <Flash />
+      </>,
+      this,
     );
-
-    this.tweens.add({
-      targets: flash,
-      alpha: 0,
-      duration: 650,
-      ease: 'Quad.easeOut',
-      onComplete: () => {
-        flash.destroy();
-      },
-    });
 
     for (let index = 0; index < 28; index++) {
       const particle = this.add.circle(

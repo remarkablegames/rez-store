@@ -55,17 +55,12 @@ export class PhotoRestorer {
     this.y = y;
     this.photoTextures = createPhotoTextures(scene, this.imageKey);
 
-    scene.add.image(x, y, this.photoTextures.clean.key).setDepth(10);
-    this.agedImage = scene.add
-      .image(x, y, this.photoTextures.aged.key)
-      .setDepth(11);
-    this.grimeImage = scene.add
-      .image(x, y, this.photoTextures.grime.key)
-      .setDepth(12);
+    scene.add.image(x, y, this.photoTextures.clean.key);
+    this.agedImage = scene.add.image(x, y, this.photoTextures.aged.key);
+    this.grimeImage = scene.add.image(x, y, this.photoTextures.grime.key);
     this.brushCursor = scene.add
       .circle(x, y, BRUSH_RADIUS, 0xffffff, 0.045)
       .setStrokeStyle(2, 0xffffff, 0.78)
-      .setDepth(40)
       .setVisible(false);
 
     scene.input.setDefaultCursor('default');
@@ -356,15 +351,13 @@ export class PhotoRestorer {
     const worldY = this.y - LAYOUT.PHOTO.HEIGHT / 2 + localY;
 
     for (let index = 0; index < 2; index++) {
-      const particle = this.scene.add
-        .circle(
-          worldX + Phaser.Math.Between(-10, 10),
-          worldY + Phaser.Math.Between(-8, 8),
-          Phaser.Math.FloatBetween(1, 2.6),
-          0xe1d2b5,
-          Phaser.Math.FloatBetween(0.25, 0.5),
-        )
-        .setDepth(45);
+      const particle = this.scene.add.circle(
+        worldX + Phaser.Math.Between(-10, 10),
+        worldY + Phaser.Math.Between(-8, 8),
+        Phaser.Math.FloatBetween(1, 2.6),
+        0xe1d2b5,
+        Phaser.Math.FloatBetween(0.25, 0.5),
+      );
 
       this.scene.tweens.add({
         targets: particle,

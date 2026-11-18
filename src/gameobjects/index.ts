@@ -1,2 +1,1 @@
-export * from './Player';
-export * from './Star';
+export * from './PhotoRestorer';

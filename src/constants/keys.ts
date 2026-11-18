@@ -1,8 +1,12 @@
+export const IMAGE = {
+  SMILING_GIRL: 'images/smiling_girl.jpg',
+} as const;
+
 export const TEXTURE = {
-  DUDE: 'Dude',
-  GROUND: 'Ground',
-  SKY: 'Sky',
-  STAR: 'Star',
+  BACKGROUND: 'Background',
+  PHOTO_AGED: 'PhotoAged',
+  PHOTO_CLEAN: 'PhotoClean',
+  PHOTO_GRIME: 'PhotoGrime',
 } as const;
 
 export const SCENE = {

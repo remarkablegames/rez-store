@@ -1,23 +1,23 @@
 <p align="center">
-  <img src="public/logo192.png" alt="Phaser Template">
+  <img src="public/logo192.png" alt="Rez Store">
 </p>
 
-# Phaser Template
+# Rez Store
 
-[![release](https://img.shields.io/github/v/release/remarkablegames/phaser-template)](https://github.com/remarkablegames/phaser-template/releases)
-[![build](https://github.com/remarkablegames/phaser-template/actions/workflows/build.yml/badge.svg)](https://github.com/remarkablegames/phaser-template/actions/workflows/build.yml)
+[![release](https://img.shields.io/github/v/release/remarkablegames/rez-store)](https://github.com/remarkablegames/rez-store/releases)
+[![build](https://github.com/remarkablegames/rez-store/actions/workflows/build.yml/badge.svg)](https://github.com/remarkablegames/rez-store/actions/workflows/build.yml)
 
-<kbd>phaser-template</kbd> is a template for making [Phaser](https://phaser.io/) games. The template is inspired by the tutorial "[Making your first Phaser 3 game](https://phaser.io/tutorials/making-your-first-phaser-3-game)".
+📸 Repair photographs.
 
 Play in your browser:
 
-- [remarkablegames](https://remarkablegames.org/phaser-template/)
+- [remarkablegames](https://remarkablegames.org/rez-store/)
 
 Or download for desktop:
 
-- [Windows](https://github.com/remarkablegames/phaser-template/releases/latest/download/windows.zip)
-- [macOS](https://github.com/remarkablegames/phaser-template/releases/latest/download/macos.zip)
-- [Linux](https://github.com/remarkablegames/phaser-template/releases/latest/download/linux.zip)
+- [Windows](https://github.com/remarkablegames/rez-store/releases/latest/download/windows.zip)
+- [macOS](https://github.com/remarkablegames/rez-store/releases/latest/download/macos.zip)
+- [Linux](https://github.com/remarkablegames/rez-store/releases/latest/download/linux.zip)
 
 ## Prerequisites
 
@@ -32,24 +32,14 @@ brew install nvm
 Clone the repository:
 
 ```sh
-git clone https://github.com/remarkablegames/phaser-template.git
-cd phaser-template
+git clone https://github.com/remarkablegames/rez-store.git
+cd rez-store
 ```
 
 Install the dependencies:
 
 ```sh
 npm install
-```
-
-Rename the game:
-
-```sh
-git grep -l phaser-template | xargs sed -i '' -e 's/phaser-template/my-game/g'
-```
-
-```sh
-git grep -l 'Phaser Template' | xargs sed -i '' -e 's/Phaser Template/My Game/g'
 ```
 
 Update the files:

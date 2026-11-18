@@ -1,7 +1,7 @@
 {
-  "name": "Phaser Template",
-  "short_name": "Phaser Template",
-  "description": "Phaser Template",
+  "name": "Rez Store",
+  "short_name": "Rez Store",
+  "description": "📸 Repair photographs.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#000000",

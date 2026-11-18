@@ -19,6 +19,11 @@ Or download for desktop:
 - [macOS](https://github.com/remarkablegames/rez-store/releases/latest/download/macos.zip)
 - [Linux](https://github.com/remarkablegames/rez-store/releases/latest/download/linux.zip)
 
+## Credits
+
+- [A young girl with a big smile and hearts](https://unsplash.com/photos/a-young-girl-with-a-big-smile-and-hearts-nufhUFkjU1o)
+- [Hands reach toward the sky in a field](https://unsplash.com/photos/hands-reach-toward-the-sky-in-a-field-rjOikduibSA)
+
 ## Prerequisites
 
 [nvm](https://github.com/nvm-sh/nvm#installing-and-updating):

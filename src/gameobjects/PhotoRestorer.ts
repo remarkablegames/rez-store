@@ -10,15 +10,21 @@ const DUST_PUFF_INTERVAL = 80;
 const GRIME_FADE_DURATION = 600;
 const TEXTURE_REFRESH_INTERVAL = 34;
 
-export interface PhotoRestorerCallbacks {
+interface PhotoRestorerCallbacks {
   onProgress: (progress: number) => void;
   onCleanComplete: () => void;
   onComplete: () => void;
 }
 
+interface PhotoRestorerOptions {
+  callbacks: PhotoRestorerCallbacks;
+  imageKey: string;
+}
+
 export class PhotoRestorer {
   private readonly scene: Phaser.Scene;
   private readonly callbacks: PhotoRestorerCallbacks;
+  private readonly imageKey: string;
   private readonly photoTextures: PhotoTextures;
   private readonly agedImage: Phaser.GameObjects.Image;
   private readonly grimeImage: Phaser.GameObjects.Image;
@@ -40,13 +46,14 @@ export class PhotoRestorer {
     scene: Phaser.Scene,
     x: number,
     y: number,
-    callbacks: PhotoRestorerCallbacks,
+    options: PhotoRestorerOptions,
   ) {
     this.scene = scene;
-    this.callbacks = callbacks;
+    this.callbacks = options.callbacks;
+    this.imageKey = options.imageKey;
     this.x = x;
     this.y = y;
-    this.photoTextures = createPhotoTextures(scene);
+    this.photoTextures = createPhotoTextures(scene, this.imageKey);
 
     scene.add.image(x, y, this.photoTextures.clean.key).setDepth(10);
     this.agedImage = scene.add

@@ -10,8 +10,11 @@ const DUST_COLORS = ['#e8ddc8', '#d5c7ac', '#a99b84', '#837866'] as const;
 
 type Random = Phaser.Math.RandomDataGenerator;
 
-export function createPhotoTextures(scene: Phaser.Scene): PhotoTextures {
-  const image = getPhotoSource(scene);
+export function createPhotoTextures(
+  scene: Phaser.Scene,
+  imageKey: string,
+): PhotoTextures {
+  const image = getPhotoSource(scene, imageKey);
 
   const clean = createCanvasTexture(
     scene,
@@ -53,8 +56,11 @@ export function createPhotoTextures(scene: Phaser.Scene): PhotoTextures {
   };
 }
 
-function getPhotoSource(scene: Phaser.Scene): HTMLImageElement {
-  const source = scene.textures.get(KEY.IMAGE.SMILING_GIRL).getSourceImage();
+function getPhotoSource(
+  scene: Phaser.Scene,
+  imageKey: string,
+): HTMLImageElement {
+  const source = scene.textures.get(imageKey).getSourceImage();
 
   if (!(source instanceof HTMLImageElement)) {
     throw new Error('The photograph source must be an HTML image');

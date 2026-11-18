@@ -1,5 +1,6 @@
 export const IMAGE = {
   SMILING_GIRL: 'images/smiling_girl.jpg',
+  HANDS_TOGETHER: 'images/hands_together.jpg',
 } as const;
 
 export const TEXTURE = {

@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { render } from 'phaser-jsx';
 
 import { Hud } from '../components';
-import { KEY, LAYOUT } from '../constants';
+import { KEY, LAYOUT, LEVELS } from '../constants';
 import { PhotoRestorer } from '../gameobjects';
 import type { HudController } from '../types';
 import { createBackgroundTexture } from '../utils';
@@ -11,9 +11,14 @@ export class Game extends Phaser.Scene {
   private restorer?: PhotoRestorer;
   private hud?: HudController;
   private startedAt = 0;
+  private level = 0;
 
   constructor() {
     super(KEY.SCENE.GAME);
+  }
+
+  init({ level = 0 }) {
+    this.level = LEVELS[level] ? level : 0;
   }
 
   create() {
@@ -28,14 +33,17 @@ export class Game extends Phaser.Scene {
     this.createHudPanel();
 
     this.restorer = new PhotoRestorer(this, LAYOUT.PHOTO.X, LAYOUT.PHOTO.Y, {
-      onProgress: (progress) => {
-        this.hud?.setProgress(progress);
-      },
-      onCleanComplete: () => {
-        this.hud?.setStage('color');
-      },
-      onComplete: () => {
-        this.handleComplete();
+      imageKey: LEVELS[this.level],
+      callbacks: {
+        onProgress: (progress) => {
+          this.hud?.setProgress(progress);
+        },
+        onCleanComplete: () => {
+          this.hud?.setStage('color');
+        },
+        onComplete: () => {
+          this.handleComplete();
+        },
       },
     });
 
@@ -48,7 +56,7 @@ export class Game extends Phaser.Scene {
           this.restorer?.setColorProgress(value);
         }}
         onRestart={() => {
-          this.scene.restart();
+          this.scene.start(KEY.SCENE.GAME, { level: this.level + 1 });
         }}
       />,
       this,
@@ -89,7 +97,7 @@ export class Game extends Phaser.Scene {
       .text(
         LAYOUT.PHOTO.X,
         LAYOUT.PHOTO.Y + LAYOUT.PHOTO.HEIGHT / 2 + LAYOUT.PHOTO.BORDER + 20,
-        'MEMORY NO. 001   /   HANDLE WITH CARE',
+        `MEMORY NO. ${String(this.level + 1).padStart(3, '0')}   /   HANDLE WITH CARE`,
         {
           fontFamily: '"Courier New", Courier, monospace',
           fontSize: 14,

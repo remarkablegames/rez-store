@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
-import { Rectangle, Text, useState } from 'phaser-jsx';
+import { Rectangle, Text } from 'phaser-jsx';
 
 import { LAYOUT, THEME } from '../constants';
 import type { GradeLetter, JobReport } from '../types';
 import { formatElapsed } from '../utils';
+import { Button } from './Button';
 
 const HEAT_CELL = 22;
 const HEAT_GAP = 2;
@@ -15,7 +16,6 @@ interface GradeReportProps {
 }
 
 export function GradeReport({ report, onNext }: GradeReportProps) {
-  const [hovered, setHovered] = useState<'next' | null>(null);
   const gridWidth =
     report.zoneColumns > 0
       ? report.zoneColumns * (HEAT_CELL + HEAT_GAP) - HEAT_GAP
@@ -205,41 +205,15 @@ export function GradeReport({ report, onNext }: GradeReportProps) {
         }}
       />
 
-      <Rectangle
+      <Button
         x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
         y={638}
         width={LAYOUT.HUD.CONTENT_WIDTH}
         height={44}
-        originX={0.5}
-        originY={0.5}
-        fillColor={
-          hovered === 'next'
-            ? THEME.SHAPE_COLOR.GOLD_HOVER
-            : THEME.SHAPE_COLOR.GOLD
-        }
-        input={{ useHandCursor: true }}
-        onPointerOver={() => {
-          setHovered('next');
-        }}
-        onPointerOut={() => {
-          setHovered(null);
-        }}
-        onPointerUp={onNext}
-      />
-
-      <Text
-        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
-        y={638}
-        text="NEXT JOB"
-        style={{
-          fontFamily: THEME.FONT.MONO,
-          fontSize: 12,
-          color: THEME.TEXT_COLOR.DARK,
-          letterSpacing: 0.5,
-        }}
-        originX={0.5}
-        originY={0.5}
-      />
+        onClick={onNext}
+      >
+        NEXT JOB
+      </Button>
     </>
   );
 }

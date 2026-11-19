@@ -3,6 +3,7 @@ import { Rectangle, Text, useState } from 'phaser-jsx';
 
 import { LAYOUT, THEME } from '../constants';
 import type { HudController, JobReport, Level, RestoreStage } from '../types';
+import { Button } from './Button';
 import { GradeReport } from './GradeReport';
 
 interface StageCopy {
@@ -54,7 +55,6 @@ export function Hud({
   const [report, setReport] = useState<JobReport | null>(null);
   const [colorValue, setColorValue] = useState(0);
   const [draggingSlider, setDraggingSlider] = useState(false);
-  const [buttonHovered, setButtonHovered] = useState(false);
 
   onReady({ setStage, setReport });
 
@@ -373,41 +373,17 @@ export function Hud({
         visible={!isComplete}
       />
 
-      <Rectangle
-        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
-        y={638}
-        width={LAYOUT.HUD.CONTENT_WIDTH}
-        height={44}
-        originX={0.5}
-        originY={0.5}
-        fillColor={
-          buttonHovered ? THEME.SHAPE_COLOR.GOLD_HOVER : THEME.SHAPE_COLOR.GOLD
-        }
-        visible={!isComplete}
-        input={{ useHandCursor: true }}
-        onPointerOver={() => {
-          setButtonHovered(true);
-        }}
-        onPointerOut={() => {
-          setButtonHovered(false);
-        }}
-        onPointerUp={isClean ? onContinue : onDeliver}
-      />
-
-      <Text
-        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
-        y={638}
-        text={isClean ? 'CONTINUE TO COLOR' : 'DELIVER PHOTO'}
-        style={{
-          fontFamily: THEME.FONT.MONO,
-          fontSize: 12,
-          color: THEME.TEXT_COLOR.DARK,
-          letterSpacing: 0.5,
-        }}
-        originX={0.5}
-        originY={0.5}
-        visible={!isComplete}
-      />
+      {!isComplete && (
+        <Button
+          x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
+          y={638}
+          width={LAYOUT.HUD.CONTENT_WIDTH}
+          height={44}
+          onClick={isClean ? onContinue : onDeliver}
+        >
+          {isClean ? 'CONTINUE TO COLOR' : 'DELIVER PHOTO'}
+        </Button>
+      )}
 
       {isComplete && report && <GradeReport report={report} onNext={onNext} />}
     </>

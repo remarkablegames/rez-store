@@ -64,7 +64,7 @@ export function GradeReport({ report, onNext }: GradeReportProps) {
 
       <Text
         x={LAYOUT.HUD.CONTENT_X + 74}
-        y={180}
+        y={174}
         text={String(Math.round(report.overall * 100))}
         style={{
           fontFamily: THEME.FONT.SERIF,
@@ -291,7 +291,7 @@ function ReportRow({ label, value, y }: ReportRowProps) {
       />
       <Text
         x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH}
-        y={y - 4}
+        y={y + 4}
         text={value}
         style={{
           fontFamily: THEME.FONT.SERIF,

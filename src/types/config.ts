@@ -21,7 +21,7 @@ export interface Level {
    * Hidden neutral point (0–1) on the development slider. Values below it are
    * too warm, values above it are too cool.
    */
-  colorTarget: number;
+  colorTarget?: number;
 
   /** Maximum payout for a perfect restoration. */
   fee: number;

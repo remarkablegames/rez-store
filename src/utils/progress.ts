@@ -62,6 +62,7 @@ export function recordJob(
   overall: number,
   payout: number,
   grade: GradeLetter,
+  colorTarget?: number,
 ): JobAward {
   const progress = loadProgress();
   const key = String(level);
@@ -69,10 +70,12 @@ export function recordJob(
   const previousPayout = previous?.payout ?? 0;
   const earned = Math.max(0, payout - previousPayout);
   const isBest =
-    !previous ||
-    payout > previous.payout ||
-    (payout === previous.payout && overall > previous.overall);
-  const best = previous && !isBest ? previous : { overall, payout, grade };
+    previous?.colorTarget === undefined ||
+    (previous.colorTarget === colorTarget &&
+      (payout > previous.payout ||
+        (payout === previous.payout && overall > previous.overall)));
+  const best =
+    previous && !isBest ? previous : { overall, payout, grade, colorTarget };
   const next: Progress = {
     ...progress,
     wallet: progress.wallet + earned,

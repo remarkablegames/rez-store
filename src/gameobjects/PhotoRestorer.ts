@@ -86,7 +86,7 @@ export class PhotoRestorer {
       return;
     }
 
-    const target = Phaser.Math.Clamp(this.level.colorTarget, 0.1, 0.9);
+    const target = Phaser.Math.Clamp(this.level.colorTarget ?? 0.5, 0.1, 0.9);
     const next = Phaser.Math.Clamp(value, 0, 1);
 
     if (next <= target) {

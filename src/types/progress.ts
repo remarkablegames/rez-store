@@ -4,6 +4,7 @@ export interface JobRecord {
   overall: number;
   payout: number;
   grade: GradeLetter;
+  colorTarget?: number;
 }
 
 export interface Progress {

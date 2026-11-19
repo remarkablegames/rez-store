@@ -8,6 +8,7 @@ import type { HudController, JobReport, SurfaceResult } from '../types';
 import {
   createBackgroundTexture,
   createParticles,
+  createRandom,
   getClientNote,
   getColorAccuracy,
   getGrade,
@@ -23,6 +24,7 @@ export class Game extends Phaser.Scene {
   private startedAt = 0;
   private level = 0;
   private grimeSeed = '';
+  private colorTarget = 0;
   private surface: SurfaceResult | null = null;
   private colorValue = 0;
 
@@ -39,6 +41,7 @@ export class Game extends Phaser.Scene {
   } = {}) {
     this.level = LEVELS[level] ? level : 0;
     this.grimeSeed = grimeSeed;
+    this.colorTarget = createRandom(grimeSeed).realInRange(0.35, 0.65);
   }
 
   create() {
@@ -59,7 +62,7 @@ export class Game extends Phaser.Scene {
     this.createHudPanel();
 
     this.restorer = new PhotoRestorer(this, LAYOUT.PHOTO.X, LAYOUT.PHOTO.Y, {
-      level,
+      level: { ...level, colorTarget: this.colorTarget },
       grimeSeed: this.grimeSeed,
     });
 
@@ -108,11 +111,17 @@ export class Game extends Phaser.Scene {
 
     const level = LEVELS[this.level];
     const surface = this.surface?.cleanliness ?? 0;
-    const color = getColorAccuracy(this.colorValue, level.colorTarget);
+    const color = getColorAccuracy(this.colorValue, this.colorTarget);
     const overall = getOverall(surface, color);
     const grade = getGrade(overall);
     const payout = getPayout(level.fee, overall);
-    const award = recordJob(this.level, overall, payout, grade);
+    const award = recordJob(
+      this.level,
+      overall,
+      payout,
+      grade,
+      this.colorTarget,
+    );
     const elapsedSeconds = Math.max(
       0,
       Math.round((this.time.now - this.startedAt) / 1000),
@@ -130,7 +139,7 @@ export class Game extends Phaser.Scene {
       earned: award.earned,
       bestPayout: award.bestPayout,
       wallet: award.wallet,
-      note: getClientNote(surface, color, this.colorValue - level.colorTarget),
+      note: getClientNote(surface, color, this.colorValue - this.colorTarget),
     };
 
     this.hud?.setReport(report);

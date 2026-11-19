@@ -7,6 +7,7 @@ import { PhotoRestorer } from '../gameobjects';
 import type { HudController, JobReport, SurfaceResult } from '../types';
 import {
   createBackgroundTexture,
+  createParticles,
   getClientNote,
   getColorAccuracy,
   getGrade,
@@ -210,34 +211,14 @@ export class Game extends Phaser.Scene {
       this,
     );
 
-    for (let index = 0; index < 28; index++) {
-      const particle = this.add.circle(
-        Phaser.Math.Between(
-          LAYOUT.PHOTO.X - LAYOUT.PHOTO.WIDTH / 2 - 30,
-          LAYOUT.PHOTO.X + LAYOUT.PHOTO.WIDTH / 2 + 30,
-        ),
-        Phaser.Math.Between(
-          LAYOUT.PHOTO.Y - LAYOUT.PHOTO.HEIGHT / 2 - 30,
-          LAYOUT.PHOTO.Y + LAYOUT.PHOTO.HEIGHT / 2 + 30,
-        ),
-        Phaser.Math.FloatBetween(1, 3),
-        index % 3 === 0 ? 0xffe6b0 : 0xc8a566,
-        Phaser.Math.FloatBetween(0.3, 0.8),
-      );
-
-      this.tweens.add({
-        targets: particle,
-        alpha: 0,
-        x: particle.x + Phaser.Math.Between(-40, 40),
-        y: particle.y - Phaser.Math.Between(40, 110),
-        duration: Phaser.Math.Between(700, 1400),
-        delay: Phaser.Math.Between(0, 250),
-        ease: 'Quad.easeOut',
-        onComplete: () => {
-          particle.destroy();
-        },
-      });
-    }
+    createParticles(this, {
+      count: 28,
+      x: LAYOUT.PHOTO.X,
+      y: LAYOUT.PHOTO.Y,
+      spreadX: LAYOUT.PHOTO.WIDTH / 2 + 30,
+      spreadY: LAYOUT.PHOTO.HEIGHT / 2 + 30,
+      color: (index) => (index % 3 === 0 ? 0xffe6b0 : 0xc8a566),
+    });
   }
 
   /**

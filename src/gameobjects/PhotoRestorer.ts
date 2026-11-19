@@ -7,7 +7,7 @@ import type {
   RestoreStage,
   SurfaceResult,
 } from '../types';
-import { createPhotoTextures, measureSurface } from '../utils';
+import { createParticles, createPhotoTextures, measureSurface } from '../utils';
 
 const BRUSH_RADIUS = 36;
 const DUST_PUFF_INTERVAL = 80;
@@ -329,27 +329,20 @@ export class PhotoRestorer {
     const worldX = this.x - LAYOUT.PHOTO.WIDTH / 2 + localX;
     const worldY = this.y - LAYOUT.PHOTO.HEIGHT / 2 + localY;
 
-    for (let index = 0; index < 2; index++) {
-      const particle = this.scene.add.circle(
-        worldX + Phaser.Math.Between(-10, 10),
-        worldY + Phaser.Math.Between(-8, 8),
-        Phaser.Math.FloatBetween(1, 2.6),
-        0xe1d2b5,
-        Phaser.Math.FloatBetween(0.25, 0.5),
-      );
-
-      this.scene.tweens.add({
-        targets: particle,
-        alpha: 0,
-        x: particle.x + Phaser.Math.Between(-12, 12),
-        y: particle.y - Phaser.Math.Between(14, 34),
-        duration: Phaser.Math.Between(350, 650),
-        ease: 'Quad.easeOut',
-        onComplete: () => {
-          particle.destroy();
-        },
-      });
-    }
+    createParticles(this.scene, {
+      count: 2,
+      x: worldX,
+      y: worldY,
+      spreadX: 10,
+      spreadY: 8,
+      color: 0xe1d2b5,
+      radiusRange: [1, 2.6],
+      alphaRange: [0.25, 0.5],
+      durationRange: [350, 650],
+      delayRange: [0, 0],
+      driftXRange: [-12, 12],
+      driftYRange: [-34, -14],
+    });
   }
 
   /**

@@ -363,19 +363,6 @@ export function Hud({ onReady, onColorChange, onRestart }: HudProps) {
         />
       ))}
 
-      <Text
-        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
-        y={672}
-        text="REZ STORE  /  PHOTO LAB"
-        style={{
-          fontFamily: FONT.MONO,
-          fontSize: 12,
-          color: TEXT_COLOR.FAINT,
-          letterSpacing: 1.5,
-        }}
-        originX={0.5}
-      />
-
       <Rectangle
         x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
         y={622}

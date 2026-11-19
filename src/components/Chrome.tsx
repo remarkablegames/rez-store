@@ -23,7 +23,6 @@ export function Chrome({ level, title }: ChromeProps) {
   const memoryLabel = [
     `MEMORY NO. ${String(level + 1).padStart(3, '0')}`,
     title.toUpperCase(),
-    'HANDLE WITH CARE',
   ].join('  /  ');
 
   return (

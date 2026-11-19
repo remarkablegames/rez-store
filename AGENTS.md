@@ -49,6 +49,8 @@ Code style:
 - [ESLint](./eslint.config.mts) with `typescript-eslint` strict and stylistic type-checked configs
   - Sort imports and exports with `simple-import-sort`
   - Avoid unnecessary type casting, only annotate or assert types when inference is genuinely impossible
+- UI typography:
+  - `fontSize` must not be below 12px for readability
 
 Examples:
 

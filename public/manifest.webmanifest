@@ -1,7 +1,7 @@
 {
-  "name": "Rez Store",
+  "name": "Rez Store: Photo Repair",
   "short_name": "Rez Store",
-  "description": "📸 Repair photographs.",
+  "description": "📸 A casual game about repairing photographs.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#000000",

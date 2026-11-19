@@ -1,13 +1,13 @@
 <p align="center">
-  <img src="public/logo192.png" alt="Rez Store">
+  <img src="public/logo192.png" alt="Rez Store: Photo Repair">
 </p>
 
-# Rez Store
+# Rez Store: Photo Repair
 
 [![release](https://img.shields.io/github/v/release/remarkablegames/rez-store)](https://github.com/remarkablegames/rez-store/releases)
 [![build](https://github.com/remarkablegames/rez-store/actions/workflows/build.yml/badge.svg)](https://github.com/remarkablegames/rez-store/actions/workflows/build.yml)
 
-📸 Repair photographs.
+📸 A casual game about repairing photographs.
 
 Play in your browser:
 

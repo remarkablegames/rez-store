@@ -38,7 +38,7 @@ export function Chrome({ level }: ChromeProps) {
       <Text
         x={left}
         y={44}
-        text="Photograph Restoration"
+        text="Photo Repair"
         style={{
           fontFamily: FONT.SERIF,
           fontSize: 32,

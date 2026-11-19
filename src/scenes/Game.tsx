@@ -84,12 +84,6 @@ export class Game extends Phaser.Scene {
         onNext={() => {
           this.scene.start(KEY.SCENE.GAME, { level: this.level + 1 });
         }}
-        onRetry={() => {
-          this.scene.start(KEY.SCENE.GAME, {
-            level: this.level,
-            grimeSeed: this.grimeSeed,
-          });
-        }}
       />,
       this,
     );

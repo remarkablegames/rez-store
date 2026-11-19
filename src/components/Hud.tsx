@@ -37,7 +37,6 @@ interface HudProps {
   onContinue: () => void;
   onDeliver: () => void;
   onNext: () => void;
-  onRetry: () => void;
 }
 
 export function Hud({
@@ -50,7 +49,6 @@ export function Hud({
   onContinue,
   onDeliver,
   onNext,
-  onRetry,
 }: HudProps) {
   const [stage, setStage] = useState<RestoreStage>('clean');
   const [report, setReport] = useState<JobReport | null>(null);
@@ -437,9 +435,7 @@ export function Hud({
         visible={!isComplete}
       />
 
-      {isComplete && report && (
-        <GradeReport report={report} onRetry={onRetry} onNext={onNext} />
-      )}
+      {isComplete && report && <GradeReport report={report} onNext={onNext} />}
     </>
   );
 }

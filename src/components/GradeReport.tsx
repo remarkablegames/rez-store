@@ -11,12 +11,11 @@ const HEAT_START_Y = 398;
 
 interface GradeReportProps {
   report: JobReport;
-  onRetry: () => void;
   onNext: () => void;
 }
 
-export function GradeReport({ report, onRetry, onNext }: GradeReportProps) {
-  const [hovered, setHovered] = useState<'retry' | 'next' | null>(null);
+export function GradeReport({ report, onNext }: GradeReportProps) {
+  const [hovered, setHovered] = useState<'next' | null>(null);
   const gridWidth =
     report.zoneColumns > 0
       ? report.zoneColumns * (HEAT_CELL + HEAT_GAP) - HEAT_GAP
@@ -232,43 +231,7 @@ export function GradeReport({ report, onRetry, onNext }: GradeReportProps) {
       />
 
       <Rectangle
-        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 4}
-        y={638}
-        width={LAYOUT.HUD.CONTENT_WIDTH / 2 - 6}
-        height={40}
-        originX={0.5}
-        originY={0.5}
-        fillColor={
-          hovered === 'retry'
-            ? THEME.SHAPE_COLOR.BUTTON_DARK_HOVER
-            : THEME.SHAPE_COLOR.BUTTON_DARK
-        }
-        input={{ useHandCursor: true }}
-        onPointerOver={() => {
-          setHovered('retry');
-        }}
-        onPointerOut={() => {
-          setHovered(null);
-        }}
-        onPointerUp={onRetry}
-      />
-
-      <Text
-        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 4}
-        y={638}
-        text="RETRY"
-        style={{
-          fontFamily: THEME.FONT.MONO,
-          fontSize: 11,
-          color: THEME.TEXT_COLOR.GOLD,
-          letterSpacing: 1,
-        }}
-        originX={0.5}
-        originY={0.5}
-      />
-
-      <Rectangle
-        x={LAYOUT.HUD.CONTENT_X + (LAYOUT.HUD.CONTENT_WIDTH * 3) / 4}
+        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
         y={638}
         width={LAYOUT.HUD.CONTENT_WIDTH / 2 - 6}
         height={40}
@@ -290,7 +253,7 @@ export function GradeReport({ report, onRetry, onNext }: GradeReportProps) {
       />
 
       <Text
-        x={LAYOUT.HUD.CONTENT_X + (LAYOUT.HUD.CONTENT_WIDTH * 3) / 4}
+        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
         y={638}
         text="NEXT JOB"
         style={{

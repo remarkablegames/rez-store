@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 import { LAYOUT } from '../constants';
-import type { PhotoTextures, RestoreStage } from '../types';
+import type { Level, PhotoTextures, RestoreStage } from '../types';
 import { createPhotoTextures } from '../utils';
 
 const BRUSH_RADIUS = 36;
@@ -18,13 +18,12 @@ interface PhotoRestorerCallbacks {
 
 interface PhotoRestorerOptions {
   callbacks: PhotoRestorerCallbacks;
-  imageKey: string;
+  level: Level;
 }
 
 export class PhotoRestorer {
   private readonly scene: Phaser.Scene;
   private readonly callbacks: PhotoRestorerCallbacks;
-  private readonly imageKey: string;
   private readonly photoTextures: PhotoTextures;
   private readonly agedImage: Phaser.GameObjects.Image;
   private readonly grimeImage: Phaser.GameObjects.Image;
@@ -50,10 +49,9 @@ export class PhotoRestorer {
   ) {
     this.scene = scene;
     this.callbacks = options.callbacks;
-    this.imageKey = options.imageKey;
     this.x = x;
     this.y = y;
-    this.photoTextures = createPhotoTextures(scene, this.imageKey);
+    this.photoTextures = createPhotoTextures(scene, options.level);
 
     scene.add.image(x, y, this.photoTextures.clean.key);
     this.agedImage = scene.add.image(x, y, this.photoTextures.aged.key);

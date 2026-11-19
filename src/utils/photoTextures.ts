@@ -1,20 +1,37 @@
 import Phaser from 'phaser';
 
 import { KEY, LAYOUT } from '../constants';
-import type { PhotoTextures } from '../types';
+import type { Grime, Level, PhotoTextures } from '../types';
 import { createCanvasTexture } from './canvasTexture';
 
 const CELL_SIZE = 16;
-const DIRT_ALPHA_THRESHOLD = 18;
+const DIRT_ALPHA_THRESHOLD = 4;
 const DUST_COLORS = ['#e8ddc8', '#d5c7ac', '#a99b84', '#837866'] as const;
+
+const GRIME = {
+  DUST_CLUSTERS: 84,
+  DUST_SPECKS_MIN: 10,
+  DUST_SPECKS_MAX: 22,
+  EDGE_CLUSTERS: 36,
+  SMUDGES: 16,
+  STAINS: 5,
+  SCRATCHES: 22,
+  HAIRS: 8,
+  CREASES: 3,
+  FOXING: 40,
+  HAZE_BLOOMS: 22,
+  HAZE_LIGHT_PATCHES: 12,
+  HAZE_GRAIN: 3200,
+} as const;
 
 type Random = Phaser.Math.RandomDataGenerator;
 
 export function createPhotoTextures(
   scene: Phaser.Scene,
-  imageKey: string,
+  level: Level,
 ): PhotoTextures {
-  const image = getPhotoSource(scene, imageKey);
+  const image = getPhotoSource(scene, level.image);
+  const focusY = level.focusY ?? 0.5;
 
   const clean = createCanvasTexture(
     scene,
@@ -22,7 +39,7 @@ export function createPhotoTextures(
     LAYOUT.PHOTO.WIDTH,
     LAYOUT.PHOTO.HEIGHT,
   );
-  drawCleanPhoto(clean.context, image);
+  drawCleanPhoto(clean.context, image, focusY);
   clean.refresh();
 
   const aged = createCanvasTexture(
@@ -31,7 +48,7 @@ export function createPhotoTextures(
     LAYOUT.PHOTO.WIDTH,
     LAYOUT.PHOTO.HEIGHT,
   );
-  drawAgedPhoto(aged.context, image);
+  drawAgedPhoto(aged.context, image, focusY);
   aged.refresh();
 
   const grime = createCanvasTexture(
@@ -40,7 +57,7 @@ export function createPhotoTextures(
     LAYOUT.PHOTO.WIDTH,
     LAYOUT.PHOTO.HEIGHT,
   );
-  drawGrime(grime.context);
+  drawGrime(grime.context, level.grime);
   grime.refresh();
 
   const { columns, dirtyCells, rows } = buildDirtyMask(grime.context);
@@ -76,13 +93,35 @@ function createRandom(): Random {
 function drawBaseImage(
   context: CanvasRenderingContext2D,
   image: HTMLImageElement,
+  focusY: number,
   grade: (data: Uint8ClampedArray) => void,
 ): void {
   context.clearRect(0, 0, LAYOUT.PHOTO.WIDTH, LAYOUT.PHOTO.HEIGHT);
   context.save();
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = 'high';
-  context.drawImage(image, 0, 0, LAYOUT.PHOTO.WIDTH, LAYOUT.PHOTO.HEIGHT);
+
+  const scale = Math.max(
+    LAYOUT.PHOTO.WIDTH / image.naturalWidth,
+    LAYOUT.PHOTO.HEIGHT / image.naturalHeight,
+  );
+  const cropWidth = LAYOUT.PHOTO.WIDTH / scale;
+  const cropHeight = LAYOUT.PHOTO.HEIGHT / scale;
+  const cropX = (image.naturalWidth - cropWidth) / 2;
+  const cropY =
+    (image.naturalHeight - cropHeight) * Math.min(1, Math.max(0, focusY));
+
+  context.drawImage(
+    image,
+    cropX,
+    cropY,
+    cropWidth,
+    cropHeight,
+    0,
+    0,
+    LAYOUT.PHOTO.WIDTH,
+    LAYOUT.PHOTO.HEIGHT,
+  );
   context.restore();
 
   const imageData = context.getImageData(
@@ -98,8 +137,9 @@ function drawBaseImage(
 function drawCleanPhoto(
   context: CanvasRenderingContext2D,
   image: HTMLImageElement,
+  focusY: number,
 ): void {
-  drawBaseImage(context, image, (data) => {
+  drawBaseImage(context, image, focusY, (data) => {
     for (let index = 0; index < data.length; index += 4) {
       const red = data[index];
       const green = data[index + 1];
@@ -122,8 +162,9 @@ function drawCleanPhoto(
 function drawAgedPhoto(
   context: CanvasRenderingContext2D,
   image: HTMLImageElement,
+  focusY: number,
 ): void {
-  drawBaseImage(context, image, (data) => {
+  drawBaseImage(context, image, focusY, (data) => {
     for (let index = 0; index < data.length; index += 4) {
       const red = data[index];
       const green = data[index + 1];
@@ -196,28 +237,92 @@ function addAgedFinish(context: CanvasRenderingContext2D): void {
   context.restore();
 }
 
-function drawGrime(context: CanvasRenderingContext2D): void {
+function drawGrime(context: CanvasRenderingContext2D, config: Grime): void {
   context.clearRect(0, 0, LAYOUT.PHOTO.WIDTH, LAYOUT.PHOTO.HEIGHT);
   context.save();
 
   const random = createRandom();
-  drawDust(context, random);
-  drawSmudges(context, random);
-  drawStains(context, random);
-  drawScratches(context, random);
-  drawHairs(context, random);
-  drawCreases(context, random);
-  drawFoxing(context, random);
+  drawHaze(context, random, config.haze);
+  drawDust(context, random, config.density);
+  drawSmudges(context, random, config.density);
+  drawStains(context, random, config.density);
+  drawScratches(context, random, config.density);
+  drawHairs(context, random, config.density);
+  drawCreases(context, random, config.density);
+  drawFoxing(context, random, config.density);
 
   context.restore();
 }
 
-function drawDust(context: CanvasRenderingContext2D, random: Random): void {
-  for (let index = 0; index < 55; index++) {
+function drawHaze(
+  context: CanvasRenderingContext2D,
+  random: Random,
+  opacity: number,
+): void {
+  if (opacity <= 0) {
+    return;
+  }
+
+  context.save();
+
+  // A translucent film of dust covers the entire print.
+  context.fillStyle = `rgba(82, 69, 50, ${String(opacity)})`;
+  context.fillRect(0, 0, LAYOUT.PHOTO.WIDTH, LAYOUT.PHOTO.HEIGHT);
+
+  // Uneven darker blooms where grime has settled.
+  for (let index = 0; index < GRIME.HAZE_BLOOMS; index++) {
+    const x = random.between(0, LAYOUT.PHOTO.WIDTH);
+    const y = random.between(0, LAYOUT.PHOTO.HEIGHT);
+    const radius = random.between(90, 280);
+    const alpha = random.realInRange(opacity * 0.4, opacity * 1.15);
+    const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
+    gradient.addColorStop(0, `rgba(44, 34, 22, ${String(alpha)})`);
+    gradient.addColorStop(0.62, `rgba(44, 34, 22, ${String(alpha * 0.55)})`);
+    gradient.addColorStop(1, 'rgba(44, 34, 22, 0)');
+    context.fillStyle = gradient;
+    context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+  }
+
+  // Lighter dusty patches break up the film.
+  for (let index = 0; index < GRIME.HAZE_LIGHT_PATCHES; index++) {
+    const x = random.between(0, LAYOUT.PHOTO.WIDTH);
+    const y = random.between(0, LAYOUT.PHOTO.HEIGHT);
+    const radius = random.between(50, 180);
+    const alpha = random.realInRange(0.015, 0.05);
+    const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
+    gradient.addColorStop(0, `rgba(226, 213, 184, ${String(alpha)})`);
+    gradient.addColorStop(1, 'rgba(226, 213, 184, 0)');
+    context.fillStyle = gradient;
+    context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+  }
+
+  // Fine grit across every pixel so the whole print reads as dirty.
+  for (let index = 0; index < GRIME.HAZE_GRAIN; index++) {
+    const x = random.between(0, LAYOUT.PHOTO.WIDTH - 1);
+    const y = random.between(0, LAYOUT.PHOTO.HEIGHT - 1);
+    const alpha = random.realInRange(0.015, 0.08);
+    context.fillStyle =
+      random.frac() > 0.6
+        ? `rgba(229, 218, 192, ${String(alpha)})`
+        : `rgba(45, 35, 23, ${String(alpha * 1.2)})`;
+    context.fillRect(x, y, 1, 1);
+  }
+
+  context.restore();
+}
+
+function drawDust(
+  context: CanvasRenderingContext2D,
+  random: Random,
+  density: number,
+): void {
+  const clusters = scaleCount(GRIME.DUST_CLUSTERS, density);
+
+  for (let index = 0; index < clusters; index++) {
     const centerX = random.between(-12, LAYOUT.PHOTO.WIDTH + 12);
     const centerY = random.between(-12, LAYOUT.PHOTO.HEIGHT + 12);
     const spread = random.realInRange(8, 52);
-    const count = random.between(8, 18);
+    const count = random.between(GRIME.DUST_SPECKS_MIN, GRIME.DUST_SPECKS_MAX);
 
     for (let speck = 0; speck < count; speck++) {
       const angle = random.realInRange(0, Math.PI * 2);
@@ -232,7 +337,9 @@ function drawDust(context: CanvasRenderingContext2D, random: Random): void {
   }
 
   // Extra dust gathering around the edges of the print.
-  for (let index = 0; index < 28; index++) {
+  const edgeClusters = scaleCount(GRIME.EDGE_CLUSTERS, density);
+
+  for (let index = 0; index < edgeClusters; index++) {
     const edge = index % 4;
     let centerX = random.between(0, LAYOUT.PHOTO.WIDTH);
     let centerY = random.between(0, LAYOUT.PHOTO.HEIGHT);
@@ -275,8 +382,14 @@ function drawDustSpeck(
   context.fill();
 }
 
-function drawSmudges(context: CanvasRenderingContext2D, random: Random): void {
-  for (let index = 0; index < 11; index++) {
+function drawSmudges(
+  context: CanvasRenderingContext2D,
+  random: Random,
+  density: number,
+): void {
+  const count = scaleCount(GRIME.SMUDGES, density);
+
+  for (let index = 0; index < count; index++) {
     const x = random.between(30, LAYOUT.PHOTO.WIDTH - 30);
     const y = random.between(30, LAYOUT.PHOTO.HEIGHT - 30);
     const radius = random.realInRange(28, 110);
@@ -290,8 +403,14 @@ function drawSmudges(context: CanvasRenderingContext2D, random: Random): void {
   }
 }
 
-function drawStains(context: CanvasRenderingContext2D, random: Random): void {
-  for (let index = 0; index < 4; index++) {
+function drawStains(
+  context: CanvasRenderingContext2D,
+  random: Random,
+  density: number,
+): void {
+  const count = scaleCount(GRIME.STAINS, density);
+
+  for (let index = 0; index < count; index++) {
     const x = random.between(70, LAYOUT.PHOTO.WIDTH - 70);
     const y = random.between(70, LAYOUT.PHOTO.HEIGHT - 70);
     const radius = random.realInRange(22, 65);
@@ -336,10 +455,13 @@ function drawStains(context: CanvasRenderingContext2D, random: Random): void {
 function drawScratches(
   context: CanvasRenderingContext2D,
   random: Random,
+  density: number,
 ): void {
   context.lineCap = 'round';
 
-  for (let index = 0; index < 16; index++) {
+  const count = scaleCount(GRIME.SCRATCHES, density);
+
+  for (let index = 0; index < count; index++) {
     const startX = random.between(-30, LAYOUT.PHOTO.WIDTH + 30);
     const startY = random.between(-30, LAYOUT.PHOTO.HEIGHT + 30);
     const angle = random.realInRange(0, Math.PI * 2);
@@ -373,10 +495,16 @@ function drawScratches(
   }
 }
 
-function drawHairs(context: CanvasRenderingContext2D, random: Random): void {
+function drawHairs(
+  context: CanvasRenderingContext2D,
+  random: Random,
+  density: number,
+): void {
   context.lineCap = 'round';
 
-  for (let index = 0; index < 6; index++) {
+  const count = scaleCount(GRIME.HAIRS, density);
+
+  for (let index = 0; index < count; index++) {
     const startX = random.between(0, LAYOUT.PHOTO.WIDTH);
     const startY = random.between(0, LAYOUT.PHOTO.HEIGHT);
     const endX = startX + random.realInRange(-120, 120);
@@ -400,8 +528,14 @@ function drawHairs(context: CanvasRenderingContext2D, random: Random): void {
   }
 }
 
-function drawCreases(context: CanvasRenderingContext2D, random: Random): void {
-  for (let index = 0; index < 2; index++) {
+function drawCreases(
+  context: CanvasRenderingContext2D,
+  random: Random,
+  density: number,
+): void {
+  const count = scaleCount(GRIME.CREASES, density);
+
+  for (let index = 0; index < count; index++) {
     const x = random.between(
       LAYOUT.PHOTO.WIDTH * 0.2,
       LAYOUT.PHOTO.WIDTH * 0.8,
@@ -435,8 +569,14 @@ function drawCreases(context: CanvasRenderingContext2D, random: Random): void {
   }
 }
 
-function drawFoxing(context: CanvasRenderingContext2D, random: Random): void {
-  for (let index = 0; index < 28; index++) {
+function drawFoxing(
+  context: CanvasRenderingContext2D,
+  random: Random,
+  density: number,
+): void {
+  const count = scaleCount(GRIME.FOXING, density);
+
+  for (let index = 0; index < count; index++) {
     const x = random.between(0, LAYOUT.PHOTO.WIDTH);
     const y = random.between(0, LAYOUT.PHOTO.HEIGHT);
     const radius = random.realInRange(0.5, 2.2);
@@ -476,6 +616,10 @@ function buildDirtyMask(context: CanvasRenderingContext2D): {
   }
 
   return { columns, dirtyCells, rows };
+}
+
+function scaleCount(base: number, density: number): number {
+  return Math.max(1, Math.round(base * density));
 }
 
 function clampChannel(value: number): number {

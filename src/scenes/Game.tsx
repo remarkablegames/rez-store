@@ -33,7 +33,7 @@ export class Game extends Phaser.Scene {
     this.createHudPanel();
 
     this.restorer = new PhotoRestorer(this, LAYOUT.PHOTO.X, LAYOUT.PHOTO.Y, {
-      imageKey: LEVELS[this.level],
+      level: LEVELS[this.level],
       callbacks: {
         onProgress: (progress) => {
           this.hud?.setProgress(progress);

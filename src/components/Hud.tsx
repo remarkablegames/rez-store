@@ -140,7 +140,7 @@ export function Hud({
         text="YOUR TOOL"
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 10,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 1.5,
         }}
@@ -176,21 +176,8 @@ export function Hud({
         text="STANDARD BRUSH"
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 11,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.CREAM,
-          letterSpacing: 0.5,
-        }}
-        visible={isClean}
-      />
-
-      <Text
-        x={LAYOUT.HUD.CONTENT_X + 40}
-        y={336}
-        text="SOFT BRISTLES"
-        style={{
-          fontFamily: THEME.FONT.MONO,
-          fontSize: 9,
-          color: THEME.TEXT_COLOR.FAINT,
           letterSpacing: 0.5,
         }}
         visible={isClean}
@@ -202,7 +189,7 @@ export function Hud({
         text="DEVELOPMENT"
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 10,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 1.5,
         }}
@@ -277,7 +264,7 @@ export function Hud({
         text="TOO WARM"
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 9,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.FAINT,
           letterSpacing: 1,
         }}
@@ -290,7 +277,7 @@ export function Hud({
         text="TOO COOL"
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 9,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.FAINT,
           letterSpacing: 1,
         }}
@@ -329,7 +316,7 @@ export function Hud({
         text="JOB FEE"
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 10,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 1.5,
         }}
@@ -350,24 +337,11 @@ export function Hud({
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={510}
-        text="PAID ON QUALITY"
-        style={{
-          fontFamily: THEME.FONT.MONO,
-          fontSize: 9,
-          color: THEME.TEXT_COLOR.FAINT,
-          letterSpacing: 0.5,
-        }}
-        visible={!isComplete}
-      />
-
-      <Text
-        x={LAYOUT.HUD.CONTENT_X}
         y={534}
         text="EARNINGS"
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 10,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 1.5,
         }}
@@ -392,7 +366,7 @@ export function Hud({
         text={bestPayout > 0 ? `BEST $${String(bestPayout)}` : 'FIRST DELIVERY'}
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 9,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.FAINT,
           letterSpacing: 0.5,
         }}
@@ -426,7 +400,7 @@ export function Hud({
         text={isClean ? 'CONTINUE TO COLOR' : 'DELIVER PHOTO'}
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 11,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.DARK,
           letterSpacing: 0.5,
         }}

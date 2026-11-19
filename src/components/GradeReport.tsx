@@ -56,7 +56,7 @@ export function GradeReport({ report, onNext }: GradeReportProps) {
         text="OVERALL"
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 9,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 1.5,
         }}
@@ -109,7 +109,7 @@ export function GradeReport({ report, onNext }: GradeReportProps) {
         text={report.note}
         style={{
           fontFamily: THEME.FONT.SANS,
-          fontSize: 11,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.MUTED,
           fontStyle: 'italic',
           lineSpacing: 4,
@@ -123,7 +123,7 @@ export function GradeReport({ report, onNext }: GradeReportProps) {
         text="MISSED GRIME"
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 10,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 1.5,
         }}
@@ -147,31 +147,6 @@ export function GradeReport({ report, onNext }: GradeReportProps) {
         );
       })}
 
-      <Text
-        x={gridX}
-        y={HEAT_START_Y + report.zoneRows * (HEAT_CELL + HEAT_GAP) + 2}
-        text="CLEAN"
-        style={{
-          fontFamily: THEME.FONT.MONO,
-          fontSize: 8,
-          color: THEME.TEXT_COLOR.FAINT,
-          letterSpacing: 1,
-        }}
-      />
-
-      <Text
-        x={gridX + gridWidth}
-        y={HEAT_START_Y + report.zoneRows * (HEAT_CELL + HEAT_GAP) + 2}
-        text="DUST"
-        style={{
-          fontFamily: THEME.FONT.MONO,
-          fontSize: 8,
-          color: THEME.TEXT_COLOR.FAINT,
-          letterSpacing: 1,
-        }}
-        originX={1}
-      />
-
       <Rectangle
         x={LAYOUT.HUD.CONTENT_X}
         y={514}
@@ -189,7 +164,7 @@ export function GradeReport({ report, onNext }: GradeReportProps) {
         text={earnedLabel}
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 10,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 1.5,
         }}
@@ -212,7 +187,7 @@ export function GradeReport({ report, onNext }: GradeReportProps) {
         text={`JOB $${String(report.payout)}   ${report.bestPayout > 0 ? `BEST $${String(report.bestPayout)}` : 'BEST —'}`}
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 9,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.MUTED,
           letterSpacing: 0.5,
         }}
@@ -224,7 +199,7 @@ export function GradeReport({ report, onNext }: GradeReportProps) {
         text={`WALLET $${String(report.wallet)}`}
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 9,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.MUTED,
           letterSpacing: 0.5,
         }}
@@ -233,8 +208,8 @@ export function GradeReport({ report, onNext }: GradeReportProps) {
       <Rectangle
         x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
         y={638}
-        width={LAYOUT.HUD.CONTENT_WIDTH / 2 - 6}
-        height={40}
+        width={LAYOUT.HUD.CONTENT_WIDTH}
+        height={44}
         originX={0.5}
         originY={0.5}
         fillColor={
@@ -258,7 +233,7 @@ export function GradeReport({ report, onNext }: GradeReportProps) {
         text="NEXT JOB"
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 11,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.DARK,
           letterSpacing: 0.5,
         }}
@@ -284,7 +259,7 @@ function ReportRow({ label, value, y }: ReportRowProps) {
         text={label}
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 10,
+          fontSize: 12,
           color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 1.5,
         }}

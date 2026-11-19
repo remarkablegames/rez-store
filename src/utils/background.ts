@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 
 import { KEY, LAYOUT } from '../constants';
+import { createRandom } from '../utils';
 import { createCanvasTexture } from './canvasTexture';
 
 export function createBackgroundTexture(
@@ -13,7 +14,7 @@ export function createBackgroundTexture(
     LAYOUT.GAME.HEIGHT,
   );
   const { context } = texture;
-  const random = new Phaser.Math.RandomDataGenerator([Phaser.Math.RND.uuid()]);
+  const random = createRandom();
 
   const base = context.createLinearGradient(0, 0, 0, LAYOUT.GAME.HEIGHT);
   base.addColorStop(0, '#241c16');

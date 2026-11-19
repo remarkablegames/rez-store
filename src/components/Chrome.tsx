@@ -15,11 +15,16 @@ const TEXT_COLOR = {
 
 interface ChromeProps {
   level: number;
+  title: string;
 }
 
-export function Chrome({ level }: ChromeProps) {
+export function Chrome({ level, title }: ChromeProps) {
   const left = LAYOUT.PHOTO.X - LAYOUT.PHOTO.WIDTH / 2;
-  const memoryLabel = `MEMORY NO. ${String(level + 1).padStart(3, '0')}   /   HANDLE WITH CARE`;
+  const memoryLabel = [
+    `MEMORY NO. ${String(level + 1).padStart(3, '0')}`,
+    title.toUpperCase(),
+    'HANDLE WITH CARE',
+  ].join('  /  ');
 
   return (
     <Fragment>

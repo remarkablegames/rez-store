@@ -1,95 +1,71 @@
 import Phaser from 'phaser';
 import { Rectangle, Text, useState } from 'phaser-jsx';
 
-import { LAYOUT } from '../constants';
-import type { HudController, RestoreStage } from '../types';
-import { formatElapsed } from '../utils';
-
-const FONT = {
-  MONO: '"Courier New", Courier, monospace',
-  SANS: 'Helvetica, Arial, sans-serif',
-  SERIF: 'Georgia, "Times New Roman", serif',
-} as const;
-
-const TEXT_COLOR = {
-  CREAM: '#f1e6d2',
-  MUTED: '#a99b86',
-  GOLD: '#c8a566',
-  FAINT: '#807460',
-  DARK: '#1a1510',
-} as const;
-
-const SHAPE_COLOR = {
-  GOLD: 0xc8a566,
-  GOLD_HOVER: 0xe1c489,
-  TRACK: 0x352c22,
-  KNOB: 0xf2e4c6,
-  DIVIDER: 0x9a8157,
-} as const;
+import { LAYOUT, THEME } from '../constants';
+import type { HudController, JobReport, Level, RestoreStage } from '../types';
+import { GradeReport } from './GradeReport';
 
 interface StageCopy {
   step: string;
   title: string;
   instruction: string;
-  metricLabel: string;
   tip: string;
-  log: readonly [string, string, string];
 }
 
-const COPY: Record<RestoreStage, StageCopy> = {
+const COPY: Record<'clean' | 'color', StageCopy> = {
   clean: {
-    step: 'STEP 01 / SURFACE',
+    step: 'SURFACE',
     title: 'Surface Cleaning',
-    instruction:
-      'Press and drag across the photograph to sweep away dust, smudges, and scratches.',
-    metricLabel: 'SURFACE CLEANED',
-    tip: 'Broad, overlapping strokes work best.',
-    log: ['DUST & DEBRIS', 'SURFACE SMUDGES', 'PAPER ABRASIONS'],
+    instruction: 'Clean until the photo looks clear to you.',
+    tip: 'Trust your eye.',
   },
   color: {
-    step: 'STEP 02 / COLOR',
-    title: 'Color Recovery',
-    instruction:
-      'Drag the slider to wash the sepia away and bring the photograph back to life.',
-    metricLabel: 'COLOR RECOVERED',
-    tip: 'Slide until the skin tones feel natural.',
-    log: ['SEPIA CAST', 'FADED TONES', 'EDGE VIGNETTE'],
-  },
-  complete: {
-    step: 'RESTORATION DONE',
-    title: 'Restored',
-    instruction:
-      'The dust is gone. The color has returned. A memory, made whole.',
-    metricLabel: 'TIME TO RESTORE',
-    tip: '',
-    log: ['SURFACE CLEAN', 'COLOR RECOVERED', 'MEMORY ARCHIVED'],
+    step: 'COLOR',
+    title: 'Color Balance',
+    instruction: 'Balance the tint until the skin tones feel natural.',
+    tip: 'Skin tones are the giveaway.',
   },
 };
 
 interface HudProps {
+  level: Level;
+  levelIndex: number;
+  wallet: number;
+  bestPayout: number;
   onReady: (controller: HudController) => void;
-  onColorChange: (progress: number) => void;
-  onRestart: () => void;
+  onColorChange: (value: number) => void;
+  onContinue: () => void;
+  onDeliver: () => void;
+  onNext: () => void;
+  onRetry: () => void;
 }
 
-export function Hud({ onReady, onColorChange, onRestart }: HudProps) {
+export function Hud({
+  level,
+  levelIndex,
+  wallet,
+  bestPayout,
+  onReady,
+  onColorChange,
+  onContinue,
+  onDeliver,
+  onNext,
+  onRetry,
+}: HudProps) {
   const [stage, setStage] = useState<RestoreStage>('clean');
-  const [progress, setProgress] = useState(0);
-  const [colorProgress, setColorProgress] = useState(0);
-  const [elapsed, setElapsed] = useState(0);
+  const [report, setReport] = useState<JobReport | null>(null);
+  const [colorValue, setColorValue] = useState(0);
   const [draggingSlider, setDraggingSlider] = useState(false);
   const [buttonHovered, setButtonHovered] = useState(false);
 
-  onReady({ setStage, setProgress, setColorProgress, setElapsed });
+  onReady({ setStage, setReport });
 
-  const copy = COPY[stage];
   const isClean = stage === 'clean';
   const isColor = stage === 'color';
   const isComplete = stage === 'complete';
-  const displayedProgress = isColor ? colorProgress : progress;
-  const metricText = isComplete
-    ? formatElapsed(elapsed)
-    : `${String(Math.round(displayedProgress * 100))}%`;
+  const copy = COPY[isClean ? 'clean' : 'color'];
+  const jobNumber = String(levelIndex + 1).padStart(2, '0');
+  const step = `JOB ${jobNumber} / ${copy.step}`;
 
   const updateColorFromPointer = (pointer: Phaser.Input.Pointer): void => {
     const value = Phaser.Math.Clamp(
@@ -97,15 +73,12 @@ export function Hud({ onReady, onColorChange, onRestart }: HudProps) {
       0,
       1,
     );
-    setColorProgress(value);
+
+    setColorValue(value);
     onColorChange(value);
   };
 
   const finishColorDrag = (): void => {
-    if (colorProgress >= 0.95) {
-      setColorProgress(1);
-      onColorChange(1);
-    }
     setDraggingSlider(false);
   };
 
@@ -114,13 +87,14 @@ export function Hud({ onReady, onColorChange, onRestart }: HudProps) {
       <Text
         x={LAYOUT.HUD.CONTENT_X}
         y={124}
-        text={copy.step}
+        text={step}
         style={{
-          fontFamily: FONT.MONO,
+          fontFamily: THEME.FONT.MONO,
           fontSize: 14,
-          color: TEXT_COLOR.GOLD,
+          color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 2,
         }}
+        visible={!isComplete}
       />
 
       <Text
@@ -128,11 +102,12 @@ export function Hud({ onReady, onColorChange, onRestart }: HudProps) {
         y={142}
         text={copy.title}
         style={{
-          fontFamily: FONT.SERIF,
-          fontSize: isComplete ? 34 : 24,
-          color: TEXT_COLOR.CREAM,
+          fontFamily: THEME.FONT.SERIF,
+          fontSize: 24,
+          color: THEME.TEXT_COLOR.CREAM,
           padding: { bottom: 1 },
         }}
+        visible={!isComplete}
       />
 
       <Text
@@ -140,12 +115,13 @@ export function Hud({ onReady, onColorChange, onRestart }: HudProps) {
         y={188}
         text={copy.instruction}
         style={{
-          fontFamily: FONT.SANS,
+          fontFamily: THEME.FONT.SANS,
           fontSize: 14,
-          color: TEXT_COLOR.MUTED,
+          color: THEME.TEXT_COLOR.MUTED,
           lineSpacing: 5,
           wordWrap: { width: LAYOUT.HUD.CONTENT_WIDTH },
         }}
+        visible={!isComplete}
       />
 
       <Rectangle
@@ -155,64 +131,83 @@ export function Hud({ onReady, onColorChange, onRestart }: HudProps) {
         height={1}
         originX={0}
         originY={0.5}
-        fillColor={SHAPE_COLOR.DIVIDER}
+        fillColor={THEME.SHAPE_COLOR.DIVIDER}
         fillAlpha={0.28}
+        visible={!isComplete}
       />
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
         y={298}
-        text={metricText}
+        text="YOUR TOOL"
         style={{
-          fontFamily: FONT.SERIF,
-          fontSize: isComplete ? 42 : 46,
-          color: TEXT_COLOR.CREAM,
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 10,
+          color: THEME.TEXT_COLOR.GOLD,
+          letterSpacing: 1.5,
         }}
+        visible={isClean}
+      />
+
+      <Rectangle
+        x={LAYOUT.HUD.CONTENT_X}
+        y={320}
+        width={28}
+        height={28}
+        originX={0}
+        originY={0}
+        fillColor={THEME.SHAPE_COLOR.BUTTON_DARK}
+        visible={isClean}
+      />
+
+      <Rectangle
+        x={LAYOUT.HUD.CONTENT_X + 7}
+        y={327}
+        width={14}
+        height={14}
+        originX={0}
+        originY={0}
+        fillColor={THEME.SHAPE_COLOR.GOLD}
+        fillAlpha={0.35}
+        visible={isClean}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X + 40}
+        y={320}
+        text="STANDARD BRUSH"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 11,
+          color: THEME.TEXT_COLOR.CREAM,
+          letterSpacing: 0.5,
+        }}
+        visible={isClean}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X + 40}
+        y={336}
+        text="SOFT BRISTLES"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 9,
+          color: THEME.TEXT_COLOR.FAINT,
+          letterSpacing: 0.5,
+        }}
+        visible={isClean}
       />
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={360}
-        text={copy.metricLabel}
+        y={298}
+        text="DEVELOPMENT"
         style={{
-          fontFamily: FONT.MONO,
-          fontSize: 12,
-          color: TEXT_COLOR.GOLD,
-          letterSpacing: 2,
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 10,
+          color: THEME.TEXT_COLOR.GOLD,
+          letterSpacing: 1.5,
         }}
-      />
-
-      <Rectangle
-        x={LAYOUT.HUD.CONTENT_X}
-        y={386}
-        width={LAYOUT.HUD.CONTENT_WIDTH}
-        height={6}
-        originX={0}
-        originY={0.5}
-        fillColor={SHAPE_COLOR.TRACK}
-        visible={isClean}
-      />
-
-      <Rectangle
-        x={LAYOUT.HUD.CONTENT_X}
-        y={386}
-        width={LAYOUT.HUD.CONTENT_WIDTH}
-        height={6}
-        originX={0}
-        originY={0.5}
-        fillColor={SHAPE_COLOR.GOLD}
-        scaleX={progress}
-        visible={isClean}
-      />
-
-      <Rectangle
-        x={LAYOUT.HUD.CONTENT_X}
-        y={LAYOUT.COLOR_SLIDER.Y}
-        width={LAYOUT.HUD.CONTENT_WIDTH}
-        height={LAYOUT.COLOR_SLIDER.TRACK_HEIGHT}
-        originX={0}
-        originY={0.5}
-        fillColor={SHAPE_COLOR.TRACK}
         visible={isColor}
       />
 
@@ -223,19 +218,30 @@ export function Hud({ onReady, onColorChange, onRestart }: HudProps) {
         height={LAYOUT.COLOR_SLIDER.TRACK_HEIGHT}
         originX={0}
         originY={0.5}
-        fillColor={SHAPE_COLOR.GOLD}
-        scaleX={colorProgress}
+        fillColor={THEME.SHAPE_COLOR.TRACK}
         visible={isColor}
       />
 
       <Rectangle
-        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH * colorProgress}
+        x={LAYOUT.HUD.CONTENT_X}
+        y={LAYOUT.COLOR_SLIDER.Y}
+        width={LAYOUT.HUD.CONTENT_WIDTH}
+        height={LAYOUT.COLOR_SLIDER.TRACK_HEIGHT}
+        originX={0}
+        originY={0.5}
+        fillColor={THEME.SHAPE_COLOR.GOLD}
+        scaleX={colorValue}
+        visible={isColor}
+      />
+
+      <Rectangle
+        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH * colorValue}
         y={LAYOUT.COLOR_SLIDER.Y}
         width={LAYOUT.COLOR_SLIDER.KNOB_WIDTH}
         height={LAYOUT.COLOR_SLIDER.KNOB_HEIGHT}
         originX={0.5}
         originY={0.5}
-        fillColor={SHAPE_COLOR.KNOB}
+        fillColor={THEME.SHAPE_COLOR.KNOB}
         visible={isColor}
       />
 
@@ -270,11 +276,11 @@ export function Hud({ onReady, onColorChange, onRestart }: HudProps) {
       <Text
         x={LAYOUT.HUD.CONTENT_X}
         y={LAYOUT.COLOR_SLIDER.Y + 20}
-        text="FADED"
+        text="TOO WARM"
         style={{
-          fontFamily: FONT.MONO,
-          fontSize: 12,
-          color: TEXT_COLOR.FAINT,
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 9,
+          color: THEME.TEXT_COLOR.FAINT,
           letterSpacing: 1,
         }}
         visible={isColor}
@@ -283,11 +289,11 @@ export function Hud({ onReady, onColorChange, onRestart }: HudProps) {
       <Text
         x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH}
         y={LAYOUT.COLOR_SLIDER.Y + 20}
-        text="VIVID"
+        text="TOO COOL"
         style={{
-          fontFamily: FONT.MONO,
-          fontSize: 12,
-          color: TEXT_COLOR.FAINT,
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 9,
+          color: THEME.TEXT_COLOR.FAINT,
           letterSpacing: 1,
         }}
         originX={1}
@@ -296,82 +302,116 @@ export function Hud({ onReady, onColorChange, onRestart }: HudProps) {
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={440}
+        y={isClean ? 386 : 404}
         text={copy.tip}
         style={{
-          fontFamily: FONT.SANS,
-          fontSize: 14,
-          color: TEXT_COLOR.FAINT,
+          fontFamily: THEME.FONT.SANS,
+          fontSize: 13,
+          color: THEME.TEXT_COLOR.FAINT,
           fontStyle: 'italic',
-          lineSpacing: 4,
-          wordWrap: { width: LAYOUT.HUD.CONTENT_WIDTH },
         }}
         visible={!isComplete}
       />
 
       <Rectangle
         x={LAYOUT.HUD.CONTENT_X}
-        y={490}
+        y={440}
         width={LAYOUT.HUD.CONTENT_WIDTH}
         height={1}
         originX={0}
         originY={0.5}
-        fillColor={SHAPE_COLOR.DIVIDER}
+        fillColor={THEME.SHAPE_COLOR.DIVIDER}
         fillAlpha={0.2}
+        visible={!isComplete}
       />
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={504}
-        text="RESTORATION LOG"
+        y={452}
+        text="JOB FEE"
         style={{
-          fontFamily: FONT.MONO,
-          fontSize: 12,
-          color: TEXT_COLOR.GOLD,
-          letterSpacing: 2,
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 10,
+          color: THEME.TEXT_COLOR.GOLD,
+          letterSpacing: 1.5,
         }}
+        visible={!isComplete}
       />
 
-      {copy.log.map((_, index) => {
-        const y = 528 + index * 22;
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={468}
+        text={`$${String(level.fee)}`}
+        style={{
+          fontFamily: THEME.FONT.SERIF,
+          fontSize: 30,
+          color: THEME.TEXT_COLOR.CREAM,
+        }}
+        visible={!isComplete}
+      />
 
-        return (
-          <Rectangle
-            x={LAYOUT.HUD.CONTENT_X + 2}
-            y={y + 4}
-            width={4}
-            height={4}
-            originX={0}
-            originY={0}
-            fillColor={SHAPE_COLOR.GOLD}
-            fillAlpha={isComplete ? 0.8 : 0.45}
-          />
-        );
-      })}
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={510}
+        text="PAID ON QUALITY"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 9,
+          color: THEME.TEXT_COLOR.FAINT,
+          letterSpacing: 0.5,
+        }}
+        visible={!isComplete}
+      />
 
-      {copy.log.map((line, index) => (
-        <Text
-          x={LAYOUT.HUD.CONTENT_X + 14}
-          y={528 + index * 22}
-          text={line}
-          style={{
-            fontFamily: FONT.MONO,
-            fontSize: 12,
-            color: TEXT_COLOR.MUTED,
-            letterSpacing: 1,
-          }}
-        />
-      ))}
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={534}
+        text="EARNINGS"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 10,
+          color: THEME.TEXT_COLOR.GOLD,
+          letterSpacing: 1.5,
+        }}
+        visible={!isComplete}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={550}
+        text={`$${String(wallet)}`}
+        style={{
+          fontFamily: THEME.FONT.SERIF,
+          fontSize: 22,
+          color: THEME.TEXT_COLOR.CREAM,
+        }}
+        visible={!isComplete}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={580}
+        text={bestPayout > 0 ? `BEST $${String(bestPayout)}` : 'FIRST DELIVERY'}
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 9,
+          color: THEME.TEXT_COLOR.FAINT,
+          letterSpacing: 0.5,
+        }}
+        visible={!isComplete}
+      />
 
       <Rectangle
         x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
-        y={622}
+        y={638}
         width={LAYOUT.HUD.CONTENT_WIDTH}
         height={44}
         originX={0.5}
         originY={0.5}
-        fillColor={buttonHovered ? SHAPE_COLOR.GOLD_HOVER : SHAPE_COLOR.GOLD}
-        visible={isComplete}
+        fillColor={
+          buttonHovered ? THEME.SHAPE_COLOR.GOLD_HOVER : THEME.SHAPE_COLOR.GOLD
+        }
+        visible={!isComplete}
         input={{ useHandCursor: true }}
         onPointerOver={() => {
           setButtonHovered(true);
@@ -379,23 +419,27 @@ export function Hud({ onReady, onColorChange, onRestart }: HudProps) {
         onPointerOut={() => {
           setButtonHovered(false);
         }}
-        onPointerUp={onRestart}
+        onPointerUp={isClean ? onContinue : onDeliver}
       />
 
       <Text
         x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
-        y={622}
-        text="RESTORE ANOTHER"
+        y={638}
+        text={isClean ? 'CONTINUE TO COLOR' : 'DELIVER PHOTO'}
         style={{
-          fontFamily: FONT.MONO,
-          fontSize: 12,
-          color: TEXT_COLOR.DARK,
-          letterSpacing: 1.5,
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 11,
+          color: THEME.TEXT_COLOR.DARK,
+          letterSpacing: 0.5,
         }}
         originX={0.5}
         originY={0.5}
-        visible={isComplete}
+        visible={!isComplete}
       />
+
+      {isComplete && report && (
+        <GradeReport report={report} onRetry={onRetry} onNext={onNext} />
+      )}
     </>
   );
 }

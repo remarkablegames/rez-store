@@ -1,5 +1,7 @@
 import type Phaser from 'phaser';
 
+import type { DirtProfile } from './dirt';
+
 export interface PhotoTextures {
   clean: Phaser.Textures.CanvasTexture;
   aged: Phaser.Textures.CanvasTexture;
@@ -8,4 +10,5 @@ export interface PhotoTextures {
   columns: number;
   rows: number;
   cellSize: number;
+  dirt: DirtProfile;
 }

@@ -1,0 +1,383 @@
+import Phaser from 'phaser';
+import { Rectangle, Text, useState } from 'phaser-jsx';
+
+import { LAYOUT, THEME } from '../constants';
+import type { GradeLetter, JobReport } from '../types';
+import { formatElapsed } from '../utils';
+
+const HEAT_CELL = 22;
+const HEAT_GAP = 2;
+const HEAT_START_Y = 398;
+
+interface GradeReportProps {
+  report: JobReport;
+  onRetry: () => void;
+  onNext: () => void;
+}
+
+export function GradeReport({ report, onRetry, onNext }: GradeReportProps) {
+  const [hovered, setHovered] = useState<'retry' | 'next' | null>(null);
+  const gridWidth =
+    report.zoneColumns > 0
+      ? report.zoneColumns * (HEAT_CELL + HEAT_GAP) - HEAT_GAP
+      : 0;
+  const gridX =
+    LAYOUT.HUD.CONTENT_X + (LAYOUT.HUD.CONTENT_WIDTH - gridWidth) / 2;
+  const earnedLabel = report.earned > 0 ? 'EARNED' : 'NO IMPROVEMENT';
+  const earnedValue = report.earned > 0 ? `+$${String(report.earned)}` : '$0';
+
+  return (
+    <>
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={124}
+        text="CLIENT REPORT"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 14,
+          color: THEME.TEXT_COLOR.GOLD,
+          letterSpacing: 2,
+        }}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={140}
+        text={report.grade}
+        style={{
+          fontFamily: THEME.FONT.SERIF,
+          fontSize: 64,
+          color: gradeColor(report.grade),
+        }}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X + 74}
+        y={166}
+        text="OVERALL"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 9,
+          color: THEME.TEXT_COLOR.GOLD,
+          letterSpacing: 1.5,
+        }}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X + 74}
+        y={180}
+        text={String(Math.round(report.overall * 100))}
+        style={{
+          fontFamily: THEME.FONT.SERIF,
+          fontSize: 24,
+          color: THEME.TEXT_COLOR.CREAM,
+        }}
+      />
+
+      <Rectangle
+        x={LAYOUT.HUD.CONTENT_X}
+        y={222}
+        width={LAYOUT.HUD.CONTENT_WIDTH}
+        height={1}
+        originX={0}
+        originY={0.5}
+        fillColor={THEME.SHAPE_COLOR.DIVIDER}
+        fillAlpha={0.28}
+      />
+
+      <ReportRow label="SURFACE" y={236} value={percent(report.surface)} />
+      <ReportRow label="COLOR" y={260} value={percent(report.color)} />
+      <ReportRow
+        label="TIME"
+        y={284}
+        value={formatElapsed(report.timeSeconds)}
+      />
+
+      <Rectangle
+        x={LAYOUT.HUD.CONTENT_X}
+        y={306}
+        width={LAYOUT.HUD.CONTENT_WIDTH}
+        height={1}
+        originX={0}
+        originY={0.5}
+        fillColor={THEME.SHAPE_COLOR.DIVIDER}
+        fillAlpha={0.2}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={320}
+        text={report.note}
+        style={{
+          fontFamily: THEME.FONT.SANS,
+          fontSize: 11,
+          color: THEME.TEXT_COLOR.MUTED,
+          fontStyle: 'italic',
+          lineSpacing: 4,
+          wordWrap: { width: LAYOUT.HUD.CONTENT_WIDTH },
+        }}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={380}
+        text="MISSED GRIME"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 10,
+          color: THEME.TEXT_COLOR.GOLD,
+          letterSpacing: 1.5,
+        }}
+      />
+
+      {report.zones.map((value, index) => {
+        const column = index % report.zoneColumns;
+        const row = Math.floor(index / report.zoneColumns);
+
+        return (
+          <Rectangle
+            x={gridX + column * (HEAT_CELL + HEAT_GAP)}
+            y={HEAT_START_Y + row * (HEAT_CELL + HEAT_GAP)}
+            width={HEAT_CELL}
+            height={HEAT_CELL}
+            originX={0}
+            originY={0}
+            fillColor={heatColor(value)}
+            fillAlpha={0.95}
+          />
+        );
+      })}
+
+      <Text
+        x={gridX}
+        y={HEAT_START_Y + report.zoneRows * (HEAT_CELL + HEAT_GAP) + 2}
+        text="CLEAN"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 8,
+          color: THEME.TEXT_COLOR.FAINT,
+          letterSpacing: 1,
+        }}
+      />
+
+      <Text
+        x={gridX + gridWidth}
+        y={HEAT_START_Y + report.zoneRows * (HEAT_CELL + HEAT_GAP) + 2}
+        text="DUST"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 8,
+          color: THEME.TEXT_COLOR.FAINT,
+          letterSpacing: 1,
+        }}
+        originX={1}
+      />
+
+      <Rectangle
+        x={LAYOUT.HUD.CONTENT_X}
+        y={514}
+        width={LAYOUT.HUD.CONTENT_WIDTH}
+        height={1}
+        originX={0}
+        originY={0.5}
+        fillColor={THEME.SHAPE_COLOR.DIVIDER}
+        fillAlpha={0.28}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={526}
+        text={earnedLabel}
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 10,
+          color: THEME.TEXT_COLOR.GOLD,
+          letterSpacing: 1.5,
+        }}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={542}
+        text={earnedValue}
+        style={{
+          fontFamily: THEME.FONT.SERIF,
+          fontSize: 26,
+          color: THEME.TEXT_COLOR.CREAM,
+        }}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={578}
+        text={`JOB $${String(report.payout)}   ${report.bestPayout > 0 ? `BEST $${String(report.bestPayout)}` : 'BEST —'}`}
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 9,
+          color: THEME.TEXT_COLOR.MUTED,
+          letterSpacing: 0.5,
+        }}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={592}
+        text={`WALLET $${String(report.wallet)}`}
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 9,
+          color: THEME.TEXT_COLOR.MUTED,
+          letterSpacing: 0.5,
+        }}
+      />
+
+      <Rectangle
+        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 4}
+        y={638}
+        width={LAYOUT.HUD.CONTENT_WIDTH / 2 - 6}
+        height={40}
+        originX={0.5}
+        originY={0.5}
+        fillColor={
+          hovered === 'retry'
+            ? THEME.SHAPE_COLOR.BUTTON_DARK_HOVER
+            : THEME.SHAPE_COLOR.BUTTON_DARK
+        }
+        input={{ useHandCursor: true }}
+        onPointerOver={() => {
+          setHovered('retry');
+        }}
+        onPointerOut={() => {
+          setHovered(null);
+        }}
+        onPointerUp={onRetry}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 4}
+        y={638}
+        text="RETRY"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 11,
+          color: THEME.TEXT_COLOR.GOLD,
+          letterSpacing: 1,
+        }}
+        originX={0.5}
+        originY={0.5}
+      />
+
+      <Rectangle
+        x={LAYOUT.HUD.CONTENT_X + (LAYOUT.HUD.CONTENT_WIDTH * 3) / 4}
+        y={638}
+        width={LAYOUT.HUD.CONTENT_WIDTH / 2 - 6}
+        height={40}
+        originX={0.5}
+        originY={0.5}
+        fillColor={
+          hovered === 'next'
+            ? THEME.SHAPE_COLOR.GOLD_HOVER
+            : THEME.SHAPE_COLOR.GOLD
+        }
+        input={{ useHandCursor: true }}
+        onPointerOver={() => {
+          setHovered('next');
+        }}
+        onPointerOut={() => {
+          setHovered(null);
+        }}
+        onPointerUp={onNext}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X + (LAYOUT.HUD.CONTENT_WIDTH * 3) / 4}
+        y={638}
+        text="NEXT JOB"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 11,
+          color: THEME.TEXT_COLOR.DARK,
+          letterSpacing: 0.5,
+        }}
+        originX={0.5}
+        originY={0.5}
+      />
+    </>
+  );
+}
+
+interface ReportRowProps {
+  label: string;
+  value: string;
+  y: number;
+}
+
+function ReportRow({ label, value, y }: ReportRowProps) {
+  return (
+    <>
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={y}
+        text={label}
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 10,
+          color: THEME.TEXT_COLOR.GOLD,
+          letterSpacing: 1.5,
+        }}
+      />
+      <Text
+        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH}
+        y={y - 4}
+        text={value}
+        style={{
+          fontFamily: THEME.FONT.SERIF,
+          fontSize: 18,
+          color: THEME.TEXT_COLOR.CREAM,
+        }}
+        originX={1}
+      />
+    </>
+  );
+}
+
+function percent(value: number): string {
+  return `${String(Math.round(value * 100))}%`;
+}
+
+function gradeColor(grade: GradeLetter): string {
+  if (grade === 'S' || grade === 'A') {
+    return THEME.TEXT_COLOR.GOLD;
+  }
+
+  if (grade === 'B') {
+    return THEME.TEXT_COLOR.CREAM;
+  }
+
+  if (grade === 'F') {
+    return THEME.TEXT_COLOR.RUST;
+  }
+
+  return THEME.TEXT_COLOR.MUTED;
+}
+
+function heatColor(value: number): number {
+  const clamped = Phaser.Math.Clamp(value, 0, 1);
+  const from =
+    clamped <= 0.5 ? THEME.SHAPE_COLOR.HEAT_CLEAN : THEME.SHAPE_COLOR.HEAT_MID;
+  const to =
+    clamped <= 0.5 ? THEME.SHAPE_COLOR.HEAT_MID : THEME.SHAPE_COLOR.HEAT_DIRT;
+  const local = clamped <= 0.5 ? clamped * 2 : (clamped - 0.5) * 2;
+  const fromRed = (from >> 16) & 0xff;
+  const fromGreen = (from >> 8) & 0xff;
+  const fromBlue = from & 0xff;
+  const toRed = (to >> 16) & 0xff;
+  const toGreen = (to >> 8) & 0xff;
+  const toBlue = to & 0xff;
+
+  return (
+    (Math.round(Phaser.Math.Linear(fromRed, toRed, local)) << 16) |
+    (Math.round(Phaser.Math.Linear(fromGreen, toGreen, local)) << 8) |
+    Math.round(Phaser.Math.Linear(fromBlue, toBlue, local))
+  );
+}

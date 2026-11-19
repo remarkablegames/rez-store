@@ -4,74 +4,146 @@ import { render } from 'phaser-jsx';
 import { Chrome, Flash, Hud, Stamp } from '../components';
 import { KEY, LAYOUT, LEVELS } from '../constants';
 import { PhotoRestorer } from '../gameobjects';
-import type { HudController } from '../types';
-import { createBackgroundTexture } from '../utils';
+import type { HudController, JobReport, SurfaceResult } from '../types';
+import {
+  createBackgroundTexture,
+  getClientNote,
+  getColorAccuracy,
+  getGrade,
+  getOverall,
+  getPayout,
+  loadProgress,
+  recordJob,
+} from '../utils';
 
 export class Game extends Phaser.Scene {
   private restorer?: PhotoRestorer;
   private hud?: HudController;
   private startedAt = 0;
   private level = 0;
+  private grimeSeed = '';
+  private surface: SurfaceResult | null = null;
+  private colorValue = 0;
 
   constructor() {
     super(KEY.SCENE.GAME);
   }
 
-  init({ level = 0 }) {
+  init({
+    level = 0,
+    grimeSeed = Phaser.Math.RND.uuid(),
+  }: {
+    level?: number;
+    grimeSeed?: string;
+  } = {}) {
     this.level = LEVELS[level] ? level : 0;
+    this.grimeSeed = grimeSeed;
   }
 
   create() {
     this.startedAt = this.time.now;
     this.hud = undefined;
+    this.surface = null;
+    this.colorValue = 0;
+
+    const level = LEVELS[this.level];
+    const progress = loadProgress();
+    const best = progress.best[String(this.level)];
 
     const background = createBackgroundTexture(this);
     this.add.image(0, 0, background.key).setOrigin(0);
 
-    render(<Chrome level={this.level} />, this);
+    render(<Chrome level={this.level} title={level.title} />, this);
     this.createPhotoFrame();
     this.createHudPanel();
 
     this.restorer = new PhotoRestorer(this, LAYOUT.PHOTO.X, LAYOUT.PHOTO.Y, {
-      level: LEVELS[this.level],
-      callbacks: {
-        onProgress: (progress) => {
-          this.hud?.setProgress(progress);
-        },
-        onCleanComplete: () => {
-          this.hud?.setStage('color');
-        },
-        onComplete: () => {
-          this.handleComplete();
-        },
-      },
+      level,
+      grimeSeed: this.grimeSeed,
     });
 
     render(
       <Hud
+        level={level}
+        levelIndex={this.level}
+        wallet={progress.wallet}
+        bestPayout={best?.payout ?? 0}
         onReady={(controller) => {
           this.hud = controller;
         }}
         onColorChange={(value) => {
-          this.restorer?.setColorProgress(value);
+          this.colorValue = value;
+          this.restorer?.setColorValue(value);
         }}
-        onRestart={() => {
+        onContinue={() => {
+          this.handleContinue();
+        }}
+        onDeliver={() => {
+          this.handleDeliver();
+        }}
+        onNext={() => {
           this.scene.start(KEY.SCENE.GAME, { level: this.level + 1 });
+        }}
+        onRetry={() => {
+          this.scene.start(KEY.SCENE.GAME, {
+            level: this.level,
+            grimeSeed: this.grimeSeed,
+          });
         }}
       />,
       this,
     );
   }
 
-  private handleComplete(): void {
+  private handleContinue(): void {
+    const surface = this.restorer?.commitSurface();
+
+    if (!surface) {
+      return;
+    }
+
+    this.surface = surface;
+    this.hud?.setStage('color');
+  }
+
+  private handleDeliver(): void {
+    if (!this.restorer?.finishColor()) {
+      return;
+    }
+
+    const level = LEVELS[this.level];
+    const surface = this.surface?.cleanliness ?? 0;
+    const color = getColorAccuracy(this.colorValue, level.colorTarget);
+    const overall = getOverall(surface, color);
+    const grade = getGrade(overall);
+    const payout = getPayout(level.fee, overall);
+    const award = recordJob(this.level, overall, payout, grade);
     const elapsedSeconds = Math.max(
       0,
       Math.round((this.time.now - this.startedAt) / 1000),
     );
+    const report: JobReport = {
+      surface,
+      color,
+      overall,
+      grade,
+      timeSeconds: elapsedSeconds,
+      zones: this.surface?.zones ?? [],
+      zoneColumns: this.surface?.columns ?? 0,
+      zoneRows: this.surface?.rows ?? 0,
+      payout,
+      earned: award.earned,
+      bestPayout: award.bestPayout,
+      wallet: award.wallet,
+      note: getClientNote(surface, color, this.colorValue - level.colorTarget),
+    };
 
-    this.hud?.setElapsed(elapsedSeconds);
+    this.hud?.setReport(report);
     this.hud?.setStage('complete');
-    this.playCompletionEffects();
+
+    if (overall >= 0.88) {
+      this.playCompletionEffects();
+    }
   }
 
   private createPhotoFrame(): void {
@@ -175,7 +247,7 @@ export class Game extends Phaser.Scene {
   }
 
   /**
-   * Update lifecycle
+   * Update lifecycle.
    */
   update() {
     this.restorer?.update();

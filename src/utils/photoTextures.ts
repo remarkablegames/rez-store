@@ -2,7 +2,9 @@ import Phaser from 'phaser';
 
 import { KEY, LAYOUT } from '../constants';
 import type { Grime, Level, PhotoTextures } from '../types';
+import { createRandom } from '../utils';
 import { createCanvasTexture } from './canvasTexture';
+import { measureDirt } from './dirt';
 
 const CELL_SIZE = 16;
 const DIRT_ALPHA_THRESHOLD = 4;
@@ -29,6 +31,7 @@ type Random = Phaser.Math.RandomDataGenerator;
 export function createPhotoTextures(
   scene: Phaser.Scene,
   level: Level,
+  grimeSeed: string,
 ): PhotoTextures {
   const image = getPhotoSource(scene, level.image);
   const focusY = level.focusY ?? 0.5;
@@ -57,10 +60,11 @@ export function createPhotoTextures(
     LAYOUT.PHOTO.WIDTH,
     LAYOUT.PHOTO.HEIGHT,
   );
-  drawGrime(grime.context, level.grime);
+  drawGrime(grime.context, level.grime, grimeSeed);
   grime.refresh();
 
   const { columns, dirtyCells, rows } = buildDirtyMask(grime.context);
+  const dirt = measureDirt(grime.context);
 
   return {
     clean,
@@ -70,6 +74,7 @@ export function createPhotoTextures(
     columns,
     rows,
     cellSize: CELL_SIZE,
+    dirt,
   };
 }
 
@@ -84,10 +89,6 @@ function getPhotoSource(
   }
 
   return source;
-}
-
-function createRandom(): Random {
-  return new Phaser.Math.RandomDataGenerator([Phaser.Math.RND.uuid()]);
 }
 
 function drawBaseImage(
@@ -237,11 +238,15 @@ function addAgedFinish(context: CanvasRenderingContext2D): void {
   context.restore();
 }
 
-function drawGrime(context: CanvasRenderingContext2D, config: Grime): void {
+function drawGrime(
+  context: CanvasRenderingContext2D,
+  config: Grime,
+  seed: string,
+): void {
   context.clearRect(0, 0, LAYOUT.PHOTO.WIDTH, LAYOUT.PHOTO.HEIGHT);
   context.save();
 
-  const random = createRandom();
+  const random = createRandom(seed);
   drawHaze(context, random, config.haze);
   drawDust(context, random, config.density);
   drawSmudges(context, random, config.density);

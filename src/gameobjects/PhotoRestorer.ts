@@ -1,32 +1,31 @@
 import Phaser from 'phaser';
 
 import { LAYOUT } from '../constants';
-import type { Level, PhotoTextures, RestoreStage } from '../types';
-import { createPhotoTextures } from '../utils';
+import type {
+  Level,
+  PhotoTextures,
+  RestoreStage,
+  SurfaceResult,
+} from '../types';
+import { createPhotoTextures, measureSurface } from '../utils';
 
 const BRUSH_RADIUS = 36;
-const CLEAN_COMPLETE_THRESHOLD = 0.94;
 const DUST_PUFF_INTERVAL = 80;
-const GRIME_FADE_DURATION = 600;
 const TEXTURE_REFRESH_INTERVAL = 34;
-
-interface PhotoRestorerCallbacks {
-  onProgress: (progress: number) => void;
-  onCleanComplete: () => void;
-  onComplete: () => void;
-}
+const MAX_COOL_CAST = 0.55;
+const COOL_CAST_COLOR = 0x6f8fb8;
 
 interface PhotoRestorerOptions {
-  callbacks: PhotoRestorerCallbacks;
   level: Level;
+  grimeSeed: string;
 }
 
 export class PhotoRestorer {
   private readonly scene: Phaser.Scene;
-  private readonly callbacks: PhotoRestorerCallbacks;
+  private readonly level: Level;
   private readonly photoTextures: PhotoTextures;
   private readonly agedImage: Phaser.GameObjects.Image;
-  private readonly grimeImage: Phaser.GameObjects.Image;
+  private readonly colorCast: Phaser.GameObjects.Rectangle;
   private readonly brushCursor: Phaser.GameObjects.Arc;
   private readonly cleanedCells = new Set<number>();
   private readonly x: number;
@@ -38,7 +37,6 @@ export class PhotoRestorer {
   private grimeNeedsRefresh = false;
   private lastTextureRefresh = 0;
   private lastDustPuff = 0;
-  private lastReportedPercent = -1;
   private pointerOverPhoto = false;
 
   constructor(
@@ -48,14 +46,29 @@ export class PhotoRestorer {
     options: PhotoRestorerOptions,
   ) {
     this.scene = scene;
-    this.callbacks = options.callbacks;
+    this.level = options.level;
     this.x = x;
     this.y = y;
-    this.photoTextures = createPhotoTextures(scene, options.level);
+    this.photoTextures = createPhotoTextures(
+      scene,
+      options.level,
+      options.grimeSeed,
+    );
 
     scene.add.image(x, y, this.photoTextures.clean.key);
     this.agedImage = scene.add.image(x, y, this.photoTextures.aged.key);
-    this.grimeImage = scene.add.image(x, y, this.photoTextures.grime.key);
+    scene.add.image(x, y, this.photoTextures.grime.key);
+    this.colorCast = scene.add
+      .rectangle(
+        x,
+        y,
+        LAYOUT.PHOTO.WIDTH,
+        LAYOUT.PHOTO.HEIGHT,
+        COOL_CAST_COLOR,
+        1,
+      )
+      .setAlpha(0)
+      .setVisible(false);
     this.brushCursor = scene.add
       .circle(x, y, BRUSH_RADIUS, 0xffffff, 0.045)
       .setStrokeStyle(2, 0xffffff, 0.78)
@@ -66,23 +79,55 @@ export class PhotoRestorer {
     scene.input.on('pointermove', this.handlePointerMove);
     scene.input.on('pointerup', this.handlePointerUp);
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleShutdown);
-
-    if (this.photoTextures.dirtyCells.size === 0) {
-      this.completeCleaning();
-    }
   }
 
-  setColorProgress(value: number): void {
+  setColorValue(value: number): void {
     if (this.stage !== 'color') {
       return;
     }
 
-    const progress = Phaser.Math.Clamp(value, 0, 1);
-    this.agedImage.setAlpha(1 - progress);
+    const target = Phaser.Math.Clamp(this.level.colorTarget, 0.1, 0.9);
+    const next = Phaser.Math.Clamp(value, 0, 1);
 
-    if (progress >= 0.99) {
-      this.finishRestoration();
+    if (next <= target) {
+      this.agedImage.setAlpha(1 - next / target);
+      this.colorCast.setAlpha(0);
+      return;
     }
+
+    this.agedImage.setAlpha(0);
+    this.colorCast.setAlpha(((next - target) / (1 - target)) * MAX_COOL_CAST);
+  }
+
+  commitSurface(): SurfaceResult | null {
+    if (this.stage !== 'clean') {
+      return null;
+    }
+
+    const result = measureSurface(
+      this.photoTextures.grime.context,
+      this.photoTextures.dirt,
+    );
+
+    this.stage = 'color';
+    this.isScrubbing = false;
+    this.lastPoint = null;
+    this.pointerOverPhoto = false;
+    this.brushCursor.setVisible(false);
+    this.scene.input.setDefaultCursor('default');
+    this.colorCast.setVisible(true);
+
+    return result;
+  }
+
+  finishColor(): boolean {
+    if (this.stage !== 'color') {
+      return false;
+    }
+
+    this.stage = 'complete';
+
+    return true;
   }
 
   destroy(): void {
@@ -211,16 +256,10 @@ export class PhotoRestorer {
     context.restore();
 
     this.grimeNeedsRefresh = true;
-
-    const cleanedBefore = this.cleanedCells.size;
     this.markCleanedCells(localX, localY);
 
-    if (this.cleanedCells.size !== cleanedBefore) {
-      this.reportProgress();
-
-      if (hadGrime) {
-        this.spawnDust(localX, localY);
-      }
+    if (hadGrime) {
+      this.spawnDust(localX, localY);
     }
   }
 
@@ -278,64 +317,6 @@ export class PhotoRestorer {
     }
   }
 
-  private reportProgress(): void {
-    const total = this.photoTextures.dirtyCells.size;
-
-    if (total === 0) {
-      this.callbacks.onProgress(1);
-      this.completeCleaning();
-      return;
-    }
-
-    const rawProgress = this.cleanedCells.size / total;
-    const visibleProgress = Math.min(1, rawProgress / CLEAN_COMPLETE_THRESHOLD);
-    const percent = Math.round(visibleProgress * 100);
-
-    if (percent !== this.lastReportedPercent) {
-      this.lastReportedPercent = percent;
-      this.callbacks.onProgress(visibleProgress);
-    }
-
-    if (rawProgress >= CLEAN_COMPLETE_THRESHOLD) {
-      this.completeCleaning();
-    }
-  }
-
-  private completeCleaning(): void {
-    if (this.stage !== 'clean') {
-      return;
-    }
-
-    this.stage = 'color';
-    this.isScrubbing = false;
-    this.lastPoint = null;
-    this.pointerOverPhoto = false;
-    this.brushCursor.setVisible(false);
-    this.scene.input.setDefaultCursor('default');
-    this.callbacks.onProgress(1);
-    this.callbacks.onCleanComplete();
-
-    this.scene.tweens.add({
-      targets: this.grimeImage,
-      alpha: 0,
-      duration: GRIME_FADE_DURATION,
-      ease: 'Sine.easeInOut',
-      onComplete: () => {
-        this.grimeImage.setVisible(false);
-      },
-    });
-  }
-
-  private finishRestoration(): void {
-    if (this.stage !== 'color') {
-      return;
-    }
-
-    this.stage = 'complete';
-    this.agedImage.setAlpha(0);
-    this.callbacks.onComplete();
-  }
-
   private spawnDust(localX: number, localY: number): void {
     const now = this.scene.time.now;
 
@@ -372,7 +353,7 @@ export class PhotoRestorer {
   }
 
   /**
-   * Update lifecycle
+   * Update lifecycle.
    */
   update(): void {
     if (this.destroyed) {

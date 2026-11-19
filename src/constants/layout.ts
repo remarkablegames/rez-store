@@ -23,7 +23,7 @@ export const HUD = {
 } as const;
 
 export const COLOR_SLIDER = {
-  Y: 390,
+  Y: 360,
   TRACK_HEIGHT: 6,
   HIT_HEIGHT: 48,
   KNOB_WIDTH: 12,

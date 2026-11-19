@@ -12,5 +12,6 @@ export const TEXTURE = {
 
 export const SCENE = {
   BOOT: 'Boot',
+  TITLE: 'Title',
   GAME: 'Game',
 } as const;

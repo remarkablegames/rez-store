@@ -14,6 +14,6 @@ export class Boot extends Phaser.Scene {
   }
 
   create() {
-    this.scene.start(KEY.SCENE.GAME);
+    this.scene.start(KEY.SCENE.TITLE);
   }
 }

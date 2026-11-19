@@ -1,14 +1,12 @@
-import type {
-  GradeLetter,
-  JobAward,
-  JobRecord,
-  PlayerProgress,
-} from '../types';
+import type { GradeLetter, JobAward, JobRecord, Progress } from '../types';
 
 const STORAGE_KEY = 'org.remarkablegames.rez-store';
 const VALID_GRADES: readonly GradeLetter[] = ['S', 'A', 'B', 'C', 'D', 'F'];
 
-export function loadProgress(): PlayerProgress {
+/**
+ * Load progress.
+ */
+export function loadProgress(): Progress {
   if (typeof localStorage === 'undefined') {
     return createEmptyProgress();
   }
@@ -22,12 +20,43 @@ export function loadProgress(): PlayerProgress {
 
     const parsed: unknown = JSON.parse(raw);
 
-    return isPlayerProgress(parsed) ? parsed : createEmptyProgress();
+    return validateProgress(parsed) ? parsed : createEmptyProgress();
   } catch {
     return createEmptyProgress();
   }
 }
 
+/**
+ * Check if progress exists.
+ */
+export function hasSavedProgress(): boolean {
+  if (typeof localStorage === 'undefined') {
+    return false;
+  }
+
+  const raw = localStorage.getItem(STORAGE_KEY);
+
+  if (!raw) {
+    return false;
+  }
+
+  try {
+    return validateProgress(JSON.parse(raw));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Reset progress.
+ */
+export function resetProgress(): void {
+  saveProgress(createEmptyProgress());
+}
+
+/**
+ * Record job result.
+ */
 export function recordJob(
   level: number,
   overall: number,
@@ -44,7 +73,7 @@ export function recordJob(
     payout > previous.payout ||
     (payout === previous.payout && overall > previous.overall);
   const best = previous && !isBest ? previous : { overall, payout, grade };
-  const next: PlayerProgress = {
+  const next: Progress = {
     ...progress,
     wallet: progress.wallet + earned,
     best: { ...progress.best, [key]: best },
@@ -60,7 +89,10 @@ export function recordJob(
   };
 }
 
-function createEmptyProgress(): PlayerProgress {
+/**
+ * Create empty progress.
+ */
+function createEmptyProgress(): Progress {
   return {
     version: 1,
     wallet: 0,
@@ -68,7 +100,10 @@ function createEmptyProgress(): PlayerProgress {
   };
 }
 
-function saveProgress(progress: PlayerProgress): void {
+/**
+ * Save progress.
+ */
+function saveProgress(progress: Progress): void {
   if (typeof localStorage === 'undefined') {
     return;
   }
@@ -80,7 +115,10 @@ function saveProgress(progress: PlayerProgress): void {
   }
 }
 
-function isPlayerProgress(value: unknown): value is PlayerProgress {
+/**
+ * Validate progress.
+ */
+function validateProgress(value: unknown): value is Progress {
   if (!isRecord(value)) {
     return false;
   }
@@ -100,6 +138,9 @@ function isPlayerProgress(value: unknown): value is PlayerProgress {
   return Object.values(value.best).every(isJobRecord);
 }
 
+/**
+ * Check job record.
+ */
 function isJobRecord(value: unknown): value is JobRecord {
   if (!isRecord(value)) {
     return false;
@@ -117,6 +158,9 @@ function isJobRecord(value: unknown): value is JobRecord {
   );
 }
 
+/**
+ * Check record.
+ */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }

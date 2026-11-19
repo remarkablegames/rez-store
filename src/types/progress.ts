@@ -6,7 +6,7 @@ export interface JobRecord {
   grade: GradeLetter;
 }
 
-export interface PlayerProgress {
+export interface Progress {
   version: 1;
   wallet: number;
   best: Partial<Record<string, JobRecord>>;

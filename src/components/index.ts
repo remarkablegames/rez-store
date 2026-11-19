@@ -1,3 +1,4 @@
+export * from './Button';
 export * from './Chrome';
 export * from './Flash';
 export * from './GradeReport';

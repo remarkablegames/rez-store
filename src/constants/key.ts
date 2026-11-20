@@ -28,6 +28,7 @@ export const SOUND = {
   SCRATCH_HARD: 'sounds/scratch/hard',
   UI_CLICK: 'sounds/ui/click',
   UI_SELECT: 'sounds/ui/select',
+  UI_DROP: 'sounds/ui/drop',
   UI_HOVER: 'sounds/ui/hover',
   UI_SUCCESS: 'sounds/ui/success',
   UI_FAIL: 'sounds/ui/fail',

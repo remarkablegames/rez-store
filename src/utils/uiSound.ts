@@ -2,11 +2,12 @@ import Phaser from 'phaser';
 
 import { KEY } from '../constants';
 
-type UiSoundType = 'click' | 'select' | 'hover' | 'success' | 'fail';
+type UiSoundType = 'click' | 'select' | 'drop' | 'hover' | 'success' | 'fail';
 
 const SOUND_KEYS: Record<UiSoundType, string> = {
   click: KEY.SOUND.UI_CLICK,
   select: KEY.SOUND.UI_SELECT,
+  drop: KEY.SOUND.UI_DROP,
   hover: KEY.SOUND.UI_HOVER,
   success: KEY.SOUND.UI_SUCCESS,
   fail: KEY.SOUND.UI_FAIL,
@@ -14,7 +15,8 @@ const SOUND_KEYS: Record<UiSoundType, string> = {
 
 const VOLUMES: Record<UiSoundType, number> = {
   click: 0.6,
-  select: 0.6,
+  select: 0.5,
+  drop: 0.5,
   hover: 0.3,
   success: 0.4,
   fail: 0.4,
@@ -23,6 +25,7 @@ const VOLUMES: Record<UiSoundType, number> = {
 const INTERVALS: Record<UiSoundType, number> = {
   click: 100,
   select: 100,
+  drop: 100,
   hover: 150,
   success: 100,
   fail: 100,
@@ -33,6 +36,7 @@ export class UiSound {
   private readonly lastPlay: Record<UiSoundType, number> = {
     click: 0,
     select: 0,
+    drop: 0,
     hover: 0,
     success: 0,
     fail: 0,

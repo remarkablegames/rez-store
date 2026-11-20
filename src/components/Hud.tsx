@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { Rectangle, Text, useState } from 'phaser-jsx';
 
 import { BRUSHES, LAYOUT, THEME } from '../constants';
+import { useUiSound } from '../hooks';
 import type {
   Brush,
   BrushId,
@@ -78,6 +79,7 @@ export function Hud({
   const [colorValue, setColorValue] = useState(0);
   const [draggingSlider, setDraggingSlider] = useState(false);
   const [selectedBrush, setSelectedBrush] = useState<BrushId>(equippedBrush);
+  const uiSound = useUiSound();
 
   onReady({ setStage, setReport });
 
@@ -298,6 +300,7 @@ export function Hud({
         onPointerDown={(pointer) => {
           setDraggingSlider(true);
           updateColorFromPointer(pointer);
+          uiSound.play('drop');
         }}
         onPointerMove={(pointer) => {
           if (draggingSlider) {

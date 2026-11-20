@@ -185,7 +185,11 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
       <Text
         x={LAYOUT.HUD.CONTENT_X}
         y={578}
-        text={`JOB $${String(report.payout)}   ${report.bestPayout > 0 ? `BEST $${String(report.bestPayout)}` : 'BEST —'}`}
+        text={
+          report.bestPayout > 0
+            ? `BEST $${String(report.bestPayout)}`
+            : 'BEST —'
+        }
         style={{
           fontFamily: THEME.FONT.MONO,
           fontSize: 12,

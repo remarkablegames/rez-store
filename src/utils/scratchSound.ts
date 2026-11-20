@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 import { KEY } from '../constants';
 
 const SCRATCH_SOUND_INTERVAL = 80;
-const SCRATCH_VOLUME = 0.6;
+const SCRATCH_VOLUME = 0.3;
 
 const HARD_SOUND_KEYS = [
   KEY.SOUND.SCRATCH_FAST1,

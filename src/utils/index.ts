@@ -9,3 +9,4 @@ export * from './photoTextures';
 export * from './progress';
 export * from './scratchSound';
 export * from './time';
+export * from './uiSound';

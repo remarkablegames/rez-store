@@ -1,6 +1,7 @@
 import { Rectangle, Text, useState } from 'phaser-jsx';
 
 import { THEME } from '../constants';
+import { useUiSound } from '../hooks';
 
 interface ButtonProps {
   x: number;
@@ -24,6 +25,7 @@ export function Button({
   disabled = false,
 }: ButtonProps) {
   const [hovered, setHovered] = useState(false);
+  const uiSound = useUiSound();
   const isSecondary = variant === 'secondary';
   const fillColor = disabled
     ? THEME.SHAPE_COLOR.BUTTON_DARK
@@ -54,6 +56,7 @@ export function Button({
         onPointerOver={() => {
           if (!disabled) {
             setHovered(true);
+            uiSound.play('hover');
           }
         }}
         onPointerOut={() => {
@@ -62,6 +65,7 @@ export function Button({
         onPointerUp={() => {
           if (!disabled) {
             onClick();
+            uiSound.play('click');
           }
         }}
       />

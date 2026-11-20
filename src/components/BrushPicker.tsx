@@ -1,6 +1,7 @@
 import { Rectangle, Text } from 'phaser-jsx';
 
 import { LAYOUT, THEME } from '../constants';
+import { useUiSound } from '../hooks';
 import type { Brush, BrushId } from '../types';
 
 const GAP = 6;
@@ -39,6 +40,8 @@ interface BrushOptionProps {
 }
 
 function BrushOption({ brush, x, width, active, onSelect }: BrushOptionProps) {
+  const uiSound = useUiSound();
+
   return (
     <>
       <Rectangle
@@ -54,6 +57,7 @@ function BrushOption({ brush, x, width, active, onSelect }: BrushOptionProps) {
         input={{ useHandCursor: true }}
         onPointerUp={() => {
           onSelect(brush);
+          uiSound.play('select');
         }}
       />
 

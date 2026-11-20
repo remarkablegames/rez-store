@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
-import { Rectangle, Text } from 'phaser-jsx';
+import { Rectangle, Text, useEffect } from 'phaser-jsx';
 
 import { LAYOUT, THEME } from '../constants';
+import { useUiSound } from '../hooks';
 import type { GradeLetter, JobReport } from '../types';
 import { formatElapsed } from '../utils';
 import { Button } from './Button';
@@ -17,6 +18,24 @@ interface GradeReportProps {
 }
 
 export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
+  const uiSound = useUiSound();
+
+  useEffect(() => {
+    switch (report.grade) {
+      case 'S':
+      case 'A':
+      case 'B':
+        uiSound.play('success');
+        break;
+
+      case 'C':
+      case 'D':
+      case 'F':
+        uiSound.play('fail');
+        break;
+    }
+  }, []);
+
   const gridWidth =
     report.zoneColumns > 0
       ? report.zoneColumns * (HEAT_CELL + HEAT_GAP) - HEAT_GAP

@@ -19,11 +19,11 @@ export const SCENE = {
 } as const;
 
 export const SOUND = {
-  SCRATCH_FAST1: 'sounds/scratch_fast1',
-  SCRATCH_FAST2: 'sounds/scratch_fast2',
-  SCRATCH_FAST3: 'sounds/scratch_fast3',
-  SCRATCH_FAST4: 'sounds/scratch_fast4',
-  SCRATCH_SLOW: 'sounds/scratch_slow',
-  SCRATCH_SOFT: 'sounds/scratch_soft',
-  SCRATCH_HARD: 'sounds/scratch_hard',
+  SCRATCH_FAST1: 'sounds/scratch/fast1',
+  SCRATCH_FAST2: 'sounds/scratch/fast2',
+  SCRATCH_FAST3: 'sounds/scratch/fast3',
+  SCRATCH_FAST4: 'sounds/scratch/fast4',
+  SCRATCH_SLOW: 'sounds/scratch/slow',
+  SCRATCH_SOFT: 'sounds/scratch/soft',
+  SCRATCH_HARD: 'sounds/scratch/hard',
 } as const;

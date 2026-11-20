@@ -91,6 +91,7 @@ export function recordJob(
     previous && !isBest ? previous : { overall, payout, grade, colorTarget };
   const next: Progress = {
     ...progress,
+    level: level + 1,
     earnings: progress.earnings + earned,
     best: { ...progress.best, [key]: best },
   };
@@ -207,6 +208,7 @@ function parseProgress(value: unknown): Progress | null {
 
   return {
     version: 1,
+    level: Number(value.level) || 0,
     ...base,
     brushes,
     equippedBrush,
@@ -295,6 +297,7 @@ function isBrushId(value: unknown): value is BrushId {
 function createEmptyProgress(): Progress {
   return {
     version: 1,
+    level: 0,
     earnings: 0,
     best: {},
     brushes: [DEFAULT_BRUSH_ID],

@@ -10,6 +10,7 @@ export interface JobRecord {
 
 export interface Progress {
   version: 1;
+  level: number;
   earnings: number;
   best: Partial<Record<string, JobRecord>>;
   brushes: BrushId[];

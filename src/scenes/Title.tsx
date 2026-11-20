@@ -3,7 +3,7 @@ import { Container, Rectangle, render, Text } from 'phaser-jsx';
 
 import { Button } from '../components';
 import { KEY, LAYOUT, THEME } from '../constants';
-import { hasSavedProgress, resetProgress } from '../utils';
+import { hasSavedProgress, loadProgress, resetProgress } from '../utils';
 
 export class Title extends Phaser.Scene {
   constructor() {
@@ -62,7 +62,8 @@ export class Title extends Phaser.Scene {
               width={260}
               height={44}
               onClick={() => {
-                this.scene.start(KEY.SCENE.GAME, { level: 0 });
+                const progress = loadProgress();
+                this.scene.start(KEY.SCENE.GAME, { level: progress.level });
               }}
             >
               CONTINUE

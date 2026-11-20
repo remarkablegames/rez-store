@@ -21,7 +21,7 @@ interface ChromeProps {
 export function Chrome({ level, title }: ChromeProps) {
   const left = LAYOUT.PHOTO.X - LAYOUT.PHOTO.WIDTH / 2;
   const memoryLabel = [
-    `MEMORY NO. ${String(level + 1).padStart(3, '0')}`,
+    `JOB NO. ${String(level + 1).padStart(2, '0')}`,
     title.toUpperCase(),
   ].join('  /  ');
 

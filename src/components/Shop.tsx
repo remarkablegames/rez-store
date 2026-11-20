@@ -174,7 +174,7 @@ export function Shop({ level, onNext }: ShopProps) {
       <Text
         x={CENTER_X}
         y={616}
-        text={`NEXT UP  /  MEMORY NO. ${nextMemory}  ${nextLevel.title.toUpperCase()}`}
+        text={`NEXT UP  /  JOB NO. ${nextMemory}  ${nextLevel.title.toUpperCase()}`}
         originX={0.5}
         style={{
           fontFamily: THEME.FONT.MONO,

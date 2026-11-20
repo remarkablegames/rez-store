@@ -46,7 +46,6 @@ export class PhotoRestorer {
   private grimeNeedsRefresh = false;
   private lastTextureRefresh = 0;
   private lastDustPuff = 0;
-  private lastPointerTime = 0;
   private pointerOverPhotoFrame = false;
   private readonly scratchSound: ScratchSound;
 
@@ -170,8 +169,7 @@ export class PhotoRestorer {
 
     this.isScrubbing = true;
     this.lastPoint = point;
-    this.lastPointerTime = this.scene.time.now;
-    this.stamp(point.x, point.y, 0);
+    this.stamp(point.x, point.y);
   };
 
   private readonly handlePointerMove = (
@@ -185,19 +183,14 @@ export class PhotoRestorer {
     const previous = this.lastPoint;
     this.lastPoint = point;
 
-    const now = this.scene.time.now;
-    const elapsed = now - this.lastPointerTime;
-    this.lastPointerTime = now;
-
     if (!previous) {
-      this.stamp(point.x, point.y, 0);
+      this.stamp(point.x, point.y);
       return;
     }
 
     const deltaX = point.x - previous.x;
     const deltaY = point.y - previous.y;
     const distance = Math.hypot(deltaX, deltaY);
-    const speed = elapsed > 0 ? distance / elapsed : 0;
     const steps = Math.max(1, Math.ceil(distance / (this.brush.radius * 0.22)));
 
     for (let step = 1; step <= steps; step++) {
@@ -205,7 +198,6 @@ export class PhotoRestorer {
       this.stamp(
         previous.x + deltaX * progress,
         previous.y + deltaY * progress,
-        speed,
       );
     }
   };
@@ -236,7 +228,7 @@ export class PhotoRestorer {
     );
   }
 
-  private stamp(localX: number, localY: number, speedPxPerMs: number): void {
+  private stamp(localX: number, localY: number): void {
     if (this.stage !== 'clean') {
       return;
     }
@@ -279,8 +271,9 @@ export class PhotoRestorer {
 
     if (hadGrime) {
       this.spawnDust(localX, localY);
-      this.scratchSound.play(speedPxPerMs, true);
     }
+
+    this.scratchSound.play(hadGrime);
   }
 
   private hasDirtyCellNear(localX: number, localY: number): boolean {

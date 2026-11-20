@@ -5,7 +5,7 @@ import { KEY } from '../constants';
 const SCRATCH_SOUND_INTERVAL = 80;
 const SCRATCH_VOLUME = 0.6;
 
-const FAST_SOUND_KEYS = [
+const HARD_SOUND_KEYS = [
   KEY.SOUND.SCRATCH_FAST1,
   KEY.SOUND.SCRATCH_FAST2,
   KEY.SOUND.SCRATCH_FAST3,
@@ -13,7 +13,7 @@ const FAST_SOUND_KEYS = [
   KEY.SOUND.SCRATCH_HARD,
 ] as const;
 
-const SLOW_SOUND_KEYS = [
+const SOFT_SOUND_KEYS = [
   KEY.SOUND.SCRATCH_SLOW,
   KEY.SOUND.SCRATCH_SOFT,
 ] as const;
@@ -26,11 +26,7 @@ export class ScratchSound {
     this.scene = scene;
   }
 
-  play(speedPxPerMs: number, hadGrime: boolean): void {
-    if (!hadGrime) {
-      return;
-    }
-
+  play(hasGrime: boolean): void {
     const now = this.scene.time.now;
 
     if (now - this.lastPlay < SCRATCH_SOUND_INTERVAL) {
@@ -39,7 +35,7 @@ export class ScratchSound {
 
     this.lastPlay = now;
 
-    const keys = speedPxPerMs >= 0.4 ? FAST_SOUND_KEYS : SLOW_SOUND_KEYS;
+    const keys = hasGrime ? HARD_SOUND_KEYS : SOFT_SOUND_KEYS;
     const key = keys[Math.floor(Math.random() * keys.length)];
 
     this.scene.sound.add(key).play({ volume: SCRATCH_VOLUME });

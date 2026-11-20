@@ -7,4 +7,5 @@ export * from './math';
 export * from './particles';
 export * from './photoTextures';
 export * from './progress';
+export * from './scratchSound';
 export * from './time';

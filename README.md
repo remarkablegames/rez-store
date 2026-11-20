@@ -21,8 +21,16 @@ Or download for desktop:
 
 ## Credits
 
-- [A young girl with a big smile and hearts](https://unsplash.com/photos/a-young-girl-with-a-big-smile-and-hearts-nufhUFkjU1o)
-- [Hands reach toward the sky in a field](https://unsplash.com/photos/hands-reach-toward-the-sky-in-a-field-rjOikduibSA)
+### Images
+
+- [Unsplash](https://unsplash.com/)
+  - [A young girl with a big smile and hearts](https://unsplash.com/photos/a-young-girl-with-a-big-smile-and-hearts-nufhUFkjU1o)
+  - [Hands reach toward the sky in a field](https://unsplash.com/photos/hands-reach-toward-the-sky-in-a-field-rjOikduibSA)
+
+### Sounds
+
+- [Pixabay](https://pixabay.com/sound-effects/)
+  - [scratching](https://pixabay.com/sound-effects/film-special-effects-scratching-85152/)
 
 ## Prerequisites
 

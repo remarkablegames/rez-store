@@ -11,6 +11,10 @@ export class Boot extends Phaser.Scene {
     Object.values(KEY.IMAGE).forEach((image) => {
       this.load.image(image, image);
     });
+
+    Object.values(KEY.SOUND).forEach((sound) => {
+      this.load.audio(sound, [`${sound}.ogg`, `${sound}.mp3`]);
+    });
   }
 
   create() {

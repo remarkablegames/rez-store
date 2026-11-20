@@ -2,14 +2,19 @@ import Phaser from 'phaser';
 
 import { LAYOUT } from '../constants';
 import type {
+  Brush,
   Level,
   PhotoTextures,
   RestoreStage,
   SurfaceResult,
 } from '../types';
-import { createParticles, createPhotoTextures, measureSurface } from '../utils';
+import {
+  createLampGlowTexture,
+  createParticles,
+  createPhotoTextures,
+  measureSurface,
+} from '../utils';
 
-const BRUSH_RADIUS = 36;
 const DUST_PUFF_INTERVAL = 80;
 const TEXTURE_REFRESH_INTERVAL = 34;
 const MAX_COOL_CAST = 0.55;
@@ -18,6 +23,8 @@ const COOL_CAST_COLOR = 0x6f8fb8;
 interface PhotoRestorerOptions {
   level: Level;
   grimeSeed: string;
+  brush: Brush;
+  lamp: boolean;
 }
 
 export class PhotoRestorer {
@@ -26,10 +33,12 @@ export class PhotoRestorer {
   private readonly photoTextures: PhotoTextures;
   private readonly agedImage: Phaser.GameObjects.Image;
   private readonly colorCast: Phaser.GameObjects.Rectangle;
+  private readonly lampGlow?: Phaser.GameObjects.Image;
   private readonly brushCursor: Phaser.GameObjects.Arc;
   private readonly cleanedCells = new Set<number>();
   private readonly x: number;
   private readonly y: number;
+  private brush: Brush;
   private stage: RestoreStage = 'clean';
   private destroyed = false;
   private isScrubbing = false;
@@ -49,6 +58,7 @@ export class PhotoRestorer {
     this.level = options.level;
     this.x = x;
     this.y = y;
+    this.brush = options.brush;
     this.photoTextures = createPhotoTextures(
       scene,
       options.level,
@@ -58,6 +68,12 @@ export class PhotoRestorer {
     scene.add.image(x, y, this.photoTextures.clean.key);
     this.agedImage = scene.add.image(x, y, this.photoTextures.aged.key);
     scene.add.image(x, y, this.photoTextures.grime.key);
+
+    if (options.lamp) {
+      const lampTexture = createLampGlowTexture(scene);
+      this.lampGlow = scene.add.image(x, y, lampTexture.key).setAlpha(0.9);
+    }
+
     this.colorCast = scene.add
       .rectangle(
         x,
@@ -70,7 +86,7 @@ export class PhotoRestorer {
       .setAlpha(0)
       .setVisible(false);
     this.brushCursor = scene.add
-      .circle(x, y, BRUSH_RADIUS, 0xffffff, 0.045)
+      .circle(x, y, this.brush.radius, 0xffffff, 0.045)
       .setStrokeStyle(2, 0xffffff, 0.78)
       .setVisible(false);
 
@@ -79,6 +95,11 @@ export class PhotoRestorer {
     scene.input.on('pointermove', this.handlePointerMove);
     scene.input.on('pointerup', this.handlePointerUp);
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleShutdown);
+  }
+
+  setBrush(brush: Brush): void {
+    this.brush = brush;
+    this.brushCursor.setRadius(brush.radius);
   }
 
   setColorValue(value: number): void {
@@ -114,6 +135,7 @@ export class PhotoRestorer {
     this.lastPoint = null;
     this.pointerOverPhoto = false;
     this.brushCursor.setVisible(false);
+    this.lampGlow?.setVisible(false);
     this.scene.input.setDefaultCursor('default');
     this.colorCast.setVisible(true);
 
@@ -183,7 +205,7 @@ export class PhotoRestorer {
     const deltaX = point.x - previous.x;
     const deltaY = point.y - previous.y;
     const distance = Math.hypot(deltaX, deltaY);
-    const steps = Math.max(1, Math.ceil(distance / (BRUSH_RADIUS * 0.22)));
+    const steps = Math.max(1, Math.ceil(distance / (this.brush.radius * 0.22)));
 
     for (let step = 1; step <= steps; step++) {
       const progress = step / steps;
@@ -224,11 +246,13 @@ export class PhotoRestorer {
       return;
     }
 
+    const { edge, radius } = this.brush;
+
     if (
-      localX < -BRUSH_RADIUS ||
-      localX > LAYOUT.PHOTO.WIDTH + BRUSH_RADIUS ||
-      localY < -BRUSH_RADIUS ||
-      localY > LAYOUT.PHOTO.HEIGHT + BRUSH_RADIUS
+      localX < -radius ||
+      localX > LAYOUT.PHOTO.WIDTH + radius ||
+      localY < -radius ||
+      localY > LAYOUT.PHOTO.HEIGHT + radius
     ) {
       return;
     }
@@ -241,17 +265,17 @@ export class PhotoRestorer {
       0,
       localX,
       localY,
-      BRUSH_RADIUS,
+      radius,
     );
     gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-    gradient.addColorStop(0.58, 'rgba(0, 0, 0, 0.96)');
+    gradient.addColorStop(edge, 'rgba(0, 0, 0, 0.96)');
     gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
     context.save();
     context.globalCompositeOperation = 'destination-out';
     context.fillStyle = gradient;
     context.beginPath();
-    context.arc(localX, localY, BRUSH_RADIUS, 0, Math.PI * 2);
+    context.arc(localX, localY, radius, 0, Math.PI * 2);
     context.fill();
     context.restore();
 
@@ -265,7 +289,7 @@ export class PhotoRestorer {
 
   private hasDirtyCellNear(localX: number, localY: number): boolean {
     const { cellSize, columns, dirtyCells, rows } = this.photoTextures;
-    const reach = BRUSH_RADIUS * 0.72;
+    const reach = this.brush.radius * 0.72;
     const minColumn = Math.max(0, Math.floor((localX - reach) / cellSize));
     const maxColumn = Math.min(
       columns - 1,
@@ -289,7 +313,7 @@ export class PhotoRestorer {
 
   private markCleanedCells(localX: number, localY: number): void {
     const { cellSize, columns, dirtyCells, rows } = this.photoTextures;
-    const reach = BRUSH_RADIUS * 0.8;
+    const reach = this.brush.radius * 0.8;
     const reachSquared = reach * reach;
     const minColumn = Math.max(0, Math.floor((localX - reach) / cellSize));
     const maxColumn = Math.min(

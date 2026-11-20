@@ -16,6 +16,8 @@ export const TEXT_COLOR = {
 export const SHAPE_COLOR = {
   GOLD: 0xc8a566,
   GOLD_HOVER: 0xe1c489,
+  CREAM: 0xf1e6d2,
+  LAMP: 0xffe6b0,
   TRACK: 0x352c22,
   KNOB: 0xf2e4c6,
   DIVIDER: 0x9a8157,

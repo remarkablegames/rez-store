@@ -77,6 +77,7 @@ export class Title extends Phaser.Scene {
                 resetProgress();
                 this.scene.start(KEY.SCENE.GAME, { level: 0 });
               }}
+              variant="secondary"
             >
               RESTART
             </Button>

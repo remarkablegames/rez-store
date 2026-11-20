@@ -5,6 +5,7 @@ export const IMAGE = {
 
 export const TEXTURE = {
   BACKGROUND: 'Background',
+  LAMP_GLOW: 'LampGlow',
   PHOTO_AGED: 'PhotoAged',
   PHOTO_CLEAN: 'PhotoClean',
   PHOTO_GRIME: 'PhotoGrime',
@@ -14,4 +15,5 @@ export const SCENE = {
   BOOT: 'Boot',
   TITLE: 'Title',
   GAME: 'Game',
+  SHOP: 'Shop',
 } as const;

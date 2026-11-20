@@ -2,17 +2,19 @@ import Phaser from 'phaser';
 import { render } from 'phaser-jsx';
 
 import { Chrome, Flash, Hud, Stamp } from '../components';
-import { KEY, LAYOUT, LEVELS } from '../constants';
+import { BRUSHES, KEY, LAYOUT, LEVELS } from '../constants';
 import { PhotoRestorer } from '../gameobjects';
 import type { HudController, JobReport, SurfaceResult } from '../types';
 import {
   createBackgroundTexture,
   createParticles,
   createRandom,
+  equipBrush,
   getClientNote,
   getColorAccuracy,
   getGrade,
   getOverall,
+  getOwnedBrushes,
   getPayout,
   loadProgress,
   recordJob,
@@ -64,6 +66,8 @@ export class Game extends Phaser.Scene {
     this.restorer = new PhotoRestorer(this, LAYOUT.PHOTO.X, LAYOUT.PHOTO.Y, {
       level: { ...level, colorTarget: this.colorTarget },
       grimeSeed: this.grimeSeed,
+      brush: BRUSHES[progress.equippedBrush],
+      lamp: progress.lamp,
     });
 
     render(
@@ -72,6 +76,8 @@ export class Game extends Phaser.Scene {
         levelIndex={this.level}
         wallet={progress.wallet}
         bestPayout={best?.payout ?? 0}
+        brushes={getOwnedBrushes(progress)}
+        equippedBrush={progress.equippedBrush}
         onReady={(controller) => {
           this.hud = controller;
         }}
@@ -87,6 +93,13 @@ export class Game extends Phaser.Scene {
         }}
         onNext={() => {
           this.scene.start(KEY.SCENE.GAME, { level: this.level + 1 });
+        }}
+        onShop={() => {
+          this.scene.start(KEY.SCENE.SHOP, { level: this.level });
+        }}
+        onBrushChange={(brush) => {
+          equipBrush(brush.id);
+          this.restorer?.setBrush(brush);
         }}
       />,
       this,

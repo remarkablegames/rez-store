@@ -1,4 +1,17 @@
-import type { GradeLetter, JobAward, JobRecord, Progress } from '../types';
+import {
+  BRUSH_ORDER,
+  BRUSHES,
+  DEFAULT_BRUSH_ID,
+  WORK_LAMP,
+} from '../constants';
+import type {
+  Brush,
+  BrushId,
+  GradeLetter,
+  JobAward,
+  JobRecord,
+  Progress,
+} from '../types';
 
 const STORAGE_KEY = 'org.remarkablegames.rez-store';
 const VALID_GRADES: readonly GradeLetter[] = ['S', 'A', 'B', 'C', 'D', 'F'];
@@ -20,7 +33,7 @@ export function loadProgress(): Progress {
 
     const parsed: unknown = JSON.parse(raw);
 
-    return validateProgress(parsed) ? parsed : createEmptyProgress();
+    return parseProgress(parsed) ?? createEmptyProgress();
   } catch {
     return createEmptyProgress();
   }
@@ -41,7 +54,7 @@ export function hasSavedProgress(): boolean {
   }
 
   try {
-    return validateProgress(JSON.parse(raw));
+    return parseProgress(JSON.parse(raw)) !== null;
   } catch {
     return false;
   }
@@ -93,6 +106,190 @@ export function recordJob(
 }
 
 /**
+ * Buy a brush.
+ */
+export function buyBrush(brushId: BrushId): Progress | null {
+  const brush = BRUSHES[brushId];
+
+  if (brush.price <= 0) {
+    return null;
+  }
+
+  const progress = loadProgress();
+
+  if (progress.brushes.includes(brushId) || progress.wallet < brush.price) {
+    return null;
+  }
+
+  const next: Progress = {
+    ...progress,
+    wallet: progress.wallet - brush.price,
+    brushes: [...progress.brushes, brushId],
+    equippedBrush: brushId,
+  };
+
+  saveProgress(next);
+
+  return next;
+}
+
+/**
+ * Equip an owned brush.
+ */
+export function equipBrush(brushId: BrushId): Progress | null {
+  const progress = loadProgress();
+
+  if (!progress.brushes.includes(brushId)) {
+    return null;
+  }
+
+  if (progress.equippedBrush === brushId) {
+    return progress;
+  }
+
+  const next: Progress = { ...progress, equippedBrush: brushId };
+
+  saveProgress(next);
+
+  return next;
+}
+
+/**
+ * Buy the work lamp.
+ */
+export function buyLamp(): Progress | null {
+  const progress = loadProgress();
+
+  if (progress.lamp || progress.wallet < WORK_LAMP.price) {
+    return null;
+  }
+
+  const next: Progress = {
+    ...progress,
+    wallet: progress.wallet - WORK_LAMP.price,
+    lamp: true,
+  };
+
+  saveProgress(next);
+
+  return next;
+}
+
+/**
+ * Get owned brushes in catalog order.
+ */
+export function getOwnedBrushes(progress: Progress): Brush[] {
+  return BRUSH_ORDER.filter((brushId) =>
+    progress.brushes.includes(brushId),
+  ).map((brushId) => BRUSHES[brushId]);
+}
+
+/**
+ * Parse a saved progress record, migrating the original format.
+ */
+function parseProgress(value: unknown): Progress | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const base = parseBase(value);
+
+  if (!base) {
+    return null;
+  }
+
+  const brushes = normalizeBrushes(value.brushes);
+  const rawEquipped: unknown = value.equippedBrush;
+  const equippedBrush: BrushId =
+    isBrushId(rawEquipped) && brushes.includes(rawEquipped)
+      ? rawEquipped
+      : DEFAULT_BRUSH_ID;
+
+  return {
+    version: 1,
+    ...base,
+    brushes,
+    equippedBrush,
+    lamp: value.lamp === true,
+  };
+}
+
+/**
+ * Parse wallet and best-score records shared by all save versions.
+ */
+function parseBase(
+  value: Record<string, unknown>,
+): Pick<Progress, 'wallet' | 'best'> | null {
+  const { wallet } = value;
+
+  if (typeof wallet !== 'number' || !Number.isFinite(wallet)) {
+    return null;
+  }
+
+  const best = parseBest(value.best);
+
+  if (!best) {
+    return null;
+  }
+
+  return { wallet, best };
+}
+
+/**
+ * Parse best-score records.
+ */
+function parseBest(value: unknown): Partial<Record<string, JobRecord>> | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const best: Partial<Record<string, JobRecord>> = {};
+
+  for (const [key, record] of Object.entries(value)) {
+    if (!isJobRecord(record)) {
+      return null;
+    }
+
+    best[key] = record;
+  }
+
+  return best;
+}
+
+/**
+ * Normalize owned brushes, always keeping the standard brush.
+ */
+function normalizeBrushes(value: unknown): BrushId[] {
+  const brushes: BrushId[] = [DEFAULT_BRUSH_ID];
+
+  if (!Array.isArray(value)) {
+    return brushes;
+  }
+
+  for (const entry of value) {
+    if (
+      typeof entry === 'string' &&
+      isBrushId(entry) &&
+      !brushes.includes(entry)
+    ) {
+      brushes.push(entry);
+    }
+  }
+
+  return brushes;
+}
+
+/**
+ * Check brush ID.
+ */
+function isBrushId(value: unknown): value is BrushId {
+  return (
+    typeof value === 'string' &&
+    BRUSH_ORDER.some((brushId) => brushId === value)
+  );
+}
+
+/**
  * Create empty progress.
  */
 function createEmptyProgress(): Progress {
@@ -100,6 +297,9 @@ function createEmptyProgress(): Progress {
     version: 1,
     wallet: 0,
     best: {},
+    brushes: [DEFAULT_BRUSH_ID],
+    equippedBrush: DEFAULT_BRUSH_ID,
+    lamp: false,
   };
 }
 
@@ -116,29 +316,6 @@ function saveProgress(progress: Progress): void {
   } catch {
     return;
   }
-}
-
-/**
- * Validate progress.
- */
-function validateProgress(value: unknown): value is Progress {
-  if (!isRecord(value)) {
-    return false;
-  }
-
-  if (
-    value.version !== 1 ||
-    typeof value.wallet !== 'number' ||
-    !Number.isFinite(value.wallet)
-  ) {
-    return false;
-  }
-
-  if (!isRecord(value.best)) {
-    return false;
-  }
-
-  return Object.values(value.best).every(isJobRecord);
 }
 
 /**

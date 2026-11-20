@@ -9,6 +9,8 @@ interface ButtonProps {
   height: number;
   children: string;
   onClick: () => void;
+  variant?: 'primary' | 'secondary';
+  disabled?: boolean;
 }
 
 export function Button({
@@ -18,8 +20,25 @@ export function Button({
   height,
   children,
   onClick,
+  variant = 'primary',
+  disabled = false,
 }: ButtonProps) {
   const [hovered, setHovered] = useState(false);
+  const isSecondary = variant === 'secondary';
+  const fillColor = disabled
+    ? THEME.SHAPE_COLOR.BUTTON_DARK
+    : isSecondary
+      ? hovered
+        ? THEME.SHAPE_COLOR.BUTTON_DARK_HOVER
+        : THEME.SHAPE_COLOR.BUTTON_DARK
+      : hovered
+        ? THEME.SHAPE_COLOR.GOLD_HOVER
+        : THEME.SHAPE_COLOR.GOLD;
+  const textColor = disabled
+    ? THEME.TEXT_COLOR.FAINT
+    : isSecondary
+      ? THEME.TEXT_COLOR.CREAM
+      : THEME.TEXT_COLOR.DARK;
 
   return (
     <>
@@ -30,17 +49,21 @@ export function Button({
         height={height}
         originX={0.5}
         originY={0.5}
-        fillColor={
-          hovered ? THEME.SHAPE_COLOR.GOLD_HOVER : THEME.SHAPE_COLOR.GOLD
-        }
-        input={{ useHandCursor: true }}
+        fillColor={fillColor}
+        input={{ useHandCursor: !disabled }}
         onPointerOver={() => {
-          setHovered(true);
+          if (!disabled) {
+            setHovered(true);
+          }
         }}
         onPointerOut={() => {
           setHovered(false);
         }}
-        onPointerUp={onClick}
+        onPointerUp={() => {
+          if (!disabled) {
+            onClick();
+          }
+        }}
       />
 
       <Text
@@ -50,7 +73,7 @@ export function Button({
         style={{
           fontFamily: THEME.FONT.MONO,
           fontSize: 12,
-          color: THEME.TEXT_COLOR.DARK,
+          color: textColor,
           letterSpacing: 0.5,
         }}
         originX={0.5}

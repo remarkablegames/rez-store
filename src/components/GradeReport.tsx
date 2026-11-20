@@ -13,9 +13,10 @@ const HEAT_START_Y = 398;
 interface GradeReportProps {
   report: JobReport;
   onNext: () => void;
+  onShop: () => void;
 }
 
-export function GradeReport({ report, onNext }: GradeReportProps) {
+export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
   const gridWidth =
     report.zoneColumns > 0
       ? report.zoneColumns * (HEAT_CELL + HEAT_GAP) - HEAT_GAP
@@ -206,9 +207,20 @@ export function GradeReport({ report, onNext }: GradeReportProps) {
       />
 
       <Button
-        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
+        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 4}
         y={638}
-        width={LAYOUT.HUD.CONTENT_WIDTH}
+        width={LAYOUT.HUD.CONTENT_WIDTH / 2 - 4}
+        height={44}
+        onClick={onShop}
+        variant="secondary"
+      >
+        SHOP
+      </Button>
+
+      <Button
+        x={LAYOUT.HUD.CONTENT_X + (LAYOUT.HUD.CONTENT_WIDTH * 3) / 4}
+        y={638}
+        width={LAYOUT.HUD.CONTENT_WIDTH / 2 - 4}
         height={44}
         onClick={onNext}
       >

@@ -1,8 +1,16 @@
 import Phaser from 'phaser';
 import { Rectangle, Text, useState } from 'phaser-jsx';
 
-import { LAYOUT, THEME } from '../constants';
-import type { HudController, JobReport, Level, RestoreStage } from '../types';
+import { BRUSHES, LAYOUT, THEME } from '../constants';
+import type {
+  Brush,
+  BrushId,
+  HudController,
+  JobReport,
+  Level,
+  RestoreStage,
+} from '../types';
+import { BrushPicker } from './BrushPicker';
 import { Button } from './Button';
 import { GradeReport } from './GradeReport';
 
@@ -28,16 +36,26 @@ const COPY: Record<'clean' | 'color', StageCopy> = {
   },
 };
 
+const BRUSH_TIPS: Record<BrushId, string> = {
+  standard: 'Trust your eye.',
+  wide: 'Sweep broadly, then finish the edges.',
+  detail: 'Firm strokes for corners and edges.',
+};
+
 interface HudProps {
   level: Level;
   levelIndex: number;
   wallet: number;
   bestPayout: number;
+  brushes: Brush[];
+  equippedBrush: BrushId;
   onReady: (controller: HudController) => void;
   onColorChange: (value: number) => void;
   onContinue: () => void;
   onDeliver: () => void;
   onNext: () => void;
+  onShop: () => void;
+  onBrushChange: (brush: Brush) => void;
 }
 
 export function Hud({
@@ -45,16 +63,21 @@ export function Hud({
   levelIndex,
   wallet,
   bestPayout,
+  brushes,
+  equippedBrush,
   onReady,
   onColorChange,
   onContinue,
   onDeliver,
   onNext,
+  onShop,
+  onBrushChange,
 }: HudProps) {
   const [stage, setStage] = useState<RestoreStage>('clean');
   const [report, setReport] = useState<JobReport | null>(null);
   const [colorValue, setColorValue] = useState(0);
   const [draggingSlider, setDraggingSlider] = useState(false);
+  const [selectedBrush, setSelectedBrush] = useState<BrushId>(equippedBrush);
 
   onReady({ setStage, setReport });
 
@@ -64,6 +87,14 @@ export function Hud({
   const copy = COPY[isClean ? 'clean' : 'color'];
   const jobNumber = String(levelIndex + 1).padStart(2, '0');
   const step = `JOB ${jobNumber} / ${copy.step}`;
+  const activeBrush =
+    brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.standard;
+  const tip = isClean ? BRUSH_TIPS[activeBrush.id] : copy.tip;
+
+  const selectBrush = (brush: Brush): void => {
+    setSelectedBrush(brush.id);
+    onBrushChange(brush);
+  };
 
   const updateColorFromPointer = (pointer: Phaser.Input.Pointer): void => {
     const value = Phaser.Math.Clamp(
@@ -147,41 +178,64 @@ export function Hud({
         visible={isClean}
       />
 
-      <Rectangle
-        x={LAYOUT.HUD.CONTENT_X}
-        y={320}
-        width={28}
-        height={28}
-        originX={0}
-        originY={0}
-        fillColor={THEME.SHAPE_COLOR.BUTTON_DARK}
-        visible={isClean}
-      />
+      {isClean && brushes.length === 1 && (
+        <>
+          <Rectangle
+            x={LAYOUT.HUD.CONTENT_X}
+            y={320}
+            width={28}
+            height={28}
+            originX={0}
+            originY={0}
+            fillColor={THEME.SHAPE_COLOR.BUTTON_DARK}
+          />
 
-      <Rectangle
-        x={LAYOUT.HUD.CONTENT_X + 7}
-        y={327}
-        width={14}
-        height={14}
-        originX={0}
-        originY={0}
-        fillColor={THEME.SHAPE_COLOR.GOLD}
-        fillAlpha={0.35}
-        visible={isClean}
-      />
+          <Rectangle
+            x={LAYOUT.HUD.CONTENT_X + 7}
+            y={327}
+            width={14}
+            height={14}
+            originX={0}
+            originY={0}
+            fillColor={THEME.SHAPE_COLOR.GOLD}
+            fillAlpha={0.35}
+          />
 
-      <Text
-        x={LAYOUT.HUD.CONTENT_X + 40}
-        y={320}
-        text="STANDARD BRUSH"
-        style={{
-          fontFamily: THEME.FONT.MONO,
-          fontSize: 12,
-          color: THEME.TEXT_COLOR.CREAM,
-          letterSpacing: 0.5,
-        }}
-        visible={isClean}
-      />
+          <Text
+            x={LAYOUT.HUD.CONTENT_X + 40}
+            y={320}
+            text={activeBrush.name.toUpperCase()}
+            style={{
+              fontFamily: THEME.FONT.MONO,
+              fontSize: 12,
+              color: THEME.TEXT_COLOR.CREAM,
+              letterSpacing: 0.5,
+            }}
+          />
+        </>
+      )}
+
+      {isClean && brushes.length > 1 && (
+        <>
+          <BrushPicker
+            brushes={brushes}
+            selected={selectedBrush}
+            onSelect={selectBrush}
+          />
+
+          <Text
+            x={LAYOUT.HUD.CONTENT_X}
+            y={356}
+            text={`${activeBrush.name.toUpperCase()} · R${String(activeBrush.radius)}`}
+            style={{
+              fontFamily: THEME.FONT.MONO,
+              fontSize: 12,
+              color: THEME.TEXT_COLOR.CREAM,
+              letterSpacing: 0.5,
+            }}
+          />
+        </>
+      )}
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
@@ -288,12 +342,14 @@ export function Hud({
       <Text
         x={LAYOUT.HUD.CONTENT_X}
         y={isClean ? 386 : 404}
-        text={copy.tip}
+        text={tip}
         style={{
           fontFamily: THEME.FONT.SANS,
           fontSize: 13,
           color: THEME.TEXT_COLOR.FAINT,
           fontStyle: 'italic',
+          lineSpacing: 3,
+          wordWrap: { width: LAYOUT.HUD.CONTENT_WIDTH },
         }}
         visible={!isComplete}
       />
@@ -385,7 +441,9 @@ export function Hud({
         </Button>
       )}
 
-      {isComplete && report && <GradeReport report={report} onNext={onNext} />}
+      {isComplete && report && (
+        <GradeReport report={report} onNext={onNext} onShop={onShop} />
+      )}
     </>
   );
 }

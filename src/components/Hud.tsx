@@ -45,7 +45,7 @@ const BRUSH_TIPS: Record<BrushId, string> = {
 interface HudProps {
   level: Level;
   levelIndex: number;
-  wallet: number;
+  earnings: number;
   bestPayout: number;
   brushes: Brush[];
   equippedBrush: BrushId;
@@ -61,7 +61,7 @@ interface HudProps {
 export function Hud({
   level,
   levelIndex,
-  wallet,
+  earnings,
   bestPayout,
   brushes,
   equippedBrush,
@@ -407,7 +407,7 @@ export function Hud({
       <Text
         x={LAYOUT.HUD.CONTENT_X}
         y={550}
-        text={`$${String(wallet)}`}
+        text={`$${String(earnings)}`}
         style={{
           fontFamily: THEME.FONT.SERIF,
           fontSize: 22,

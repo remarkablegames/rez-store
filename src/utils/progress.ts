@@ -91,7 +91,7 @@ export function recordJob(
     previous && !isBest ? previous : { overall, payout, grade, colorTarget };
   const next: Progress = {
     ...progress,
-    wallet: progress.wallet + earned,
+    earnings: progress.earnings + earned,
     best: { ...progress.best, [key]: best },
   };
 
@@ -100,7 +100,7 @@ export function recordJob(
   return {
     earned,
     bestPayout: Math.max(previousPayout, payout),
-    wallet: next.wallet,
+    earnings: next.earnings,
     isBest,
   };
 }
@@ -117,13 +117,13 @@ export function buyBrush(brushId: BrushId): Progress | null {
 
   const progress = loadProgress();
 
-  if (progress.brushes.includes(brushId) || progress.wallet < brush.price) {
+  if (progress.brushes.includes(brushId) || progress.earnings < brush.price) {
     return null;
   }
 
   const next: Progress = {
     ...progress,
-    wallet: progress.wallet - brush.price,
+    earnings: progress.earnings - brush.price,
     brushes: [...progress.brushes, brushId],
     equippedBrush: brushId,
   };
@@ -160,13 +160,13 @@ export function equipBrush(brushId: BrushId): Progress | null {
 export function buyLamp(): Progress | null {
   const progress = loadProgress();
 
-  if (progress.lamp || progress.wallet < WORK_LAMP.price) {
+  if (progress.lamp || progress.earnings < WORK_LAMP.price) {
     return null;
   }
 
   const next: Progress = {
     ...progress,
-    wallet: progress.wallet - WORK_LAMP.price,
+    earnings: progress.earnings - WORK_LAMP.price,
     lamp: true,
   };
 
@@ -215,14 +215,14 @@ function parseProgress(value: unknown): Progress | null {
 }
 
 /**
- * Parse wallet and best-score records shared by all save versions.
+ * Parse earnings and best-score records shared by all save versions.
  */
 function parseBase(
   value: Record<string, unknown>,
-): Pick<Progress, 'wallet' | 'best'> | null {
-  const { wallet } = value;
+): Pick<Progress, 'earnings' | 'best'> | null {
+  const { earnings } = value;
 
-  if (typeof wallet !== 'number' || !Number.isFinite(wallet)) {
+  if (typeof earnings !== 'number' || !Number.isFinite(earnings)) {
     return null;
   }
 
@@ -232,7 +232,7 @@ function parseBase(
     return null;
   }
 
-  return { wallet, best };
+  return { earnings, best };
 }
 
 /**
@@ -295,7 +295,7 @@ function isBrushId(value: unknown): value is BrushId {
 function createEmptyProgress(): Progress {
   return {
     version: 1,
-    wallet: 0,
+    earnings: 0,
     best: {},
     brushes: [DEFAULT_BRUSH_ID],
     equippedBrush: DEFAULT_BRUSH_ID,

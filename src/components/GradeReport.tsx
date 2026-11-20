@@ -53,7 +53,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
 
       <Text
         x={LAYOUT.HUD.CONTENT_X + 74}
-        y={166}
+        y={164}
         text="OVERALL"
         style={{
           fontFamily: THEME.FONT.MONO,
@@ -197,7 +197,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
       <Text
         x={LAYOUT.HUD.CONTENT_X}
         y={592}
-        text={`WALLET $${String(report.wallet)}`}
+        text={`EARNINGS $${String(report.earnings)}`}
         style={{
           fontFamily: THEME.FONT.MONO,
           fontSize: 12,

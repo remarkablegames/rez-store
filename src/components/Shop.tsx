@@ -8,7 +8,7 @@ import { Button } from './Button';
 
 const MARGIN = 72;
 const CENTER_X = LAYOUT.GAME.WIDTH / 2;
-const WALLET_X = LAYOUT.GAME.WIDTH - MARGIN;
+const EARNINGS_X = LAYOUT.GAME.WIDTH - MARGIN;
 const CARD = {
   WIDTH: 280,
   HEIGHT: 392,
@@ -90,9 +90,9 @@ export function Shop({ level, onNext }: ShopProps) {
       />
 
       <Text
-        x={WALLET_X}
+        x={EARNINGS_X}
         y={55}
-        text="WALLET"
+        text="EARNINGS"
         originX={1}
         style={{
           fontFamily: THEME.FONT.MONO,
@@ -103,9 +103,9 @@ export function Shop({ level, onNext }: ShopProps) {
       />
 
       <Text
-        x={WALLET_X}
+        x={EARNINGS_X}
         y={80}
-        text={`$${String(progress.wallet)}`}
+        text={`$${String(progress.earnings)}`}
         originX={1}
         style={{
           fontFamily: THEME.FONT.SERIF,
@@ -146,7 +146,7 @@ export function Shop({ level, onNext }: ShopProps) {
                   : 'EQUIP'
                 : `BUY $${String(brush.price)}`
             }
-            disabled={equipped || (!owned && progress.wallet < brush.price)}
+            disabled={equipped || (!owned && progress.earnings < brush.price)}
             brush={brush}
             onAction={() => {
               handleBrushAction(brush);
@@ -167,7 +167,7 @@ export function Shop({ level, onNext }: ShopProps) {
         buttonLabel={
           progress.lamp ? 'INSTALLED' : `BUY $${String(WORK_LAMP.price)}`
         }
-        disabled={progress.lamp || progress.wallet < WORK_LAMP.price}
+        disabled={progress.lamp || progress.earnings < WORK_LAMP.price}
         onAction={handleLampAction}
       />
 

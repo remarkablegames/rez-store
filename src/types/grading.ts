@@ -15,9 +15,9 @@ export interface JobReport {
   zoneRows: number;
   /** Value of this delivery before the best-score rule. */
   payout: number;
-  /** Cash added to the wallet by this delivery. */
+  /** Cash added to earnings by this delivery. */
   earned: number;
   bestPayout: number;
-  wallet: number;
+  earnings: number;
   note: string;
 }

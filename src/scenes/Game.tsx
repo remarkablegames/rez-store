@@ -74,7 +74,7 @@ export class Game extends Phaser.Scene {
       <Hud
         level={level}
         levelIndex={this.level}
-        wallet={progress.wallet}
+        earnings={progress.earnings}
         bestPayout={best?.payout ?? 0}
         brushes={getOwnedBrushes(progress)}
         equippedBrush={progress.equippedBrush}
@@ -151,7 +151,7 @@ export class Game extends Phaser.Scene {
       payout,
       earned: award.earned,
       bestPayout: award.bestPayout,
-      wallet: award.wallet,
+      earnings: award.earnings,
       note: getClientNote(surface, color, this.colorValue - this.colorTarget),
     };
 

@@ -40,13 +40,12 @@ export class PhotoRestorer {
   private readonly y: number;
   private brush: Brush;
   private stage: RestoreStage = 'clean';
-  private destroyed = false;
   private isScrubbing = false;
   private lastPoint: Phaser.Math.Vector2 | null = null;
   private grimeNeedsRefresh = false;
   private lastTextureRefresh = 0;
   private lastDustPuff = 0;
-  private pointerOverPhoto = false;
+  private pointerOverPhotoFrame = false;
 
   constructor(
     scene: Phaser.Scene,
@@ -94,7 +93,6 @@ export class PhotoRestorer {
     scene.input.on('pointerdown', this.handlePointerDown);
     scene.input.on('pointermove', this.handlePointerMove);
     scene.input.on('pointerup', this.handlePointerUp);
-    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleShutdown);
   }
 
   setBrush(brush: Brush): void {
@@ -133,7 +131,7 @@ export class PhotoRestorer {
     this.stage = 'color';
     this.isScrubbing = false;
     this.lastPoint = null;
-    this.pointerOverPhoto = false;
+    this.pointerOverPhotoFrame = false;
     this.brushCursor.setVisible(false);
     this.lampGlow?.setVisible(false);
     this.scene.input.setDefaultCursor('default');
@@ -150,22 +148,6 @@ export class PhotoRestorer {
     this.stage = 'complete';
 
     return true;
-  }
-
-  destroy(): void {
-    if (this.destroyed) {
-      return;
-    }
-
-    this.destroyed = true;
-    this.stage = 'complete';
-    this.isScrubbing = false;
-    this.lastPoint = null;
-    this.scene.input.off('pointerdown', this.handlePointerDown);
-    this.scene.input.off('pointermove', this.handlePointerMove);
-    this.scene.input.off('pointerup', this.handlePointerUp);
-    this.scene.events.off(Phaser.Scenes.Events.SHUTDOWN, this.handleShutdown);
-    this.scene.input.setDefaultCursor('default');
   }
 
   private readonly handlePointerDown = (
@@ -221,10 +203,6 @@ export class PhotoRestorer {
     this.lastPoint = null;
   };
 
-  private readonly handleShutdown = (): void => {
-    this.destroy();
-  };
-
   private toLocal(pointer: Phaser.Input.Pointer): Phaser.Math.Vector2 {
     return new Phaser.Math.Vector2(
       pointer.x - this.x + LAYOUT.PHOTO.WIDTH / 2,
@@ -232,12 +210,17 @@ export class PhotoRestorer {
     );
   }
 
+  /**
+   * Whether cursor is inside photo frame and white border.
+   */
   private isInside(point: Phaser.Math.Vector2): boolean {
+    const b = LAYOUT.PHOTO.BORDER;
+
     return (
-      point.x >= 0 &&
-      point.y >= 0 &&
-      point.x <= LAYOUT.PHOTO.WIDTH &&
-      point.y <= LAYOUT.PHOTO.HEIGHT
+      point.x >= -b &&
+      point.y >= -b &&
+      point.x <= LAYOUT.PHOTO.WIDTH + b &&
+      point.y <= LAYOUT.PHOTO.HEIGHT + b
     );
   }
 
@@ -373,10 +356,6 @@ export class PhotoRestorer {
    * Update lifecycle.
    */
   update(): void {
-    if (this.destroyed) {
-      return;
-    }
-
     const pointer = this.scene.input.activePointer;
 
     if (this.isScrubbing && !pointer.isDown) {
@@ -385,16 +364,16 @@ export class PhotoRestorer {
     }
 
     const localPoint = this.toLocal(pointer);
-    const overPhoto = this.stage === 'clean' && this.isInside(localPoint);
+    const overPhotoFrame = this.stage === 'clean' && this.isInside(localPoint);
 
-    if (overPhoto !== this.pointerOverPhoto) {
-      this.pointerOverPhoto = overPhoto;
-      this.scene.input.setDefaultCursor(overPhoto ? 'none' : 'default');
+    if (overPhotoFrame !== this.pointerOverPhotoFrame) {
+      this.pointerOverPhotoFrame = overPhotoFrame;
+      this.scene.input.setDefaultCursor(overPhotoFrame ? 'none' : 'default');
     }
 
-    this.brushCursor.setVisible(overPhoto);
+    this.brushCursor.setVisible(overPhotoFrame);
 
-    if (overPhoto) {
+    if (overPhotoFrame) {
       this.brushCursor.setPosition(pointer.x, pointer.y);
     }
 

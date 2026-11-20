@@ -52,7 +52,10 @@ export function Button({
         originX={0.5}
         originY={0.5}
         fillColor={fillColor}
-        input={{ useHandCursor: !disabled }}
+        input={{
+          useHandCursor: !disabled,
+          cursor: disabled ? 'not-allowed' : undefined,
+        }}
         onPointerOver={() => {
           if (!disabled) {
             setHovered(true);

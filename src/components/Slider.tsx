@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { Rectangle, Text, useState } from 'phaser-jsx';
+import { Rectangle, Text } from 'phaser-jsx';
 
 import { LAYOUT, THEME } from '../constants';
 import { useUiSound } from '../hooks';
@@ -21,7 +21,6 @@ export function Slider({
   value,
   onChange,
 }: SliderProps) {
-  const [dragging, setDragging] = useState(false);
   const uiSound = useUiSound();
 
   const updateFromPointer = (pointer: Phaser.Input.Pointer): void => {
@@ -88,22 +87,13 @@ export function Slider({
         originY={0.5}
         fillColor={0xffffff}
         fillAlpha={0.001}
-        input={{ cursor: 'ew-resize' }}
+        input={{ draggable: true, cursor: 'ew-resize' }}
         onPointerDown={(pointer) => {
-          setDragging(true);
           updateFromPointer(pointer);
           uiSound.play('drop');
         }}
-        onPointerMove={(pointer) => {
-          if (dragging) {
-            updateFromPointer(pointer);
-          }
-        }}
-        onPointerUp={() => {
-          setDragging(false);
-        }}
-        onPointerUpOutside={() => {
-          setDragging(false);
+        onDrag={(pointer) => {
+          updateFromPointer(pointer);
         }}
       />
 

@@ -4,7 +4,12 @@ import { render } from 'phaser-jsx';
 import { Chrome, Flash, Hud, Stamp } from '../components';
 import { BRUSHES, KEY, LAYOUT, LEVELS } from '../constants';
 import { PhotoRestorer } from '../gameobjects';
-import type { HudController, JobReport, SurfaceResult } from '../types';
+import type {
+  ColorValue,
+  HudController,
+  JobReport,
+  SurfaceResult,
+} from '../types';
 import {
   createBackgroundTexture,
   createParticles,
@@ -26,9 +31,9 @@ export class Game extends Phaser.Scene {
   private startedAt = 0;
   private level = 0;
   private grimeSeed = '';
-  private colorTarget = 0;
+  private colorTarget: ColorValue = { temperature: 0.5, tint: 0.5 };
   private surface: SurfaceResult | null = null;
-  private colorValue = 0;
+  private colorValue: ColorValue = { temperature: 0, tint: 0 };
 
   constructor() {
     super(KEY.SCENE.GAME);
@@ -43,14 +48,20 @@ export class Game extends Phaser.Scene {
   } = {}) {
     this.level = LEVELS[level] ? level : 0;
     this.grimeSeed = grimeSeed;
-    this.colorTarget = createRandom(grimeSeed).realInRange(0.35, 0.65);
+
+    const random = createRandom(grimeSeed);
+
+    this.colorTarget = {
+      temperature: random.realInRange(0.35, 0.65),
+      tint: random.realInRange(0.35, 0.65),
+    };
   }
 
   create() {
     this.startedAt = this.time.now;
     this.hud = undefined;
     this.surface = null;
-    this.colorValue = 0;
+    this.colorValue = { temperature: 0, tint: 0 };
 
     const level = LEVELS[this.level];
     const progress = loadProgress();
@@ -101,6 +112,9 @@ export class Game extends Phaser.Scene {
           equipBrush(brush.id);
           this.restorer?.setBrush(brush);
         }}
+        onInspectChange={(inspecting) => {
+          this.restorer?.setInspecting(inspecting);
+        }}
       />,
       this,
     );
@@ -115,6 +129,7 @@ export class Game extends Phaser.Scene {
 
     this.surface = surface;
     this.hud?.setStage('color');
+    this.restorer?.setColorValue(this.colorValue);
   }
 
   private handleDeliver(): void {
@@ -124,8 +139,9 @@ export class Game extends Phaser.Scene {
 
     const level = LEVELS[this.level];
     const surface = this.surface?.cleanliness ?? 0;
+    const damage = this.surface?.damage ?? 0;
     const color = getColorAccuracy(this.colorValue, this.colorTarget);
-    const overall = getOverall(surface, color);
+    const overall = getOverall(surface, color, damage);
     const grade = getGrade(overall);
     const payout = getPayout(level.fee, overall);
     const award = recordJob(
@@ -139,9 +155,14 @@ export class Game extends Phaser.Scene {
       0,
       Math.round((this.time.now - this.startedAt) / 1000),
     );
+    const colorOffset: ColorValue = {
+      temperature: this.colorValue.temperature - this.colorTarget.temperature,
+      tint: this.colorValue.tint - this.colorTarget.tint,
+    };
     const report: JobReport = {
       surface,
       color,
+      damage,
       overall,
       grade,
       timeSeconds: elapsedSeconds,
@@ -152,7 +173,7 @@ export class Game extends Phaser.Scene {
       earned: award.earned,
       bestPayout: award.bestPayout,
       earnings: award.earnings,
-      note: getClientNote(surface, color, this.colorValue - this.colorTarget),
+      note: getClientNote(surface, color, damage, colorOffset),
     };
 
     this.hud?.setReport(report);

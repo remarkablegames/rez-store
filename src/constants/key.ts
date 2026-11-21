@@ -8,7 +8,9 @@ export const TEXTURE = {
   LAMP_GLOW: 'LampGlow',
   PHOTO_AGED: 'PhotoAged',
   PHOTO_CLEAN: 'PhotoClean',
+  PHOTO_DAMAGE: 'PhotoDamage',
   PHOTO_GRIME: 'PhotoGrime',
+  PHOTO_GRIME_DEEP: 'PhotoGrimeDeep',
 } as const;
 
 export const SCENE = {

@@ -26,4 +26,7 @@ export const SHAPE_COLOR = {
   HEAT_CLEAN: 0x3a3026,
   HEAT_MID: 0xc8a566,
   HEAT_DIRT: 0xb5532e,
+  INSPECT_GRIME: 0x5b89b5,
+  TINT_MAGENTA: 0xa24d75,
+  TINT_GREEN: 0x4f8060,
 } as const;

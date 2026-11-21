@@ -1,15 +1,14 @@
-import Phaser from 'phaser';
 import { Rectangle, Text, useEffect } from 'phaser-jsx';
 
 import { LAYOUT, THEME } from '../constants';
 import { useUiSound } from '../hooks';
 import type { GradeLetter, JobReport } from '../types';
-import { formatElapsed } from '../utils';
+import { formatElapsed, getHeatColor } from '../utils';
 import { Button } from './Button';
 
 const HEAT_CELL = 22;
 const HEAT_GAP = 2;
-const HEAT_START_Y = 398;
+const HEAT_START_Y = 400;
 
 interface GradeReportProps {
   report: JobReport;
@@ -104,17 +103,22 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
         fillAlpha={0.28}
       />
 
-      <ReportRow label="SURFACE" y={236} value={percent(report.surface)} />
-      <ReportRow label="COLOR" y={260} value={percent(report.color)} />
+      <ReportRow label="SURFACE" y={232} value={percent(report.surface)} />
+      <ReportRow label="COLOR" y={254} value={percent(report.color)} />
+      <ReportRow
+        label="ABRASION"
+        y={276}
+        value={report.damage < 0.005 ? 'NONE' : percent(report.damage)}
+      />
       <ReportRow
         label="TIME"
-        y={284}
+        y={298}
         value={formatElapsed(report.timeSeconds)}
       />
 
       <Rectangle
         x={LAYOUT.HUD.CONTENT_X}
-        y={306}
+        y={318}
         width={LAYOUT.HUD.CONTENT_WIDTH}
         height={1}
         originX={0}
@@ -125,7 +129,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={320}
+        y={330}
         text={report.note}
         style={{
           fontFamily: THEME.FONT.SANS,
@@ -139,7 +143,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={380}
+        y={386}
         text="MISSED GRIME"
         style={{
           fontFamily: THEME.FONT.MONO,
@@ -161,7 +165,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
             height={HEAT_CELL}
             originX={0}
             originY={0}
-            fillColor={heatColor(value)}
+            fillColor={getHeatColor(value)}
             fillAlpha={0.95}
           />
         );
@@ -169,7 +173,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
 
       <Rectangle
         x={LAYOUT.HUD.CONTENT_X}
-        y={514}
+        y={512}
         width={LAYOUT.HUD.CONTENT_WIDTH}
         height={1}
         originX={0}
@@ -180,7 +184,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={526}
+        y={524}
         text={earnedLabel}
         style={{
           fontFamily: THEME.FONT.MONO,
@@ -192,7 +196,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={542}
+        y={538}
         text={earnedValue}
         style={{
           fontFamily: THEME.FONT.SERIF,
@@ -203,7 +207,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={578}
+        y={576}
         text={
           report.bestPayout > 0
             ? `BEST $${String(report.bestPayout)}`
@@ -219,7 +223,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={592}
+        y={590}
         text={`EARNINGS $${String(report.earnings)}`}
         style={{
           fontFamily: THEME.FONT.MONO,
@@ -306,25 +310,4 @@ function gradeColor(grade: GradeLetter): string {
   }
 
   return THEME.TEXT_COLOR.MUTED;
-}
-
-function heatColor(value: number): number {
-  const clamped = Phaser.Math.Clamp(value, 0, 1);
-  const from =
-    clamped <= 0.5 ? THEME.SHAPE_COLOR.HEAT_CLEAN : THEME.SHAPE_COLOR.HEAT_MID;
-  const to =
-    clamped <= 0.5 ? THEME.SHAPE_COLOR.HEAT_MID : THEME.SHAPE_COLOR.HEAT_DIRT;
-  const local = clamped <= 0.5 ? clamped * 2 : (clamped - 0.5) * 2;
-  const fromRed = (from >> 16) & 0xff;
-  const fromGreen = (from >> 8) & 0xff;
-  const fromBlue = from & 0xff;
-  const toRed = (to >> 16) & 0xff;
-  const toGreen = (to >> 8) & 0xff;
-  const toBlue = to & 0xff;
-
-  return (
-    (Math.round(Phaser.Math.Linear(fromRed, toRed, local)) << 16) |
-    (Math.round(Phaser.Math.Linear(fromGreen, toGreen, local)) << 8) |
-    Math.round(Phaser.Math.Linear(fromBlue, toBlue, local))
-  );
 }

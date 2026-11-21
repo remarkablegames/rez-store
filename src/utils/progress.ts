@@ -7,6 +7,7 @@ import {
 import type {
   Brush,
   BrushId,
+  ColorValue,
   GradeLetter,
   JobAward,
   JobRecord,
@@ -75,20 +76,31 @@ export function recordJob(
   overall: number,
   payout: number,
   grade: GradeLetter,
-  colorTarget?: number,
+  colorTarget?: ColorValue,
 ): JobAward {
   const progress = loadProgress();
   const key = String(level);
   const previous = progress.best[key];
   const previousPayout = previous?.payout ?? 0;
   const earned = Math.max(0, payout - previousPayout);
+  const targetsMatch =
+    previous?.colorTarget !== undefined &&
+    previous.tintTarget !== undefined &&
+    previous.colorTarget === colorTarget?.temperature &&
+    previous.tintTarget === colorTarget.tint;
   const isBest =
     previous?.colorTarget === undefined ||
-    (previous.colorTarget === colorTarget &&
+    (targetsMatch &&
       (payout > previous.payout ||
         (payout === previous.payout && overall > previous.overall)));
-  const best =
-    previous && !isBest ? previous : { overall, payout, grade, colorTarget };
+  const record: JobRecord = {
+    overall,
+    payout,
+    grade,
+    colorTarget: colorTarget?.temperature,
+    tintTarget: colorTarget?.tint,
+  };
+  const best = previous && !isBest ? previous : record;
   const next: Progress = {
     ...progress,
     level: level + 1,

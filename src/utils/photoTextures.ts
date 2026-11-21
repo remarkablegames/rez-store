@@ -2,12 +2,17 @@ import Phaser from 'phaser';
 
 import { KEY, LAYOUT } from '../constants';
 import type { Grime, Level, PhotoTextures } from '../types';
-import { createRandom } from '../utils';
 import { createCanvasTexture } from './canvasTexture';
-import { measureDirt } from './dirt';
+import {
+  buildDirtCells,
+  combineDirtProfiles,
+  measureDirt,
+  scaleDirtProfile,
+  SET_IN_GRIME_WEIGHT,
+} from './dirt';
+import { createRandom } from './math';
 
 const CELL_SIZE = 16;
-const DIRT_ALPHA_THRESHOLD = 4;
 const DUST_COLORS = ['#e8ddc8', '#d5c7ac', '#a99b84', '#837866'] as const;
 
 const GRIME = {
@@ -16,14 +21,18 @@ const GRIME = {
   DUST_SPECKS_MAX: 22,
   EDGE_CLUSTERS: 36,
   SMUDGES: 16,
-  STAINS: 5,
-  SCRATCHES: 22,
   HAIRS: 8,
-  CREASES: 3,
-  FOXING: 40,
   HAZE_BLOOMS: 22,
   HAZE_LIGHT_PATCHES: 12,
   HAZE_GRAIN: 3200,
+} as const;
+
+const SET_IN_GRIME = {
+  CLUMPS: 18,
+  STAINS: 6,
+  SCRATCHES: 20,
+  CREASES: 3,
+  FOXING: 36,
 } as const;
 
 type Random = Phaser.Math.RandomDataGenerator;
@@ -60,21 +69,44 @@ export function createPhotoTextures(
     LAYOUT.PHOTO.WIDTH,
     LAYOUT.PHOTO.HEIGHT,
   );
-  drawGrime(grime.context, level.grime, grimeSeed);
+  drawLooseGrime(grime.context, level.grime, grimeSeed);
   grime.refresh();
 
-  const { columns, dirtyCells, rows } = buildDirtyMask(grime.context);
-  const dirt = measureDirt(grime.context);
+  const setIn = createCanvasTexture(
+    scene,
+    KEY.TEXTURE.PHOTO_GRIME_DEEP,
+    LAYOUT.PHOTO.WIDTH,
+    LAYOUT.PHOTO.HEIGHT,
+  );
+  drawSetInGrime(setIn.context, level.grime, `${grimeSeed}:set-in`);
+  setIn.refresh();
+
+  const damage = createCanvasTexture(
+    scene,
+    KEY.TEXTURE.PHOTO_DAMAGE,
+    LAYOUT.PHOTO.WIDTH,
+    LAYOUT.PHOTO.HEIGHT,
+  );
+
+  const columns = Math.ceil(LAYOUT.PHOTO.WIDTH / CELL_SIZE);
+  const rows = Math.ceil(LAYOUT.PHOTO.HEIGHT / CELL_SIZE);
+  const dirt = combineDirtProfiles(
+    measureDirt(grime.context),
+    scaleDirtProfile(measureDirt(setIn.context), SET_IN_GRIME_WEIGHT),
+  );
 
   return {
     clean,
     aged,
     grime,
-    dirtyCells,
+    setIn,
+    damage,
     columns,
     rows,
     cellSize: CELL_SIZE,
     dirt,
+    looseCells: buildDirtCells(grime.context, columns, rows, CELL_SIZE),
+    setInCells: buildDirtCells(setIn.context, columns, rows, CELL_SIZE),
   };
 }
 
@@ -238,7 +270,7 @@ function addAgedFinish(context: CanvasRenderingContext2D): void {
   context.restore();
 }
 
-function drawGrime(
+function drawLooseGrime(
   context: CanvasRenderingContext2D,
   config: Grime,
   seed: string,
@@ -250,11 +282,27 @@ function drawGrime(
   drawHaze(context, random, config.haze);
   drawDust(context, random, config.density);
   drawSmudges(context, random, config.density);
-  drawStains(context, random, config.density);
-  drawScratches(context, random, config.density);
   drawHairs(context, random, config.density);
-  drawCreases(context, random, config.density);
-  drawFoxing(context, random, config.density);
+
+  context.restore();
+}
+
+function drawSetInGrime(
+  context: CanvasRenderingContext2D,
+  config: Grime,
+  seed: string,
+): void {
+  context.clearRect(0, 0, LAYOUT.PHOTO.WIDTH, LAYOUT.PHOTO.HEIGHT);
+  context.save();
+
+  const random = createRandom(seed);
+  const density = Math.max(0.4, config.density * 0.65);
+
+  drawSetInClumps(context, random, density);
+  drawStains(context, random, density);
+  drawScratches(context, random, density);
+  drawCreases(context, random, density);
+  drawFoxing(context, random, density);
 
   context.restore();
 }
@@ -408,12 +456,33 @@ function drawSmudges(
   }
 }
 
+function drawSetInClumps(
+  context: CanvasRenderingContext2D,
+  random: Random,
+  density: number,
+): void {
+  const count = scaleCount(SET_IN_GRIME.CLUMPS, density);
+
+  for (let index = 0; index < count; index++) {
+    const x = random.between(0, LAYOUT.PHOTO.WIDTH);
+    const y = random.between(0, LAYOUT.PHOTO.HEIGHT);
+    const radius = random.realInRange(7, 26);
+    const alpha = random.realInRange(0.12, 0.32);
+    const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
+    gradient.addColorStop(0, `rgba(48, 34, 20, ${String(alpha)})`);
+    gradient.addColorStop(0.55, `rgba(48, 34, 20, ${String(alpha * 0.7)})`);
+    gradient.addColorStop(1, 'rgba(48, 34, 20, 0)');
+    context.fillStyle = gradient;
+    context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+  }
+}
+
 function drawStains(
   context: CanvasRenderingContext2D,
   random: Random,
   density: number,
 ): void {
-  const count = scaleCount(GRIME.STAINS, density);
+  const count = scaleCount(SET_IN_GRIME.STAINS, density);
 
   for (let index = 0; index < count; index++) {
     const x = random.between(70, LAYOUT.PHOTO.WIDTH - 70);
@@ -427,9 +496,9 @@ function drawStains(
     context.scale(squash, 1);
 
     const wash = context.createRadialGradient(0, 0, 0, 0, 0, radius);
-    wash.addColorStop(0, 'rgba(112, 82, 44, 0.015)');
-    wash.addColorStop(0.72, 'rgba(112, 82, 44, 0.035)');
-    wash.addColorStop(1, 'rgba(112, 82, 44, 0)');
+    wash.addColorStop(0, 'rgba(96, 64, 32, 0.08)');
+    wash.addColorStop(0.72, 'rgba(96, 64, 32, 0.14)');
+    wash.addColorStop(1, 'rgba(96, 64, 32, 0)');
     context.fillStyle = wash;
     context.beginPath();
     context.arc(0, 0, radius, 0, Math.PI * 2);
@@ -464,7 +533,7 @@ function drawScratches(
 ): void {
   context.lineCap = 'round';
 
-  const count = scaleCount(GRIME.SCRATCHES, density);
+  const count = scaleCount(SET_IN_GRIME.SCRATCHES, density);
 
   for (let index = 0; index < count; index++) {
     const startX = random.between(-30, LAYOUT.PHOTO.WIDTH + 30);
@@ -538,7 +607,7 @@ function drawCreases(
   random: Random,
   density: number,
 ): void {
-  const count = scaleCount(GRIME.CREASES, density);
+  const count = scaleCount(SET_IN_GRIME.CREASES, density);
 
   for (let index = 0; index < count; index++) {
     const x = random.between(
@@ -579,7 +648,7 @@ function drawFoxing(
   random: Random,
   density: number,
 ): void {
-  const count = scaleCount(GRIME.FOXING, density);
+  const count = scaleCount(SET_IN_GRIME.FOXING, density);
 
   for (let index = 0; index < count; index++) {
     const x = random.between(0, LAYOUT.PHOTO.WIDTH);
@@ -591,36 +660,6 @@ function drawFoxing(
     context.arc(x, y, radius, 0, Math.PI * 2);
     context.fill();
   }
-}
-
-function buildDirtyMask(context: CanvasRenderingContext2D): {
-  columns: number;
-  dirtyCells: Set<number>;
-  rows: number;
-} {
-  const columns = Math.ceil(LAYOUT.PHOTO.WIDTH / CELL_SIZE);
-  const rows = Math.ceil(LAYOUT.PHOTO.HEIGHT / CELL_SIZE);
-  const dirtyCells = new Set<number>();
-  const { data } = context.getImageData(
-    0,
-    0,
-    LAYOUT.PHOTO.WIDTH,
-    LAYOUT.PHOTO.HEIGHT,
-  );
-
-  for (let y = 0; y < LAYOUT.PHOTO.HEIGHT; y++) {
-    const rowOffset = Math.floor(y / CELL_SIZE) * columns;
-
-    for (let x = 0; x < LAYOUT.PHOTO.WIDTH; x++) {
-      const alpha = data[(y * LAYOUT.PHOTO.WIDTH + x) * 4 + 3];
-
-      if (alpha > DIRT_ALPHA_THRESHOLD) {
-        dirtyCells.add(rowOffset + Math.floor(x / CELL_SIZE));
-      }
-    }
-  }
-
-  return { columns, dirtyCells, rows };
 }
 
 function scaleCount(base: number, density: number): number {

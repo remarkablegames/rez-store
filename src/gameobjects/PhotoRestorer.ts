@@ -1,25 +1,35 @@
 import Phaser from 'phaser';
 
-import { LAYOUT } from '../constants';
+import { LAYOUT, THEME } from '../constants';
 import type {
   Brush,
+  ColorValue,
   Level,
   PhotoTextures,
   RestoreStage,
   SurfaceResult,
 } from '../types';
 import {
+  clampBinary,
   createLampGlowTexture,
   createParticles,
   createPhotoTextures,
   measureSurface,
   ScratchSound,
+  SET_IN_GRIME_WEIGHT,
 } from '../utils';
 
 const DUST_PUFF_INTERVAL = 80;
 const TEXTURE_REFRESH_INTERVAL = 34;
+const INSPECTION_REFRESH_INTERVAL = 160;
 const MAX_COOL_CAST = 0.55;
+const MAX_TINT_CAST = 0.32;
 const COOL_CAST_COLOR = 0x6f8fb8;
+const DEFAULT_COLOR_TARGET: ColorValue = { temperature: 0.5, tint: 0.5 };
+const OVERSCRUB_THRESHOLD = 0.045;
+const DAMAGE_INTERVAL = 70;
+const DAMAGE_PER_STAMP = 0.05;
+const DAMAGE_FULL_CELL_FRACTION = 0.1;
 
 interface PhotoRestorerOptions {
   level: Level;
@@ -34,18 +44,26 @@ export class PhotoRestorer {
   private readonly photoTextures: PhotoTextures;
   private readonly agedImage: Phaser.GameObjects.Image;
   private readonly colorCast: Phaser.GameObjects.Rectangle;
+  private readonly tintCast: Phaser.GameObjects.Rectangle;
   private readonly lampGlow?: Phaser.GameObjects.Image;
+  private readonly inspection: Phaser.GameObjects.Graphics;
   private readonly brushCursor: Phaser.GameObjects.Arc;
-  private readonly cleanedCells = new Set<number>();
+  private readonly looseCells: Float32Array;
+  private readonly setInCells: Float32Array;
+  private readonly damageCells: Float32Array;
   private readonly x: number;
   private readonly y: number;
   private brush: Brush;
   private stage: RestoreStage = 'clean';
   private isScrubbing = false;
+  private inspecting = false;
   private lastPoint: Phaser.Math.Vector2 | null = null;
   private grimeNeedsRefresh = false;
+  private damageNeedsRefresh = false;
   private lastTextureRefresh = 0;
+  private lastInspectionRefresh = 0;
   private lastDustPuff = 0;
+  private lastDamageStamp = 0;
   private pointerOverPhotoFrame = false;
   private readonly scratchSound: ScratchSound;
 
@@ -65,10 +83,17 @@ export class PhotoRestorer {
       options.level,
       options.grimeSeed,
     );
+    this.looseCells = this.photoTextures.looseCells;
+    this.setInCells = this.photoTextures.setInCells;
+    this.damageCells = new Float32Array(
+      this.photoTextures.columns * this.photoTextures.rows,
+    );
 
     scene.add.image(x, y, this.photoTextures.clean.key);
     this.agedImage = scene.add.image(x, y, this.photoTextures.aged.key);
+    scene.add.image(x, y, this.photoTextures.setIn.key);
     scene.add.image(x, y, this.photoTextures.grime.key);
+    scene.add.image(x, y, this.photoTextures.damage.key);
 
     if (options.lamp) {
       const lampTexture = createLampGlowTexture(scene);
@@ -86,6 +111,18 @@ export class PhotoRestorer {
       )
       .setAlpha(0)
       .setVisible(false);
+    this.tintCast = scene.add
+      .rectangle(
+        x,
+        y,
+        LAYOUT.PHOTO.WIDTH,
+        LAYOUT.PHOTO.HEIGHT,
+        THEME.SHAPE_COLOR.TINT_MAGENTA,
+        1,
+      )
+      .setAlpha(0)
+      .setVisible(false);
+    this.inspection = scene.add.graphics().setVisible(false);
     this.brushCursor = scene.add
       .circle(x, y, this.brush.radius, 0xffffff, 0.045)
       .setStrokeStyle(2, 0xffffff, 0.78)
@@ -104,22 +141,75 @@ export class PhotoRestorer {
     this.brushCursor.setRadius(brush.radius);
   }
 
-  setColorValue(value: number): void {
+  setColorValue(value: ColorValue): void {
     if (this.stage !== 'color') {
       return;
     }
 
-    const target = Phaser.Math.Clamp(this.level.colorTarget ?? 0.5, 0.1, 0.9);
-    const next = Phaser.Math.Clamp(value, 0, 1);
+    const target = this.level.colorTarget ?? DEFAULT_COLOR_TARGET;
+    const temperatureTarget = Phaser.Math.Clamp(target.temperature, 0.1, 0.9);
+    const tintTarget = Phaser.Math.Clamp(target.tint, 0.1, 0.9);
+    const temperature = Phaser.Math.Clamp(value.temperature, 0, 1);
+    const tint = Phaser.Math.Clamp(value.tint, 0, 1);
 
-    if (next <= target) {
-      this.agedImage.setAlpha(1 - next / target);
+    if (temperature <= temperatureTarget) {
+      const warmth =
+        temperatureTarget > 0
+          ? (temperatureTarget - temperature) / temperatureTarget
+          : 1;
+
+      this.agedImage.setAlpha(warmth);
       this.colorCast.setAlpha(0);
+    } else {
+      const cool =
+        temperatureTarget < 1
+          ? (temperature - temperatureTarget) / (1 - temperatureTarget)
+          : 1;
+
+      this.agedImage.setAlpha(0);
+      this.colorCast.setAlpha(cool * MAX_COOL_CAST);
+    }
+
+    const tintOffset = tint - tintTarget;
+
+    if (Math.abs(tintOffset) < 0.005) {
+      this.tintCast.setAlpha(0);
       return;
     }
 
-    this.agedImage.setAlpha(0);
-    this.colorCast.setAlpha(((next - target) / (1 - target)) * MAX_COOL_CAST);
+    const tintStrength =
+      tintOffset < 0
+        ? tintTarget > 0
+          ? -tintOffset / tintTarget
+          : 1
+        : tintTarget < 1
+          ? tintOffset / (1 - tintTarget)
+          : 1;
+
+    this.tintCast
+      .setFillStyle(
+        tintOffset < 0
+          ? THEME.SHAPE_COLOR.TINT_MAGENTA
+          : THEME.SHAPE_COLOR.TINT_GREEN,
+      )
+      .setAlpha(Phaser.Math.Clamp(tintStrength, 0, 1) * MAX_TINT_CAST);
+  }
+
+  setInspecting(inspecting: boolean): void {
+    if (this.stage !== 'clean') {
+      return;
+    }
+
+    this.inspecting = inspecting;
+    this.inspection.setVisible(inspecting);
+
+    if (!inspecting) {
+      this.inspection.clear();
+      return;
+    }
+
+    this.refreshInspection();
+    this.lastInspectionRefresh = this.scene.time.now;
   }
 
   commitSurface(): SurfaceResult | null {
@@ -128,18 +218,28 @@ export class PhotoRestorer {
     }
 
     const result = measureSurface(
-      this.photoTextures.grime.context,
+      [
+        { context: this.photoTextures.grime.context },
+        {
+          context: this.photoTextures.setIn.context,
+          weight: SET_IN_GRIME_WEIGHT,
+        },
+      ],
       this.photoTextures.dirt,
+      this.getDamage(),
     );
 
     this.stage = 'color';
     this.isScrubbing = false;
     this.lastPoint = null;
     this.pointerOverPhotoFrame = false;
+    this.inspecting = false;
+    this.inspection.clear().setVisible(false);
     this.brushCursor.setVisible(false);
     this.lampGlow?.setVisible(false);
     this.scene.input.setDefaultCursor('default');
     this.colorCast.setVisible(true);
+    this.tintCast.setVisible(true);
 
     return result;
   }
@@ -233,7 +333,7 @@ export class PhotoRestorer {
       return;
     }
 
-    const { edge, radius } = this.brush;
+    const { radius } = this.brush;
 
     if (
       localX < -radius ||
@@ -244,8 +344,35 @@ export class PhotoRestorer {
       return;
     }
 
-    const hadGrime = this.hasDirtyCellNear(localX, localY);
-    const { context } = this.photoTextures.grime;
+    const remaining = this.getMaxGrimeNear(localX, localY);
+
+    this.eraseLayer(this.photoTextures.grime.context, localX, localY, 1);
+    this.eraseLayer(
+      this.photoTextures.setIn.context,
+      localX,
+      localY,
+      this.brush.strength,
+    );
+    this.removeGrimeFromCells(localX, localY);
+
+    this.grimeNeedsRefresh = true;
+
+    if (remaining < OVERSCRUB_THRESHOLD) {
+      this.applyOverScrub(localX, localY);
+    } else {
+      this.spawnDust(localX, localY);
+    }
+
+    this.scratchSound.play(remaining >= OVERSCRUB_THRESHOLD);
+  }
+
+  private eraseLayer(
+    context: CanvasRenderingContext2D,
+    localX: number,
+    localY: number,
+    opacity: number,
+  ): void {
+    const { edge, radius } = this.brush;
     const gradient = context.createRadialGradient(
       localX,
       localY,
@@ -254,8 +381,9 @@ export class PhotoRestorer {
       localY,
       radius,
     );
-    gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-    gradient.addColorStop(edge, 'rgba(0, 0, 0, 0.96)');
+
+    gradient.addColorStop(0, `rgba(0, 0, 0, ${String(opacity)})`);
+    gradient.addColorStop(edge, `rgba(0, 0, 0, ${String(opacity * 0.96)})`);
     gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
     context.save();
@@ -265,44 +393,11 @@ export class PhotoRestorer {
     context.arc(localX, localY, radius, 0, Math.PI * 2);
     context.fill();
     context.restore();
-
-    this.grimeNeedsRefresh = true;
-    this.markCleanedCells(localX, localY);
-
-    if (hadGrime) {
-      this.spawnDust(localX, localY);
-    }
-
-    this.scratchSound.play(hadGrime);
   }
 
-  private hasDirtyCellNear(localX: number, localY: number): boolean {
-    const { cellSize, columns, dirtyCells, rows } = this.photoTextures;
-    const reach = this.brush.radius * 0.72;
-    const minColumn = Math.max(0, Math.floor((localX - reach) / cellSize));
-    const maxColumn = Math.min(
-      columns - 1,
-      Math.floor((localX + reach) / cellSize),
-    );
-    const minRow = Math.max(0, Math.floor((localY - reach) / cellSize));
-    const maxRow = Math.min(rows - 1, Math.floor((localY + reach) / cellSize));
-
-    for (let row = minRow; row <= maxRow; row++) {
-      for (let column = minColumn; column <= maxColumn; column++) {
-        const index = row * columns + column;
-
-        if (dirtyCells.has(index) && !this.cleanedCells.has(index)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  private markCleanedCells(localX: number, localY: number): void {
-    const { cellSize, columns, dirtyCells, rows } = this.photoTextures;
-    const reach = this.brush.radius * 0.8;
+  private getMaxGrimeNear(localX: number, localY: number): number {
+    const { cellSize, columns, rows } = this.photoTextures;
+    const reach = Math.max(8, this.brush.radius * 0.55);
     const reachSquared = reach * reach;
     const minColumn = Math.max(0, Math.floor((localX - reach) / cellSize));
     const maxColumn = Math.min(
@@ -311,21 +406,227 @@ export class PhotoRestorer {
     );
     const minRow = Math.max(0, Math.floor((localY - reach) / cellSize));
     const maxRow = Math.min(rows - 1, Math.floor((localY + reach) / cellSize));
+    let remaining = 0;
 
     for (let row = minRow; row <= maxRow; row++) {
       for (let column = minColumn; column <= maxColumn; column++) {
-        const index = row * columns + column;
-
-        if (!dirtyCells.has(index) || this.cleanedCells.has(index)) {
-          continue;
-        }
-
         const deltaX = (column + 0.5) * cellSize - localX;
         const deltaY = (row + 0.5) * cellSize - localY;
 
-        if (deltaX * deltaX + deltaY * deltaY <= reachSquared) {
-          this.cleanedCells.add(index);
+        if (deltaX * deltaX + deltaY * deltaY > reachSquared) {
+          continue;
         }
+
+        const index = row * columns + column;
+        remaining = Math.max(
+          remaining,
+          this.looseCells[index] + this.setInCells[index],
+        );
+      }
+    }
+
+    return remaining;
+  }
+
+  private removeGrimeFromCells(localX: number, localY: number): void {
+    const { cellSize, columns, rows } = this.photoTextures;
+    const { radius } = this.brush;
+    const radiusSquared = radius * radius;
+    const minColumn = Math.max(0, Math.floor((localX - radius) / cellSize));
+    const maxColumn = Math.min(
+      columns - 1,
+      Math.floor((localX + radius) / cellSize),
+    );
+    const minRow = Math.max(0, Math.floor((localY - radius) / cellSize));
+    const maxRow = Math.min(rows - 1, Math.floor((localY + radius) / cellSize));
+
+    for (let row = minRow; row <= maxRow; row++) {
+      for (let column = minColumn; column <= maxColumn; column++) {
+        const deltaX = (column + 0.5) * cellSize - localX;
+        const deltaY = (row + 0.5) * cellSize - localY;
+        const distanceSquared = deltaX * deltaX + deltaY * deltaY;
+
+        if (distanceSquared > radiusSquared) {
+          continue;
+        }
+
+        const falloff = this.getStampFalloff(distanceSquared);
+        const index = row * columns + column;
+
+        this.looseCells[index] = Math.max(
+          0,
+          this.looseCells[index] * (1 - falloff),
+        );
+        this.setInCells[index] = Math.max(
+          0,
+          this.setInCells[index] * (1 - falloff * this.brush.strength),
+        );
+      }
+    }
+  }
+
+  private getStampFalloff(distanceSquared: number): number {
+    const { edge, radius } = this.brush;
+    const distance = Math.sqrt(distanceSquared);
+    const fullStrength = radius * edge;
+
+    if (distance <= fullStrength) {
+      return 1;
+    }
+
+    return Math.max(0, (radius - distance) / (radius - fullStrength));
+  }
+
+  private applyOverScrub(localX: number, localY: number): void {
+    const now = this.scene.time.now;
+
+    if (now - this.lastDamageStamp < DAMAGE_INTERVAL) {
+      return;
+    }
+
+    this.lastDamageStamp = now;
+
+    const { cellSize, columns, rows } = this.photoTextures;
+    const radius = this.brush.radius * 0.8;
+    const radiusSquared = radius * radius;
+    const minColumn = Math.max(0, Math.floor((localX - radius) / cellSize));
+    const maxColumn = Math.min(
+      columns - 1,
+      Math.floor((localX + radius) / cellSize),
+    );
+    const minRow = Math.max(0, Math.floor((localY - radius) / cellSize));
+    const maxRow = Math.min(rows - 1, Math.floor((localY + radius) / cellSize));
+    const amount = DAMAGE_PER_STAMP * this.brush.abrasion;
+
+    for (let row = minRow; row <= maxRow; row++) {
+      for (let column = minColumn; column <= maxColumn; column++) {
+        const deltaX = (column + 0.5) * cellSize - localX;
+        const deltaY = (row + 0.5) * cellSize - localY;
+        const distanceSquared = deltaX * deltaX + deltaY * deltaY;
+
+        if (distanceSquared > radiusSquared) {
+          continue;
+        }
+
+        const index = row * columns + column;
+        const falloff = this.getStampFalloff(distanceSquared);
+
+        this.damageCells[index] = clampBinary(
+          this.damageCells[index] + amount * falloff,
+        );
+      }
+    }
+
+    this.drawAbrasion(localX, localY);
+    this.damageNeedsRefresh = true;
+  }
+
+  private drawAbrasion(localX: number, localY: number): void {
+    const context = this.photoTextures.damage.context;
+    const random = Phaser.Math.RND;
+
+    context.save();
+    context.lineCap = 'round';
+
+    for (let index = 0; index < 2; index++) {
+      const angle = random.realInRange(0, Math.PI * 2);
+      const length = random.realInRange(5, 16);
+      const startX = localX + random.realInRange(-7, 7);
+      const startY = localY + random.realInRange(-7, 7);
+      const endX = startX + Math.cos(angle) * length;
+      const endY = startY + Math.sin(angle) * length;
+      const bend = random.realInRange(-4, 4);
+
+      context.strokeStyle = `rgba(255, 247, 227, ${String(
+        random.realInRange(0.12, 0.24),
+      )})`;
+      context.lineWidth = random.realInRange(0.5, 1.1);
+      context.beginPath();
+      context.moveTo(startX, startY);
+      context.quadraticCurveTo(
+        (startX + endX) / 2 - Math.sin(angle) * bend,
+        (startY + endY) / 2 + Math.cos(angle) * bend,
+        endX,
+        endY,
+      );
+      context.stroke();
+    }
+
+    context.restore();
+  }
+
+  private getDamage(): number {
+    let total = 0;
+
+    for (const value of this.damageCells) {
+      total += value;
+    }
+
+    return clampBinary(
+      total / (this.damageCells.length * DAMAGE_FULL_CELL_FRACTION),
+    );
+  }
+
+  private refreshInspection(): void {
+    const surface = measureSurface(
+      [
+        { context: this.photoTextures.grime.context },
+        {
+          context: this.photoTextures.setIn.context,
+          weight: SET_IN_GRIME_WEIGHT,
+        },
+      ],
+      this.photoTextures.dirt,
+    );
+    const left = this.x - LAYOUT.PHOTO.WIDTH / 2;
+    const top = this.y - LAYOUT.PHOTO.HEIGHT / 2;
+    const zoneWidth = LAYOUT.PHOTO.WIDTH / surface.columns;
+    const zoneHeight = LAYOUT.PHOTO.HEIGHT / surface.rows;
+
+    this.inspection.clear();
+
+    for (let index = 0; index < surface.zones.length; index++) {
+      const remaining = surface.zones[index] ?? 0;
+
+      if (remaining <= 0.01) {
+        continue;
+      }
+
+      const column = index % surface.columns;
+      const row = Math.floor(index / surface.columns);
+
+      this.inspection.fillStyle(
+        THEME.SHAPE_COLOR.INSPECT_GRIME,
+        0.08 + remaining * 0.32,
+      );
+      this.inspection.fillRect(
+        left + column * zoneWidth,
+        top + row * zoneHeight,
+        zoneWidth - 1,
+        zoneHeight - 1,
+      );
+    }
+
+    const { cellSize, columns, rows } = this.photoTextures;
+
+    for (let row = 0; row < rows; row++) {
+      for (let column = 0; column < columns; column++) {
+        const damage = this.damageCells[row * columns + column];
+
+        if (damage <= 0.04) {
+          continue;
+        }
+
+        this.inspection.fillStyle(
+          THEME.SHAPE_COLOR.HEAT_DIRT,
+          Math.min(0.55, 0.12 + damage * 0.5),
+        );
+        this.inspection.fillRect(
+          left + column * cellSize,
+          top + row * cellSize,
+          cellSize - 1,
+          cellSize - 1,
+        );
       }
     }
   }
@@ -383,13 +684,32 @@ export class PhotoRestorer {
       this.brushCursor.setPosition(pointer.x, pointer.y);
     }
 
+    const now = this.scene.time.now;
+
     if (
-      this.grimeNeedsRefresh &&
-      this.scene.time.now - this.lastTextureRefresh >= TEXTURE_REFRESH_INTERVAL
+      (this.grimeNeedsRefresh || this.damageNeedsRefresh) &&
+      now - this.lastTextureRefresh >= TEXTURE_REFRESH_INTERVAL
     ) {
-      this.photoTextures.grime.refresh();
+      if (this.grimeNeedsRefresh) {
+        this.photoTextures.grime.refresh();
+        this.photoTextures.setIn.refresh();
+      }
+
+      if (this.damageNeedsRefresh) {
+        this.photoTextures.damage.refresh();
+      }
+
       this.grimeNeedsRefresh = false;
-      this.lastTextureRefresh = this.scene.time.now;
+      this.damageNeedsRefresh = false;
+      this.lastTextureRefresh = now;
+    }
+
+    if (
+      this.inspecting &&
+      now - this.lastInspectionRefresh >= INSPECTION_REFRESH_INTERVAL
+    ) {
+      this.refreshInspection();
+      this.lastInspectionRefresh = now;
     }
   }
 }

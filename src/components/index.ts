@@ -6,4 +6,5 @@ export * from './Flash';
 export * from './GradeReport';
 export * from './Hud';
 export * from './Shop';
+export * from './Slider';
 export * from './Stamp';

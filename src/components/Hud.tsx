@@ -1,4 +1,3 @@
-import Phaser from 'phaser';
 import { Rectangle, Text, useState } from 'phaser-jsx';
 
 import { BRUSHES, LAYOUT, THEME } from '../constants';
@@ -6,6 +5,7 @@ import { useUiSound } from '../hooks';
 import type {
   Brush,
   BrushId,
+  ColorValue,
   HudController,
   JobReport,
   Level,
@@ -14,6 +14,7 @@ import type {
 import { BrushPicker } from './BrushPicker';
 import { Button } from './Button';
 import { GradeReport } from './GradeReport';
+import { Slider } from './Slider';
 
 interface StageCopy {
   step: string;
@@ -26,21 +27,22 @@ const COPY: Record<'clean' | 'color', StageCopy> = {
   clean: {
     step: 'SURFACE',
     title: 'Surface Cleaning',
-    instruction: 'Clean until the photo looks clear to you.',
+    instruction: 'Lift the dust and remove the grime.',
     tip: 'Trust your eye.',
   },
   color: {
     step: 'COLOR',
     title: 'Color Balance',
-    instruction: 'Balance the tint until the skin tones feel natural.',
+    instruction:
+      'Balance the temperature and tint until the skin tones feel natural.',
     tip: 'Skin tones are the giveaway.',
   },
 };
 
 const BRUSH_TIPS: Record<BrushId, string> = {
-  standard: 'Trust your eye.',
-  wide: 'Sweep broadly, then finish the edges.',
-  detail: 'Firm strokes for corners and edges.',
+  standard: 'Steady pressure. Set-in grime needs another pass.',
+  wide: 'Sweep the loose dust, then switch to a firmer tip.',
+  detail: 'Firm strokes lift set-in grime. Do not linger on clean areas.',
 };
 
 interface HudProps {
@@ -51,12 +53,13 @@ interface HudProps {
   brushes: Brush[];
   equippedBrush: BrushId;
   onReady: (controller: HudController) => void;
-  onColorChange: (value: number) => void;
+  onColorChange: (value: ColorValue) => void;
   onContinue: () => void;
   onDeliver: () => void;
   onNext: () => void;
   onShop: () => void;
   onBrushChange: (brush: Brush) => void;
+  onInspectChange: (inspecting: boolean) => void;
 }
 
 export function Hud({
@@ -73,12 +76,16 @@ export function Hud({
   onNext,
   onShop,
   onBrushChange,
+  onInspectChange,
 }: HudProps) {
   const [stage, setStage] = useState<RestoreStage>('clean');
   const [report, setReport] = useState<JobReport | null>(null);
-  const [colorValue, setColorValue] = useState(0);
-  const [draggingSlider, setDraggingSlider] = useState(false);
+  const [colorValue, setColorValue] = useState<ColorValue>({
+    temperature: 0,
+    tint: 0,
+  });
   const [selectedBrush, setSelectedBrush] = useState<BrushId>(equippedBrush);
+  const [inspecting, setInspecting] = useState(false);
   const uiSound = useUiSound();
 
   onReady({ setStage, setReport });
@@ -91,26 +98,46 @@ export function Hud({
   const step = `JOB ${jobNumber} / ${copy.step}`;
   const activeBrush =
     brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.standard;
-  const tip = isClean ? BRUSH_TIPS[activeBrush.id] : copy.tip;
+  const tip = isClean
+    ? inspecting
+      ? 'Blue cells are missed grime. Red marks are abrasion.'
+      : BRUSH_TIPS[activeBrush.id]
+    : copy.tip;
 
   const selectBrush = (brush: Brush): void => {
     setSelectedBrush(brush.id);
     onBrushChange(brush);
   };
 
-  const updateColorFromPointer = (pointer: Phaser.Input.Pointer): void => {
-    const value = Phaser.Math.Clamp(
-      (pointer.x - LAYOUT.HUD.CONTENT_X) / LAYOUT.HUD.CONTENT_WIDTH,
-      0,
-      1,
-    );
+  const updateTemperature = (temperature: number): void => {
+    const next = { ...colorValue, temperature };
 
-    setColorValue(value);
-    onColorChange(value);
+    setColorValue(next);
+    onColorChange(next);
   };
 
-  const finishColorDrag = (): void => {
-    setDraggingSlider(false);
+  const updateTint = (tint: number): void => {
+    const next = { ...colorValue, tint };
+
+    setColorValue(next);
+    onColorChange(next);
+  };
+
+  const toggleInspection = (): void => {
+    const next = !inspecting;
+
+    setInspecting(next);
+    onInspectChange(next);
+    uiSound.play('select');
+  };
+
+  const continueToColor = (): void => {
+    if (inspecting) {
+      setInspecting(false);
+      onInspectChange(false);
+    }
+
+    onContinue();
   };
 
   return (
@@ -180,6 +207,19 @@ export function Hud({
         visible={isClean}
       />
 
+      {isClean && (
+        <Button
+          x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH - 45}
+          y={292}
+          width={90}
+          height={24}
+          onClick={toggleInspection}
+          variant="secondary"
+        >
+          {inspecting ? 'HIDE MAP' : 'INSPECT'}
+        </Button>
+      )}
+
       {isClean && brushes.length === 1 && (
         <>
           <Rectangle
@@ -228,7 +268,9 @@ export function Hud({
           <Text
             x={LAYOUT.HUD.CONTENT_X}
             y={356}
-            text={`${activeBrush.name.toUpperCase()} · R${String(activeBrush.radius)}`}
+            text={`${activeBrush.name.toUpperCase()} · R${String(
+              activeBrush.radius,
+            )} · STR ${String(Math.round(activeBrush.strength * 100))}`}
             style={{
               fontFamily: THEME.FONT.MONO,
               fontSize: 12,
@@ -252,99 +294,31 @@ export function Hud({
         visible={isColor}
       />
 
-      <Rectangle
-        x={LAYOUT.HUD.CONTENT_X}
-        y={LAYOUT.COLOR_SLIDER.Y}
-        width={LAYOUT.HUD.CONTENT_WIDTH}
-        height={LAYOUT.COLOR_SLIDER.TRACK_HEIGHT}
-        originX={0}
-        originY={0.5}
-        fillColor={THEME.SHAPE_COLOR.TRACK}
-        visible={isColor}
-      />
+      {isColor && (
+        <>
+          <Slider
+            y={LAYOUT.COLOR_SLIDER.TEMPERATURE_Y}
+            label="TEMPERATURE"
+            lowLabel="WARM"
+            highLabel="COOL"
+            value={colorValue.temperature}
+            onChange={updateTemperature}
+          />
 
-      <Rectangle
-        x={LAYOUT.HUD.CONTENT_X}
-        y={LAYOUT.COLOR_SLIDER.Y}
-        width={LAYOUT.HUD.CONTENT_WIDTH}
-        height={LAYOUT.COLOR_SLIDER.TRACK_HEIGHT}
-        originX={0}
-        originY={0.5}
-        fillColor={THEME.SHAPE_COLOR.GOLD}
-        scaleX={colorValue}
-        visible={isColor}
-      />
-
-      <Rectangle
-        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH * colorValue}
-        y={LAYOUT.COLOR_SLIDER.Y}
-        width={LAYOUT.COLOR_SLIDER.KNOB_WIDTH}
-        height={LAYOUT.COLOR_SLIDER.KNOB_HEIGHT}
-        originX={0.5}
-        originY={0.5}
-        fillColor={THEME.SHAPE_COLOR.KNOB}
-        visible={isColor}
-      />
-
-      <Rectangle
-        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
-        y={LAYOUT.COLOR_SLIDER.Y}
-        width={LAYOUT.HUD.CONTENT_WIDTH + 24}
-        height={LAYOUT.COLOR_SLIDER.HIT_HEIGHT}
-        originX={0.5}
-        originY={0.5}
-        fillColor={0xffffff}
-        fillAlpha={0.001}
-        visible={isColor}
-        input={{ cursor: 'ew-resize' }}
-        onPointerDown={(pointer) => {
-          setDraggingSlider(true);
-          updateColorFromPointer(pointer);
-          uiSound.play('drop');
-        }}
-        onPointerMove={(pointer) => {
-          if (draggingSlider) {
-            updateColorFromPointer(pointer);
-          }
-        }}
-        onPointerUp={() => {
-          finishColorDrag();
-        }}
-        onPointerUpOutside={() => {
-          finishColorDrag();
-        }}
-      />
+          <Slider
+            y={LAYOUT.COLOR_SLIDER.TINT_Y}
+            label="TINT"
+            lowLabel="MAGENTA"
+            highLabel="GREEN"
+            value={colorValue.tint}
+            onChange={updateTint}
+          />
+        </>
+      )}
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={LAYOUT.COLOR_SLIDER.Y + 20}
-        text="TOO WARM"
-        style={{
-          fontFamily: THEME.FONT.MONO,
-          fontSize: 12,
-          color: THEME.TEXT_COLOR.FAINT,
-          letterSpacing: 1,
-        }}
-        visible={isColor}
-      />
-
-      <Text
-        x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH}
-        y={LAYOUT.COLOR_SLIDER.Y + 20}
-        text="TOO COOL"
-        style={{
-          fontFamily: THEME.FONT.MONO,
-          fontSize: 12,
-          color: THEME.TEXT_COLOR.FAINT,
-          letterSpacing: 1,
-        }}
-        originX={1}
-        visible={isColor}
-      />
-
-      <Text
-        x={LAYOUT.HUD.CONTENT_X}
-        y={isClean ? 386 : 404}
+        y={isClean ? 386 : 436}
         text={tip}
         style={{
           fontFamily: THEME.FONT.SANS,
@@ -359,7 +333,7 @@ export function Hud({
 
       <Rectangle
         x={LAYOUT.HUD.CONTENT_X}
-        y={440}
+        y={474}
         width={LAYOUT.HUD.CONTENT_WIDTH}
         height={1}
         originX={0}
@@ -371,7 +345,7 @@ export function Hud({
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={452}
+        y={486}
         text="JOB FEE"
         style={{
           fontFamily: THEME.FONT.MONO,
@@ -384,11 +358,11 @@ export function Hud({
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={468}
+        y={500}
         text={`$${String(level.fee)}`}
         style={{
           fontFamily: THEME.FONT.SERIF,
-          fontSize: 30,
+          fontSize: 28,
           color: THEME.TEXT_COLOR.CREAM,
         }}
         visible={!isComplete}
@@ -396,7 +370,7 @@ export function Hud({
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={534}
+        y={544}
         text="EARNINGS"
         style={{
           fontFamily: THEME.FONT.MONO,
@@ -409,7 +383,7 @@ export function Hud({
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={550}
+        y={560}
         text={`$${String(earnings)}`}
         style={{
           fontFamily: THEME.FONT.SERIF,
@@ -421,7 +395,7 @@ export function Hud({
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={580}
+        y={590}
         text={bestPayout > 0 ? `BEST $${String(bestPayout)}` : 'FIRST DELIVERY'}
         style={{
           fontFamily: THEME.FONT.MONO,
@@ -438,7 +412,7 @@ export function Hud({
           y={638}
           width={LAYOUT.HUD.CONTENT_WIDTH}
           height={44}
-          onClick={isClean ? onContinue : onDeliver}
+          onClick={isClean ? continueToColor : onDeliver}
         >
           {isClean ? 'CONTINUE TO COLOR' : 'DELIVER PHOTO'}
         </Button>

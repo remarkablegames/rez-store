@@ -13,6 +13,12 @@ export interface Brush {
   /** Fraction of the radius that erases at full strength before the soft falloff. */
   edge: number;
 
+  /** Fraction of set-in grime removed per stamp at full pressure (0-1). */
+  strength: number;
+
+  /** Relative risk of abrading the print when over-scrubbing. */
+  abrasion: number;
+
   /** Bristle width used by the brush icon. */
   bristleWidth: number;
 

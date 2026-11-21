@@ -1,4 +1,5 @@
 export * from './brush';
+export * from './color';
 export * from './config';
 export * from './dirt';
 export * from './grading';

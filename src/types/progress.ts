@@ -6,6 +6,7 @@ export interface JobRecord {
   payout: number;
   grade: GradeLetter;
   colorTarget?: number;
+  tintTarget?: number;
 }
 
 export interface Progress {

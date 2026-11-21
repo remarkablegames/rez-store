@@ -1,3 +1,5 @@
+import type { ColorValue } from './color';
+
 export interface Grime {
   /** Opacity (0–1) of the all-over dust film. */
   haze: number;
@@ -18,10 +20,10 @@ export interface Level {
   focusY?: number;
 
   /**
-   * Hidden neutral point (0–1) on the development slider. Values below it are
-   * too warm, values above it are too cool.
+   * Hidden neutral point on the development controls. Values below the target
+   * are warm or magenta, values above it are cool or green.
    */
-  colorTarget?: number;
+  colorTarget?: ColorValue;
 
   /** Maximum payout for a perfect restoration. */
   fee: number;

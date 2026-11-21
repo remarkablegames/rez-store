@@ -37,7 +37,7 @@ export function Slider({
     <>
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={y - 22}
+        y={y - 28}
         text={label}
         style={{
           fontFamily: THEME.FONT.MONO,
@@ -120,6 +120,7 @@ export function Slider({
           letterSpacing: 1,
         }}
         originX={1}
+        originY={0}
       />
     </>
   );

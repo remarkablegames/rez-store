@@ -23,8 +23,8 @@ export const HUD = {
 } as const;
 
 export const COLOR_SLIDER = {
-  TEMPERATURE_Y: 338,
-  TINT_Y: 402,
+  TEMPERATURE_Y: 324,
+  TINT_Y: 396,
   TRACK_HEIGHT: 6,
   HIT_HEIGHT: 40,
   KNOB_WIDTH: 12,

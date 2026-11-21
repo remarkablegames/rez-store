@@ -281,19 +281,6 @@ export function Hud({
         </>
       )}
 
-      <Text
-        x={LAYOUT.HUD.CONTENT_X}
-        y={298}
-        text="DEVELOPMENT"
-        style={{
-          fontFamily: THEME.FONT.MONO,
-          fontSize: 12,
-          color: THEME.TEXT_COLOR.GOLD,
-          letterSpacing: 1.5,
-        }}
-        visible={isColor}
-      />
-
       {isColor && (
         <>
           <Slider

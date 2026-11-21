@@ -27,10 +27,23 @@ Or download for desktop:
   - [A young girl with a big smile and hearts](https://unsplash.com/photos/a-young-girl-with-a-big-smile-and-hearts-nufhUFkjU1o)
   - [Hands reach toward the sky in a field](https://unsplash.com/photos/hands-reach-toward-the-sky-in-a-field-rjOikduibSA)
 
+### Music
+
+- [FASSounds](https://pixabay.com/users/fassounds-3433550/)
+  - [Cutie Japan Lofi](https://pixabay.com/music/beats-cutie-japan-lofi-402355/)
+  - [Good Night - Lofi Cozy Chill Music](https://pixabay.com/music/beats-good-night-lofi-cozy-chill-music-160166/)
+  - [Lofi Beat](https://pixabay.com/music/beats-lofi-beat-140856/)
+  - [Lofi Polaroids](https://pixabay.com/music/beats-lofi-polaroids-632981/)
+  - [Starry Night - Aesthetic Dreamy Lofi](https://pixabay.com/music/beats-starry-night-aesthetic-dreamy-lofi-199740/)
+  - [Take A Break - Cozy Ambient Lofi](https://pixabay.com/music/beats-take-a-break-cozy-ambient-lofi-199738/)
+- [ZephiraMusic](https://pixabay.com/users/zephiramusic-54643547/)
+  - [Chill Lofi](https://pixabay.com/music/lofi-chill-lofi-585360/)
+  - [Lofi Christmas](https://pixabay.com/music/lofi-lofi-christmas-613825/)
+
 ### Sounds
 
 - [Kenney Interface Sounds](https://kenney.nl/assets/interface-sounds)
-- [Pixabay](https://pixabay.com/sound-effects/)
+- [Sound effects from Pixabay](https://pixabay.com/sound-effects/)
   - [scratching](https://pixabay.com/sound-effects/film-special-effects-scratching-85152/)
 
 ## Prerequisites

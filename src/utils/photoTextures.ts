@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import { KEY, LAYOUT } from '../constants';
 import type { Grime, Level, PhotoTextures } from '../types';
 import { createCanvasTexture } from './canvasTexture';
+import { rgba } from './color';
 import {
   buildDirtCells,
   combineDirtProfiles,
@@ -235,8 +236,8 @@ function addAgedFinish(context: CanvasRenderingContext2D): void {
     const radius = random.between(50, 170);
     const alpha = random.realInRange(0.02, 0.07);
     const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, `rgba(122, 82, 35, ${String(alpha)})`);
-    gradient.addColorStop(1, 'rgba(122, 82, 35, 0)');
+    gradient.addColorStop(0, rgba(122, 82, 35, alpha));
+    gradient.addColorStop(1, rgba(122, 82, 35, 0));
     context.fillStyle = gradient;
     context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
   }
@@ -249,9 +250,9 @@ function addAgedFinish(context: CanvasRenderingContext2D): void {
     LAYOUT.PHOTO.HEIGHT / 2,
     LAYOUT.PHOTO.WIDTH * 0.72,
   );
-  vignette.addColorStop(0, 'rgba(25, 16, 8, 0)');
-  vignette.addColorStop(0.7, 'rgba(25, 16, 8, 0.12)');
-  vignette.addColorStop(1, 'rgba(25, 16, 8, 0.55)');
+  vignette.addColorStop(0, rgba(25, 16, 8, 0));
+  vignette.addColorStop(0.7, rgba(25, 16, 8, 0.12));
+  vignette.addColorStop(1, rgba(25, 16, 8, 0.55));
   context.fillStyle = vignette;
   context.fillRect(0, 0, LAYOUT.PHOTO.WIDTH, LAYOUT.PHOTO.HEIGHT);
 
@@ -262,8 +263,8 @@ function addAgedFinish(context: CanvasRenderingContext2D): void {
     const alpha = random.realInRange(0.015, 0.06);
     context.fillStyle =
       random.frac() > 0.45
-        ? `rgba(255, 241, 210, ${String(alpha)})`
-        : `rgba(36, 25, 14, ${String(alpha)})`;
+        ? rgba(255, 241, 210, alpha)
+        : rgba(36, 25, 14, alpha);
     context.fillRect(x, y, 1, 1);
   }
 
@@ -319,7 +320,7 @@ function drawHaze(
   context.save();
 
   // A translucent film of dust covers the entire print.
-  context.fillStyle = `rgba(82, 69, 50, ${String(opacity)})`;
+  context.fillStyle = rgba(82, 69, 50, opacity);
   context.fillRect(0, 0, LAYOUT.PHOTO.WIDTH, LAYOUT.PHOTO.HEIGHT);
 
   // Uneven darker blooms where grime has settled.
@@ -329,9 +330,9 @@ function drawHaze(
     const radius = random.between(90, 280);
     const alpha = random.realInRange(opacity * 0.4, opacity * 1.15);
     const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, `rgba(44, 34, 22, ${String(alpha)})`);
-    gradient.addColorStop(0.62, `rgba(44, 34, 22, ${String(alpha * 0.55)})`);
-    gradient.addColorStop(1, 'rgba(44, 34, 22, 0)');
+    gradient.addColorStop(0, rgba(44, 34, 22, alpha));
+    gradient.addColorStop(0.62, rgba(44, 34, 22, alpha * 0.55));
+    gradient.addColorStop(1, rgba(44, 34, 22, 0));
     context.fillStyle = gradient;
     context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
   }
@@ -343,8 +344,8 @@ function drawHaze(
     const radius = random.between(50, 180);
     const alpha = random.realInRange(0.015, 0.05);
     const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, `rgba(226, 213, 184, ${String(alpha)})`);
-    gradient.addColorStop(1, 'rgba(226, 213, 184, 0)');
+    gradient.addColorStop(0, rgba(226, 213, 184, alpha));
+    gradient.addColorStop(1, rgba(226, 213, 184, 0));
     context.fillStyle = gradient;
     context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
   }
@@ -356,8 +357,8 @@ function drawHaze(
     const alpha = random.realInRange(0.015, 0.08);
     context.fillStyle =
       random.frac() > 0.6
-        ? `rgba(229, 218, 192, ${String(alpha)})`
-        : `rgba(45, 35, 23, ${String(alpha * 1.2)})`;
+        ? rgba(229, 218, 192, alpha)
+        : rgba(45, 35, 23, alpha * 1.2);
     context.fillRect(x, y, 1, 1);
   }
 
@@ -448,9 +449,9 @@ function drawSmudges(
     const radius = random.realInRange(28, 110);
     const alpha = random.realInRange(0.035, 0.1);
     const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, `rgba(72, 58, 40, ${String(alpha)})`);
-    gradient.addColorStop(0.55, `rgba(72, 58, 40, ${String(alpha * 0.6)})`);
-    gradient.addColorStop(1, 'rgba(72, 58, 40, 0)');
+    gradient.addColorStop(0, rgba(72, 58, 40, alpha));
+    gradient.addColorStop(0.55, rgba(72, 58, 40, alpha * 0.6));
+    gradient.addColorStop(1, rgba(72, 58, 40, 0));
     context.fillStyle = gradient;
     context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
   }
@@ -469,9 +470,9 @@ function drawSetInClumps(
     const radius = random.realInRange(7, 26);
     const alpha = random.realInRange(0.12, 0.32);
     const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, `rgba(48, 34, 20, ${String(alpha)})`);
-    gradient.addColorStop(0.55, `rgba(48, 34, 20, ${String(alpha * 0.7)})`);
-    gradient.addColorStop(1, 'rgba(48, 34, 20, 0)');
+    gradient.addColorStop(0, rgba(48, 34, 20, alpha));
+    gradient.addColorStop(0.55, rgba(48, 34, 20, alpha * 0.7));
+    gradient.addColorStop(1, rgba(48, 34, 20, 0));
     context.fillStyle = gradient;
     context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
   }
@@ -496,21 +497,21 @@ function drawStains(
     context.scale(squash, 1);
 
     const wash = context.createRadialGradient(0, 0, 0, 0, 0, radius);
-    wash.addColorStop(0, 'rgba(96, 64, 32, 0.08)');
-    wash.addColorStop(0.72, 'rgba(96, 64, 32, 0.14)');
-    wash.addColorStop(1, 'rgba(96, 64, 32, 0)');
+    wash.addColorStop(0, rgba(96, 64, 32, 0.08));
+    wash.addColorStop(0.72, rgba(96, 64, 32, 0.14));
+    wash.addColorStop(1, rgba(96, 64, 32, 0));
     context.fillStyle = wash;
     context.beginPath();
     context.arc(0, 0, radius, 0, Math.PI * 2);
     context.fill();
 
-    context.strokeStyle = `rgba(102, 69, 32, ${String(alpha)})`;
+    context.strokeStyle = rgba(102, 69, 32, alpha);
     context.lineWidth = random.realInRange(1, 2.6);
     context.beginPath();
     context.arc(0, 0, radius, 0, Math.PI * 2);
     context.stroke();
 
-    context.strokeStyle = `rgba(102, 69, 32, ${String(alpha * 0.45)})`;
+    context.strokeStyle = rgba(102, 69, 32, alpha * 0.45);
     context.lineWidth = random.realInRange(0.6, 1.4);
     context.beginPath();
     context.arc(
@@ -548,7 +549,7 @@ function drawScratches(
     const alpha = random.realInRange(0.12, 0.34);
     const width = random.realInRange(0.6, 1.5);
 
-    context.strokeStyle = `rgba(58, 46, 31, ${String(alpha)})`;
+    context.strokeStyle = rgba(58, 46, 31, alpha);
     context.lineWidth = width;
     context.beginPath();
     context.moveTo(startX + 0.8, startY + 0.8);
@@ -560,7 +561,7 @@ function drawScratches(
     );
     context.stroke();
 
-    context.strokeStyle = `rgba(255, 246, 224, ${String(alpha + 0.12)})`;
+    context.strokeStyle = rgba(255, 246, 224, alpha + 0.12);
     context.lineWidth = Math.max(0.5, width * 0.75);
     context.beginPath();
     context.moveTo(startX, startY);
@@ -584,9 +585,7 @@ function drawHairs(
     const endX = startX + random.realInRange(-120, 120);
     const endY = startY + random.realInRange(-120, 120);
 
-    context.strokeStyle = `rgba(48, 38, 25, ${String(
-      random.realInRange(0.16, 0.33),
-    )})`;
+    context.strokeStyle = rgba(48, 38, 25, random.realInRange(0.16, 0.33));
     context.lineWidth = random.realInRange(0.6, 1.1);
     context.beginPath();
     context.moveTo(startX, startY);
@@ -617,7 +616,7 @@ function drawCreases(
     const drift = random.realInRange(-80, 80);
     const alpha = random.realInRange(0.1, 0.18);
 
-    context.strokeStyle = `rgba(60, 46, 28, ${String(alpha)})`;
+    context.strokeStyle = rgba(60, 46, 28, alpha);
     context.lineWidth = 2.4;
     context.beginPath();
     context.moveTo(x, -10);
@@ -629,7 +628,7 @@ function drawCreases(
     );
     context.stroke();
 
-    context.strokeStyle = `rgba(255, 242, 218, ${String(alpha * 0.7)})`;
+    context.strokeStyle = rgba(255, 242, 218, alpha * 0.7);
     context.lineWidth = 1;
     context.beginPath();
     context.moveTo(x + 1.5, -10);
@@ -655,7 +654,7 @@ function drawFoxing(
     const y = random.between(0, LAYOUT.PHOTO.HEIGHT);
     const radius = random.realInRange(0.5, 2.2);
     const alpha = random.realInRange(0.15, 0.4);
-    context.fillStyle = `rgba(105, 58, 26, ${String(alpha)})`;
+    context.fillStyle = rgba(105, 58, 26, alpha);
     context.beginPath();
     context.arc(x, y, radius, 0, Math.PI * 2);
     context.fill();

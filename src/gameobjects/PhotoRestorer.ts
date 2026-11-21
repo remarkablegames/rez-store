@@ -15,6 +15,7 @@ import {
   createParticles,
   createPhotoTextures,
   measureSurface,
+  rgba,
   ScratchSound,
   SET_IN_GRIME_WEIGHT,
 } from '../utils';
@@ -387,9 +388,9 @@ export class PhotoRestorer {
       radius,
     );
 
-    gradient.addColorStop(0, `rgba(0, 0, 0, ${String(opacity)})`);
-    gradient.addColorStop(edge, `rgba(0, 0, 0, ${String(opacity * 0.96)})`);
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    gradient.addColorStop(0, rgba(0, 0, 0, opacity));
+    gradient.addColorStop(edge, rgba(0, 0, 0, opacity * 0.96));
+    gradient.addColorStop(1, rgba(0, 0, 0, 0));
 
     context.save();
     context.globalCompositeOperation = 'destination-out';
@@ -542,9 +543,7 @@ export class PhotoRestorer {
       const endY = startY + Math.sin(angle) * length;
       const bend = random.realInRange(-4, 4);
 
-      context.strokeStyle = `rgba(255, 247, 227, ${String(
-        random.realInRange(0.12, 0.24),
-      )})`;
+      context.strokeStyle = rgba(255, 247, 227, random.realInRange(0.12, 0.24));
       context.lineWidth = random.realInRange(0.5, 1.1);
       context.beginPath();
       context.moveTo(startX, startY);

@@ -78,7 +78,7 @@ export class Game extends Phaser.Scene {
       level: { ...level, colorTarget: this.colorTarget },
       grimeSeed: this.grimeSeed,
       brush: BRUSHES[progress.equippedBrush],
-      lamp: progress.lamp,
+      inspect: progress.inspect,
     });
 
     render(
@@ -89,6 +89,7 @@ export class Game extends Phaser.Scene {
         bestPayout={best?.payout ?? 0}
         brushes={getOwnedBrushes(progress)}
         equippedBrush={progress.equippedBrush}
+        inspect={progress.inspect}
         onReady={(controller) => {
           this.hud = controller;
         }}

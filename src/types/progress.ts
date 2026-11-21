@@ -16,7 +16,7 @@ export interface Progress {
   best: Partial<Record<string, JobRecord>>;
   brushes: BrushId[];
   equippedBrush: BrushId;
-  lamp: boolean;
+  inspect: boolean;
 }
 
 export interface JobAward {

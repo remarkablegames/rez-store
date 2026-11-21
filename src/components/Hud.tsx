@@ -52,6 +52,7 @@ interface HudProps {
   bestPayout: number;
   brushes: Brush[];
   equippedBrush: BrushId;
+  inspect: boolean;
   onReady: (controller: HudController) => void;
   onColorChange: (value: ColorValue) => void;
   onContinue: () => void;
@@ -69,6 +70,7 @@ export function Hud({
   bestPayout,
   brushes,
   equippedBrush,
+  inspect,
   onReady,
   onColorChange,
   onContinue,
@@ -207,7 +209,7 @@ export function Hud({
         visible={isClean}
       />
 
-      {isClean && (
+      {isClean && inspect && (
         <Button
           x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH - 45}
           y={292}

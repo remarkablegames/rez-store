@@ -2,7 +2,7 @@ import {
   BRUSH_ORDER,
   BRUSHES,
   DEFAULT_BRUSH_ID,
-  WORK_LAMP,
+  INSPECT_TOOL,
 } from '../constants';
 import type {
   Brush,
@@ -168,19 +168,19 @@ export function equipBrush(brushId: BrushId): Progress | null {
 }
 
 /**
- * Buy the work lamp.
+ * Buy the inspect tool.
  */
-export function buyLamp(): Progress | null {
+export function buyInspect(): Progress | null {
   const progress = loadProgress();
 
-  if (progress.lamp || progress.earnings < WORK_LAMP.price) {
+  if (progress.inspect || progress.earnings < INSPECT_TOOL.price) {
     return null;
   }
 
   const next: Progress = {
     ...progress,
-    earnings: progress.earnings - WORK_LAMP.price,
-    lamp: true,
+    earnings: progress.earnings - INSPECT_TOOL.price,
+    inspect: true,
   };
 
   saveProgress(next);
@@ -224,7 +224,7 @@ function parseProgress(value: unknown): Progress | null {
     ...base,
     brushes,
     equippedBrush,
-    lamp: value.lamp === true,
+    inspect: value.inspect === true,
   };
 }
 
@@ -314,7 +314,7 @@ function createEmptyProgress(): Progress {
     best: {},
     brushes: [DEFAULT_BRUSH_ID],
     equippedBrush: DEFAULT_BRUSH_ID,
-    lamp: false,
+    inspect: false,
   };
 }
 

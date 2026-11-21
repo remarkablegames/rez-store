@@ -3,7 +3,7 @@ import type { Brush, BrushId } from '../types';
 export const BRUSHES: Record<BrushId, Brush> = {
   standard: {
     id: 'standard',
-    name: 'Standard Brush',
+    name: 'Default',
     shortName: 'STANDARD',
     trait: 'BALANCED · STR 50',
     description:
@@ -20,8 +20,7 @@ export const BRUSHES: Record<BrushId, Brush> = {
     name: 'Wide Head',
     shortName: 'WIDE',
     trait: 'BROAD & SOFT · STR 28',
-    description:
-      'A broad, gentle head for clearing loose dust in a hurry. Too soft for set-in grime; finish with a firmer tip.',
+    description: 'A wide, gentle head for clearing loose dust.',
     radius: 56,
     edge: 0.5,
     strength: 0.28,
@@ -34,8 +33,7 @@ export const BRUSHES: Record<BrushId, Brush> = {
     name: 'Detail Tip',
     shortName: 'DETAIL',
     trait: 'FINE & FIRM · STR 85',
-    description:
-      'A firm, narrow tip with the power to lift set-in grime from corners and edges. Don’t linger on clean areas.',
+    description: 'A narrow, firm tip with the power to lift set-in grime.',
     radius: 18,
     edge: 0.78,
     strength: 0.85,

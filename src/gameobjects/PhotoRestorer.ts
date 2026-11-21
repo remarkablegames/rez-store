@@ -11,7 +11,6 @@ import type {
 } from '../types';
 import {
   clampBinary,
-  createLampGlowTexture,
   createParticles,
   createPhotoTextures,
   measureSurface,
@@ -36,7 +35,7 @@ interface PhotoRestorerOptions {
   level: Level;
   grimeSeed: string;
   brush: Brush;
-  lamp: boolean;
+  inspect: boolean;
 }
 
 export class PhotoRestorer {
@@ -46,7 +45,6 @@ export class PhotoRestorer {
   private readonly agedImage: Phaser.GameObjects.Image;
   private readonly colorCast: Phaser.GameObjects.Rectangle;
   private readonly tintCast: Phaser.GameObjects.Rectangle;
-  private readonly lampGlow?: Phaser.GameObjects.Image;
   private readonly inspection: Phaser.GameObjects.Graphics;
   private readonly brushCursor: Phaser.GameObjects.Arc;
   private readonly looseCells: Float32Array;
@@ -55,6 +53,7 @@ export class PhotoRestorer {
   private readonly x: number;
   private readonly y: number;
   private brush: Brush;
+  private readonly inspect: boolean;
   private stage: RestoreStage = 'clean';
   private isScrubbing = false;
   private inspecting = false;
@@ -79,6 +78,7 @@ export class PhotoRestorer {
     this.x = x;
     this.y = y;
     this.brush = options.brush;
+    this.inspect = options.inspect;
     this.photoTextures = createPhotoTextures(
       scene,
       options.level,
@@ -95,11 +95,6 @@ export class PhotoRestorer {
     scene.add.image(x, y, this.photoTextures.setIn.key);
     scene.add.image(x, y, this.photoTextures.grime.key);
     scene.add.image(x, y, this.photoTextures.damage.key);
-
-    if (options.lamp) {
-      const lampTexture = createLampGlowTexture(scene);
-      this.lampGlow = scene.add.image(x, y, lampTexture.key).setAlpha(0.9);
-    }
 
     this.colorCast = scene.add
       .rectangle(
@@ -197,7 +192,7 @@ export class PhotoRestorer {
   }
 
   setInspecting(inspecting: boolean): void {
-    if (this.stage !== 'clean') {
+    if (this.stage !== 'clean' || !this.inspect) {
       return;
     }
 
@@ -237,7 +232,6 @@ export class PhotoRestorer {
     this.inspecting = false;
     this.inspection.clear().setVisible(false);
     this.brushCursor.setVisible(false);
-    this.lampGlow?.setVisible(false);
     this.scene.input.setDefaultCursor('default');
     this.colorCast.setVisible(true);
     this.tintCast.setVisible(true);

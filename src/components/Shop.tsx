@@ -1,8 +1,14 @@
 import { Arc, Rectangle, Text, useState } from 'phaser-jsx';
 
-import { LAYOUT, LEVELS, SHOP_BRUSHES, THEME, WORK_LAMP } from '../constants';
+import {
+  INSPECT_TOOL,
+  LAYOUT,
+  LEVELS,
+  SHOP_BRUSHES,
+  THEME,
+} from '../constants';
 import type { Brush, Progress } from '../types';
-import { buyBrush, buyLamp, equipBrush, loadProgress } from '../utils';
+import { buyBrush, buyInspect, equipBrush, loadProgress } from '../utils';
 import { BrushIcon } from './BrushIcon';
 import { Button } from './Button';
 
@@ -44,8 +50,8 @@ export function Shop({ level, onNext }: ShopProps) {
     }
   };
 
-  const handleLampAction = (): void => {
-    const next = buyLamp();
+  const handleInspectAction = (): void => {
+    const next = buyInspect();
 
     if (next) {
       setProgress(next);
@@ -158,17 +164,17 @@ export function Shop({ level, onNext }: ShopProps) {
       <ShopCard
         x={CARD_LEFT + 2 * (CARD.WIDTH + CARD.GAP)}
         kind="WORKSHOP UPGRADE"
-        name={WORK_LAMP.name}
-        trait={WORK_LAMP.trait}
-        description={WORK_LAMP.description}
-        price={WORK_LAMP.price}
-        owned={progress.lamp}
-        badge={progress.lamp ? 'INSTALLED' : null}
+        name={INSPECT_TOOL.name}
+        trait={INSPECT_TOOL.trait}
+        description={INSPECT_TOOL.description}
+        price={INSPECT_TOOL.price}
+        owned={progress.inspect}
+        badge={progress.inspect ? 'INSTALLED' : null}
         buttonLabel={
-          progress.lamp ? 'INSTALLED' : `BUY $${String(WORK_LAMP.price)}`
+          progress.inspect ? 'INSTALLED' : `BUY $${String(INSPECT_TOOL.price)}`
         }
-        disabled={progress.lamp || progress.earnings < WORK_LAMP.price}
-        onAction={handleLampAction}
+        disabled={progress.inspect || progress.earnings < INSPECT_TOOL.price}
+        onAction={handleInspectAction}
       />
 
       <Text
@@ -328,7 +334,7 @@ function ShopCard({
             x={centerX}
             y={PREVIEW_Y}
             radius={44}
-            fillColor={THEME.SHAPE_COLOR.LAMP}
+            fillColor={THEME.SHAPE_COLOR.CREAM}
             fillAlpha={0.07}
           />
 
@@ -336,7 +342,7 @@ function ShopCard({
             x={centerX}
             y={PREVIEW_Y}
             radius={28}
-            fillColor={THEME.SHAPE_COLOR.LAMP}
+            fillColor={THEME.SHAPE_COLOR.CREAM}
             fillAlpha={0.14}
           />
 
@@ -344,7 +350,18 @@ function ShopCard({
             x={centerX}
             y={PREVIEW_Y}
             radius={13}
-            fillColor={THEME.SHAPE_COLOR.CREAM}
+            fillColor={THEME.SHAPE_COLOR.GOLD}
+            fillAlpha={0.5}
+          />
+
+          <Rectangle
+            x={centerX + 18}
+            y={PREVIEW_Y + 18}
+            width={14}
+            height={6}
+            originX={0}
+            originY={0.5}
+            fillColor={THEME.SHAPE_COLOR.GOLD}
             fillAlpha={0.5}
           />
         </>

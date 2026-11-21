@@ -5,7 +5,6 @@ export const IMAGE = {
 
 export const TEXTURE = {
   BACKGROUND: 'Background',
-  LAMP_GLOW: 'LampGlow',
   PHOTO_AGED: 'PhotoAged',
   PHOTO_CLEAN: 'PhotoClean',
   PHOTO_DAMAGE: 'PhotoDamage',

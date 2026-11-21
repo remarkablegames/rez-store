@@ -3,6 +3,8 @@ import { Rectangle, Text, useState } from 'phaser-jsx';
 import { THEME } from '../constants';
 import { useUiSound } from '../hooks';
 
+type ButtonVariant = 'primary' | 'secondary';
+
 interface ButtonProps {
   x: number;
   y: number;
@@ -10,7 +12,7 @@ interface ButtonProps {
   height: number;
   children: string;
   onClick: () => void;
-  variant?: 'primary' | 'secondary';
+  variant?: ButtonVariant;
   disabled?: boolean;
 }
 
@@ -26,21 +28,6 @@ export function Button({
 }: ButtonProps) {
   const [hovered, setHovered] = useState(false);
   const uiSound = useUiSound();
-  const isSecondary = variant === 'secondary';
-  const fillColor = disabled
-    ? THEME.SHAPE_COLOR.BUTTON_DARK
-    : isSecondary
-      ? hovered
-        ? THEME.SHAPE_COLOR.BUTTON_DARK_HOVER
-        : THEME.SHAPE_COLOR.BUTTON_DARK
-      : hovered
-        ? THEME.SHAPE_COLOR.GOLD_HOVER
-        : THEME.SHAPE_COLOR.GOLD;
-  const textColor = disabled
-    ? THEME.TEXT_COLOR.FAINT
-    : isSecondary
-      ? THEME.TEXT_COLOR.CREAM
-      : THEME.TEXT_COLOR.DARK;
 
   return (
     <>
@@ -51,7 +38,7 @@ export function Button({
         height={height}
         originX={0.5}
         originY={0.5}
-        fillColor={fillColor}
+        fillColor={getFillColor(variant, hovered, disabled)}
         input={{
           useHandCursor: !disabled,
           cursor: disabled ? 'not-allowed' : undefined,
@@ -80,7 +67,7 @@ export function Button({
         style={{
           fontFamily: THEME.FONT.MONO,
           fontSize: 12,
-          color: textColor,
+          color: getTextColor(variant, disabled),
           letterSpacing: 0.5,
         }}
         originX={0.5}
@@ -88,4 +75,32 @@ export function Button({
       />
     </>
   );
+}
+
+function getFillColor(
+  variant: ButtonVariant,
+  hovered: boolean,
+  disabled: boolean,
+): number {
+  if (disabled) {
+    return THEME.SHAPE_COLOR.BUTTON_DARK;
+  }
+
+  if (variant === 'secondary') {
+    return hovered
+      ? THEME.SHAPE_COLOR.BUTTON_DARK_HOVER
+      : THEME.SHAPE_COLOR.BUTTON_DARK;
+  }
+
+  return hovered ? THEME.SHAPE_COLOR.GOLD_HOVER : THEME.SHAPE_COLOR.GOLD;
+}
+
+function getTextColor(variant: ButtonVariant, disabled: boolean): string {
+  if (disabled) {
+    return THEME.TEXT_COLOR.FAINT;
+  }
+
+  return variant === 'secondary'
+    ? THEME.TEXT_COLOR.CREAM
+    : THEME.TEXT_COLOR.DARK;
 }

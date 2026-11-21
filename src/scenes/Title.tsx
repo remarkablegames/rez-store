@@ -4,10 +4,16 @@ import { Container, Rectangle, render, Text } from 'phaser-jsx';
 import { Button } from '../components';
 import { KEY, LAYOUT, THEME } from '../constants';
 import { hasSavedProgress, loadProgress, resetProgress } from '../utils';
+import { Music } from './Music';
 
 export class Title extends Phaser.Scene {
   constructor() {
     super(KEY.SCENE.TITLE);
+  }
+
+  private startMusic() {
+    const musicScene = this.scene.get(KEY.SCENE.MUSIC) as unknown as Music;
+    void musicScene.musicManager?.play();
   }
 
   create() {
@@ -62,6 +68,7 @@ export class Title extends Phaser.Scene {
               width={260}
               height={44}
               onClick={() => {
+                this.startMusic();
                 const progress = loadProgress();
                 this.scene.start(KEY.SCENE.GAME, { level: progress.level });
               }}
@@ -75,6 +82,7 @@ export class Title extends Phaser.Scene {
               width={260}
               height={44}
               onClick={() => {
+                this.startMusic();
                 resetProgress();
                 this.scene.start(KEY.SCENE.GAME, { level: 0 });
               }}
@@ -90,6 +98,7 @@ export class Title extends Phaser.Scene {
             width={260}
             height={44}
             onClick={() => {
+              this.startMusic();
               this.scene.start(KEY.SCENE.GAME, { level: 0 });
             }}
           >

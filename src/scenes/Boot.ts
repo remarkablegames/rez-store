@@ -18,6 +18,7 @@ export class Boot extends Phaser.Scene {
   }
 
   create() {
+    this.scene.launch(KEY.SCENE.MUSIC);
     this.scene.start(KEY.SCENE.TITLE);
   }
 }

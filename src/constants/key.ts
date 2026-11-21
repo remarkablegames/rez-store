@@ -16,6 +16,7 @@ export const SCENE = {
   TITLE: 'Title',
   GAME: 'Game',
   SHOP: 'Shop',
+  MUSIC: 'Music',
 } as const;
 
 export const SOUND = {
@@ -32,4 +33,15 @@ export const SOUND = {
   UI_HOVER: 'sounds/ui/hover',
   UI_SUCCESS: 'sounds/ui/success',
   UI_FAIL: 'sounds/ui/fail',
+} as const;
+
+export const MUSIC = {
+  LOFI_POLAROIDS: 'music/lofi_polaroids',
+  CUTIE_JAPAN: 'music/cutie_japan',
+  TAKE_BREAK: 'music/take_break',
+  STARRY_NIGHT: 'music/starry_night',
+  CHILL_LOFI: 'music/chill_lofi',
+  LOFI_BEAT: 'music/lofi_beat',
+  LOFI_CHRISTMAS: 'music/lofi_christmas',
+  GOOD_NIGHT: 'music/good_night',
 } as const;

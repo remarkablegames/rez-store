@@ -313,6 +313,7 @@ export function Hud({
           color: THEME.TEXT_COLOR.FAINT,
           fontStyle: 'italic',
           lineSpacing: 3,
+          padding: { bottom: 4 },
           wordWrap: { width: LAYOUT.HUD.CONTENT_WIDTH },
         }}
         visible={!isComplete}

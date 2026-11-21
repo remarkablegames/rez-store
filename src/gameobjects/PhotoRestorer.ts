@@ -257,7 +257,7 @@ export class PhotoRestorer {
   private readonly handlePointerDown = (
     pointer: Phaser.Input.Pointer,
   ): void => {
-    if (this.stage !== 'clean' || pointer.button !== 0) {
+    if (this.stage !== 'clean' || pointer.button !== 0 || this.inspecting) {
       return;
     }
 
@@ -275,7 +275,12 @@ export class PhotoRestorer {
   private readonly handlePointerMove = (
     pointer: Phaser.Input.Pointer,
   ): void => {
-    if (!this.isScrubbing || this.stage !== 'clean' || !pointer.isDown) {
+    if (
+      !this.isScrubbing ||
+      this.stage !== 'clean' ||
+      !pointer.isDown ||
+      this.inspecting
+    ) {
       return;
     }
 
@@ -675,10 +680,12 @@ export class PhotoRestorer {
 
     if (overPhotoFrame !== this.pointerOverPhotoFrame) {
       this.pointerOverPhotoFrame = overPhotoFrame;
-      this.scene.input.setDefaultCursor(overPhotoFrame ? 'none' : 'default');
+      this.scene.input.setDefaultCursor(
+        this.inspecting || !overPhotoFrame ? 'default' : 'none',
+      );
     }
 
-    this.brushCursor.setVisible(overPhotoFrame);
+    this.brushCursor.setVisible(overPhotoFrame && !this.inspecting);
 
     if (overPhotoFrame) {
       this.brushCursor.setPosition(pointer.x, pointer.y);

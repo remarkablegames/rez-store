@@ -7,6 +7,8 @@ export const LEVELS: Level[] = [
     image: IMAGE.SMILING_GIRL,
     title: 'The Smiling Girl',
     fee: 140,
+    abrasion: 0,
+    tip: 'Take your time... this print can’t be damaged by over-scrubbing.',
     grime: { haze: 0.18, density: 1.5 },
   },
 

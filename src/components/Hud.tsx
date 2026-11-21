@@ -100,7 +100,7 @@ export function Hud({
     brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.standard;
   const tip = isClean
     ? inspecting
-      ? 'Blue cells are missed grime. Red marks are abrasion.'
+      ? (level.tip ?? 'Blue cells are missed grime. Red marks are abrasion.')
       : BRUSH_TIPS[activeBrush.id]
     : copy.tip;
 

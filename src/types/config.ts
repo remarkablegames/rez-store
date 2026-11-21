@@ -1,7 +1,7 @@
 import type { ColorValue } from './color';
 
 export interface Grime {
-  /** Opacity (0–1) of the all-over dust film. */
+  /** Opacity (0-1) of the all-over dust film. */
   haze: number;
 
   /** Multiplier for dust clusters, smudges, stains, and scratches. */
@@ -27,6 +27,15 @@ export interface Level {
 
   /** Maximum payout for a perfect restoration. */
   fee: number;
+
+  /**
+   * Multiplier (0-1) applied to brush abrasion on this level. 0 disables
+   * over-scrub damage entirely; defaults to 1 (full abrasion).
+   */
+  abrasion?: number;
+
+  /** Tip shown during inspection when abrasion is relevant to this level. */
+  tip?: string;
 
   grime: Grime;
 }

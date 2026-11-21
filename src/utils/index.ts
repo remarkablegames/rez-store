@@ -3,6 +3,7 @@ export * from './canvasTexture';
 export * from './color';
 export * from './dirt';
 export * from './grading';
+export * from './loadPhoto';
 export * from './math';
 export * from './music';
 export * from './particles';

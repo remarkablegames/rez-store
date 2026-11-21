@@ -21,6 +21,7 @@ import {
   getOverall,
   getOwnedBrushes,
   getPayout,
+  loadPhoto,
   loadProgress,
   recordJob,
 } from '../utils';
@@ -57,6 +58,10 @@ export class Game extends Phaser.Scene {
     };
   }
 
+  preload() {
+    loadPhoto(this, LEVELS[this.level].image);
+  }
+
   create() {
     this.startedAt = this.time.now;
     this.hud = undefined;
@@ -66,6 +71,12 @@ export class Game extends Phaser.Scene {
     const level = LEVELS[this.level];
     const progress = loadProgress();
     const best = progress.best[String(this.level)];
+
+    const nextLevel = LEVELS[this.level + 1];
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (nextLevel) {
+      loadPhoto(this, nextLevel.image);
+    }
 
     const background = createBackgroundTexture(this);
     this.add.image(0, 0, background.key).setOrigin(0);

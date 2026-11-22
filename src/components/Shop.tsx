@@ -5,10 +5,17 @@ import {
   LAYOUT,
   LEVELS,
   SHOP_BRUSHES,
+  SHOP_COLORS,
   THEME,
 } from '../constants';
-import type { Brush, Progress } from '../types';
-import { buyBrush, buyInspect, equipBrush, loadProgress } from '../utils';
+import type { Brush, ColorAxis, Progress } from '../types';
+import {
+  buyBrush,
+  buyColor,
+  buyInspect,
+  equipBrush,
+  loadProgress,
+} from '../utils';
 import { BrushIcon } from './BrushIcon';
 import { Button } from './Button';
 
@@ -16,14 +23,13 @@ const MARGIN = 72;
 const CENTER_X = LAYOUT.GAME.WIDTH / 2;
 const EARNINGS_X = LAYOUT.GAME.WIDTH - MARGIN;
 const CARD = {
-  WIDTH: 280,
+  WIDTH: 180,
   HEIGHT: 392,
   TOP: 182,
-  GAP: 28,
+  GAP: 14,
   PADDING: 20,
 } as const;
 
-const CARD_LEFT = (LAYOUT.GAME.WIDTH - (CARD.WIDTH * 3 + CARD.GAP * 2)) / 2;
 const PREVIEW_Y = CARD.TOP + 226;
 const PRICE_LABEL_Y = CARD.TOP + 278;
 const PRICE_VALUE_Y = CARD.TOP + 292;
@@ -57,6 +63,25 @@ export function Shop({ level, onNext }: ShopProps) {
       setProgress(next);
     }
   };
+
+  const handleColorAction = (axis: ColorAxis): void => {
+    const next = buyColor(axis);
+
+    if (next) {
+      setProgress(next);
+    }
+  };
+
+  const shopItems = [
+    ...SHOP_BRUSHES.map((brush) => ({ kind: 'brush' as const, brush })),
+    ...SHOP_COLORS.map((upgrade) => ({ kind: 'color' as const, upgrade })),
+    { kind: 'inspect' as const, upgrade: INSPECT_TOOL },
+  ];
+
+  const cardLeft =
+    (LAYOUT.GAME.WIDTH -
+      (CARD.WIDTH * shopItems.length + CARD.GAP * (shopItems.length - 1))) /
+    2;
 
   return (
     <>
@@ -131,51 +156,85 @@ export function Shop({ level, onNext }: ShopProps) {
         fillAlpha={0.28}
       />
 
-      {SHOP_BRUSHES.map((brush, index) => {
-        const owned = progress.brushes.includes(brush.id);
-        const equipped = progress.equippedBrush === brush.id;
+      {shopItems.map((item, index) => {
+        const x = cardLeft + index * (CARD.WIDTH + CARD.GAP);
+
+        if (item.kind === 'brush') {
+          const brush = item.brush;
+          const owned = progress.brushes.includes(brush.id);
+          const equipped = progress.equippedBrush === brush.id;
+
+          return (
+            <ShopCard
+              key={brush.id}
+              x={x}
+              kind="BRUSH UPGRADE"
+              name={brush.name}
+              trait={brush.trait}
+              description={brush.description}
+              price={brush.price}
+              owned={owned}
+              badge={equipped ? 'EQUIPPED' : null}
+              buttonLabel={
+                owned
+                  ? equipped
+                    ? 'EQUIPPED'
+                    : 'EQUIP'
+                  : `BUY $${String(brush.price)}`
+              }
+              disabled={equipped || (!owned && progress.earnings < brush.price)}
+              brush={brush}
+              onAction={() => {
+                handleBrushAction(brush);
+              }}
+            />
+          );
+        }
+
+        if (item.kind === 'color') {
+          const upgrade = item.upgrade;
+          const owned = progress.colors.includes(upgrade.axis);
+
+          return (
+            <ShopCard
+              key={upgrade.axis}
+              x={x}
+              kind="COLOR UPGRADE"
+              name={upgrade.name}
+              trait={upgrade.trait}
+              description={upgrade.description}
+              price={upgrade.price}
+              owned={owned}
+              badge={owned ? 'OWNED' : null}
+              buttonLabel={owned ? 'OWNED' : `BUY $${String(upgrade.price)}`}
+              disabled={owned || progress.earnings < upgrade.price}
+              onAction={() => {
+                handleColorAction(upgrade.axis);
+              }}
+            />
+          );
+        }
+
+        const upgrade = item.upgrade;
+        const owned = progress.inspect;
 
         return (
           <ShopCard
-            x={CARD_LEFT + index * (CARD.WIDTH + CARD.GAP)}
-            kind="BRUSH UPGRADE"
-            name={brush.name}
-            trait={brush.trait}
-            description={brush.description}
-            price={brush.price}
+            key={upgrade.id}
+            x={x}
+            kind="WORKSHOP UPGRADE"
+            name={upgrade.name}
+            trait={upgrade.trait}
+            description={upgrade.description}
+            price={upgrade.price}
             owned={owned}
-            badge={equipped ? 'EQUIPPED' : null}
-            buttonLabel={
-              owned
-                ? equipped
-                  ? 'EQUIPPED'
-                  : 'EQUIP'
-                : `BUY $${String(brush.price)}`
-            }
-            disabled={equipped || (!owned && progress.earnings < brush.price)}
-            brush={brush}
-            onAction={() => {
-              handleBrushAction(brush);
-            }}
+            badge={owned ? 'INSTALLED' : null}
+            buttonLabel={owned ? 'INSTALLED' : `BUY $${String(upgrade.price)}`}
+            disabled={owned || progress.earnings < upgrade.price}
+            onAction={handleInspectAction}
           />
         );
       })}
-
-      <ShopCard
-        x={CARD_LEFT + 2 * (CARD.WIDTH + CARD.GAP)}
-        kind="WORKSHOP UPGRADE"
-        name={INSPECT_TOOL.name}
-        trait={INSPECT_TOOL.trait}
-        description={INSPECT_TOOL.description}
-        price={INSPECT_TOOL.price}
-        owned={progress.inspect}
-        badge={progress.inspect ? 'INSTALLED' : null}
-        buttonLabel={
-          progress.inspect ? 'INSTALLED' : `BUY $${String(INSPECT_TOOL.price)}`
-        }
-        disabled={progress.inspect || progress.earnings < INSPECT_TOOL.price}
-        onAction={handleInspectAction}
-      />
 
       <Text
         x={CENTER_X}
@@ -285,20 +344,22 @@ function ShopCard({
         text={name}
         style={{
           fontFamily: THEME.FONT.SERIF,
-          fontSize: 26,
+          fontSize: 18,
           color: THEME.TEXT_COLOR.CREAM,
+          wordWrap: { width: CARD.WIDTH - CARD.PADDING * 2 },
         }}
       />
 
       <Text
         x={x + CARD.PADDING}
-        y={CARD.TOP + 78}
+        y={CARD.TOP + 70}
         text={trait}
         style={{
           fontFamily: THEME.FONT.MONO,
           fontSize: 12,
           color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 1.5,
+          wordWrap: { width: CARD.WIDTH - CARD.PADDING * 2 },
         }}
       />
 

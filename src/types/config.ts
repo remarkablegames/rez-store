@@ -1,5 +1,3 @@
-import type { ColorValue } from './color';
-
 export type ColorAxis = 'temperature' | 'tint';
 
 export interface Grime {
@@ -20,18 +18,6 @@ export interface Level {
    * Vertical focal point (0 = top, 1 = bottom) used when the image is cover-cropped to the photo frame.
    */
   focusY?: number;
-
-  /**
-   * Hidden neutral point on the development controls.
-   * Values below the target are warm or magenta, values above it are cool or green.
-   */
-  colorTarget?: ColorValue;
-
-  /**
-   * Which color axes are exposed for balancing on this level.
-   * Defaults to both temperature and tint.
-   */
-  colorAxes?: ColorAxis[];
 
   /** Maximum payout for a perfect restoration. */
   fee: number;

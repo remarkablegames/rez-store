@@ -1,4 +1,5 @@
 import type { BrushId } from './brush';
+import type { ColorAxis } from './config';
 import type { GradeLetter } from './grading';
 
 export interface JobRecord {
@@ -16,6 +17,7 @@ export interface Progress {
   best: Partial<Record<string, JobRecord>>;
   brushes: BrushId[];
   equippedBrush: BrushId;
+  colors: ColorAxis[];
   inspect: boolean;
 }
 

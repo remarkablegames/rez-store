@@ -5,6 +5,7 @@ import { useUiSound } from '../hooks';
 import type {
   Brush,
   BrushId,
+  ColorAxis,
   ColorValue,
   HudController,
   JobReport,
@@ -52,6 +53,7 @@ interface HudProps {
   bestPayout: number;
   brushes: Brush[];
   equippedBrush: BrushId;
+  colors: ColorAxis[];
   inspect: boolean;
   onReady: (controller: HudController) => void;
   onColorChange: (value: ColorValue) => void;
@@ -70,6 +72,7 @@ export function Hud({
   bestPayout,
   brushes,
   equippedBrush,
+  colors,
   inspect,
   onReady,
   onColorChange,
@@ -102,11 +105,9 @@ export function Hud({
     brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.standard;
   const tip = isClean ? (level.tip ?? BRUSH_TIPS[activeBrush.id]) : copy.tip;
 
-  const isColorDisabled = !level.colorAxes?.length;
-  const isColorTemperatureOnly = Boolean(
-    level.colorAxes?.includes('temperature'),
-  );
-  const isColorTintOnly = Boolean(level.colorAxes?.includes('tint'));
+  const isColorDisabled = !colors.length;
+  const isColorTemperatureOnly = colors.includes('temperature');
+  const isColorTintOnly = colors.includes('tint');
 
   const continueToColor = (): void => {
     if (inspecting) {

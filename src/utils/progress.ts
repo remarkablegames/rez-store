@@ -1,12 +1,14 @@
 import {
   BRUSH_ORDER,
   BRUSHES,
+  COLORS,
   DEFAULT_BRUSH_ID,
   INSPECT_TOOL,
 } from '../constants';
 import type {
   Brush,
   BrushId,
+  ColorAxis,
   ColorValue,
   GradeLetter,
   JobAward,
@@ -189,6 +191,29 @@ export function buyInspect(): Progress | null {
 }
 
 /**
+ * Buy a color axis unlock (temperature or tint).
+ */
+export function buyColor(axis: ColorAxis): Progress | null {
+  const upgrade = COLORS[axis];
+
+  const progress = loadProgress();
+
+  if (progress.colors.includes(axis) || progress.earnings < upgrade.price) {
+    return null;
+  }
+
+  const next: Progress = {
+    ...progress,
+    earnings: progress.earnings - upgrade.price,
+    colors: [...progress.colors, axis],
+  };
+
+  saveProgress(next);
+
+  return next;
+}
+
+/**
  * Get owned brushes in catalog order.
  */
 export function getOwnedBrushes(progress: Progress): Brush[] {
@@ -218,12 +243,20 @@ function parseProgress(value: unknown): Progress | null {
       ? rawEquipped
       : DEFAULT_BRUSH_ID;
 
+  const rawColors: unknown = value.colors;
+  const colors: ColorAxis[] =
+    Array.isArray(rawColors) &&
+    rawColors.every((c): c is ColorAxis => c === 'temperature' || c === 'tint')
+      ? rawColors
+      : [];
+
   return {
     version: 1,
     level: Number(value.level) || 0,
     ...base,
     brushes,
     equippedBrush,
+    colors,
     inspect: value.inspect === true,
   };
 }
@@ -314,6 +347,7 @@ function createEmptyProgress(): Progress {
     best: {},
     brushes: [DEFAULT_BRUSH_ID],
     equippedBrush: DEFAULT_BRUSH_ID,
+    colors: [],
     inspect: false,
   };
 }

@@ -5,6 +5,7 @@ import { Chrome, Flash, Hud, Stamp } from '../components';
 import { BRUSHES, GRADING, KEY, LAYOUT, LEVELS } from '../constants';
 import { PhotoRestorer } from '../gameobjects';
 import type {
+  ColorAxis,
   ColorValue,
   HudController,
   JobReport,
@@ -29,7 +30,8 @@ import {
 export class Game extends Phaser.Scene {
   private restorer?: PhotoRestorer;
   private hud?: HudController;
-  private colorTarget?: ColorValue;
+  private colorTarget: ColorValue = { temperature: 0.5, tint: 0.5 };
+  private colors: ColorAxis[] = [];
   private surface?: SurfaceResult;
   private startedAt = 0;
   private level = 0;
@@ -53,17 +55,14 @@ export class Game extends Phaser.Scene {
     this.level = LEVELS[level] ? level : 0;
     this.grimeSeed = grimeSeed;
 
-    const levelConfig = LEVELS[this.level];
+    const progress = loadProgress();
+    this.colors = progress.colors;
 
-    if (!levelConfig.colorAxes?.length) {
-      this.colorTarget = undefined;
-    } else {
-      const random = createRandom(grimeSeed);
-      this.colorTarget = {
-        temperature: random.realInRange(0.35, 0.65),
-        tint: random.realInRange(0.35, 0.65),
-      };
-    }
+    const random = createRandom(grimeSeed);
+    this.colorTarget = {
+      temperature: random.realInRange(0.35, 0.65),
+      tint: random.realInRange(0.35, 0.65),
+    };
   }
 
   /**
@@ -100,7 +99,9 @@ export class Game extends Phaser.Scene {
     this.createHudPanel();
 
     this.restorer = new PhotoRestorer(this, LAYOUT.PHOTO.X, LAYOUT.PHOTO.Y, {
-      level: { ...level, colorTarget: this.colorTarget },
+      level,
+      colorAxes: this.colors,
+      colorTarget: this.colorTarget,
       grimeSeed: this.grimeSeed,
       brush: BRUSHES[progress.equippedBrush],
       inspect: progress.inspect,
@@ -114,6 +115,7 @@ export class Game extends Phaser.Scene {
         bestPayout={best?.payout ?? 0}
         brushes={getOwnedBrushes(progress)}
         equippedBrush={progress.equippedBrush}
+        colors={this.colors}
         inspect={progress.inspect}
         onReady={(controller) => {
           this.hud = controller;
@@ -153,7 +155,7 @@ export class Game extends Phaser.Scene {
       return;
     }
 
-    const isColorDisabled = !LEVELS[this.level].colorAxes?.length;
+    const isColorDisabled = !this.colors.length;
 
     this.surface = surface;
     if (!isColorDisabled) {
@@ -164,7 +166,7 @@ export class Game extends Phaser.Scene {
 
   private handleDeliver(): void {
     const level = LEVELS[this.level];
-    const isColorDisabled = !level.colorAxes?.length;
+    const isColorDisabled = !this.colors.length;
 
     if (isColorDisabled) {
       const committedSurface = this.restorer?.commitSurface();
@@ -182,11 +184,7 @@ export class Game extends Phaser.Scene {
 
     const color = isColorDisabled
       ? 1
-      : getColorAccuracy(
-          this.colorValue,
-          this.colorTarget ?? { temperature: 0.5, tint: 0.5 },
-          level.colorAxes,
-        );
+      : getColorAccuracy(this.colorValue, this.colorTarget, this.colors);
 
     const overall = getOverall(surface, color, damage, colorWeight);
     const grade = getGrade(overall);
@@ -207,10 +205,8 @@ export class Game extends Phaser.Scene {
     const colorOffset: ColorValue = {
       temperature: isColorDisabled
         ? 0
-        : this.colorValue.temperature - (this.colorTarget?.temperature ?? 0),
-      tint: isColorDisabled
-        ? 0
-        : this.colorValue.tint - (this.colorTarget?.tint ?? 0),
+        : this.colorValue.temperature - this.colorTarget.temperature,
+      tint: isColorDisabled ? 0 : this.colorValue.tint - this.colorTarget.tint,
     };
 
     const report: JobReport = {

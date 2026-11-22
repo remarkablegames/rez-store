@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import { LAYOUT, THEME } from '../constants';
 import type {
   Brush,
+  ColorAxis,
   ColorValue,
   Level,
   PhotoTextures,
@@ -25,7 +26,6 @@ const INSPECTION_REFRESH_INTERVAL = 160;
 const MAX_COOL_CAST = 0.55;
 const MAX_TINT_CAST = 0.32;
 const COOL_CAST_COLOR = 0x6f8fb8;
-const DEFAULT_COLOR_TARGET: ColorValue = { temperature: 0.5, tint: 0.5 };
 const OVERSCRUB_THRESHOLD = 0.045;
 const DAMAGE_INTERVAL = 70;
 const DAMAGE_PER_STAMP = 0.05;
@@ -33,6 +33,8 @@ const DAMAGE_FULL_CELL_FRACTION = 0.1;
 
 interface PhotoRestorerOptions {
   level: Level;
+  colorAxes: ColorAxis[];
+  colorTarget: ColorValue;
   grimeSeed: string;
   brush: Brush;
   inspect: boolean;
@@ -41,6 +43,8 @@ interface PhotoRestorerOptions {
 export class PhotoRestorer {
   private readonly scene: Phaser.Scene;
   private readonly level: Level;
+  private readonly colorAxes: ColorAxis[];
+  private readonly colorTarget: ColorValue;
   private readonly photoTextures: PhotoTextures;
   private readonly agedImage: Phaser.GameObjects.Image;
   private readonly colorCast: Phaser.GameObjects.Rectangle;
@@ -75,6 +79,8 @@ export class PhotoRestorer {
   ) {
     this.scene = scene;
     this.level = options.level;
+    this.colorAxes = options.colorAxes;
+    this.colorTarget = options.colorTarget;
     this.x = x;
     this.y = y;
     this.brush = options.brush;
@@ -142,11 +148,11 @@ export class PhotoRestorer {
       return;
     }
 
-    if (!this.level.colorAxes?.length) {
+    if (!this.colorAxes.length) {
       return;
     }
 
-    const target = this.level.colorTarget ?? DEFAULT_COLOR_TARGET;
+    const target = this.colorTarget;
     const temperatureTarget = Phaser.Math.Clamp(target.temperature, 0.1, 0.9);
     const tintTarget = Phaser.Math.Clamp(target.tint, 0.1, 0.9);
     const temperature = Phaser.Math.Clamp(value.temperature, 0, 1);
@@ -229,7 +235,7 @@ export class PhotoRestorer {
       this.getDamage(),
     );
 
-    const isColorDisabled = !this.level.colorAxes?.length;
+    const isColorDisabled = !this.colorAxes.length;
 
     this.stage = isColorDisabled ? 'complete' : 'color';
     this.isScrubbing = false;

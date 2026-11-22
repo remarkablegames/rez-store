@@ -174,7 +174,6 @@ export function Shop({ level, onNext }: ShopProps) {
               description={brush.description}
               price={brush.price}
               owned={owned}
-              badge={equipped ? 'EQUIPPED' : null}
               buttonLabel={
                 owned
                   ? equipped
@@ -205,7 +204,6 @@ export function Shop({ level, onNext }: ShopProps) {
               description={upgrade.description}
               price={upgrade.price}
               owned={owned}
-              badge={owned ? 'OWNED' : null}
               buttonLabel={owned ? 'OWNED' : `BUY $${String(upgrade.price)}`}
               disabled={owned || progress.earnings < upgrade.price}
               onAction={() => {
@@ -228,7 +226,6 @@ export function Shop({ level, onNext }: ShopProps) {
             description={upgrade.description}
             price={upgrade.price}
             owned={owned}
-            badge={owned ? 'INSTALLED' : null}
             buttonLabel={owned ? 'INSTALLED' : `BUY $${String(upgrade.price)}`}
             disabled={owned || progress.earnings < upgrade.price}
             onAction={handleInspectAction}
@@ -264,7 +261,6 @@ interface ShopCardProps {
   description: string;
   price: number;
   owned: boolean;
-  badge: string | null;
   buttonLabel: string;
   disabled: boolean;
   brush?: Brush;
@@ -279,7 +275,6 @@ function ShopCard({
   description,
   price,
   owned,
-  badge,
   buttonLabel,
   disabled,
   brush,
@@ -322,21 +317,6 @@ function ShopCard({
           letterSpacing: 1.5,
         }}
       />
-
-      {badge && (
-        <Text
-          x={x + CARD.WIDTH - CARD.PADDING}
-          y={CARD.TOP + 20}
-          text={badge}
-          originX={1}
-          style={{
-            fontFamily: THEME.FONT.MONO,
-            fontSize: 12,
-            color: THEME.TEXT_COLOR.GOLD,
-            letterSpacing: 1,
-          }}
-        />
-      )}
 
       <Text
         x={x + CARD.PADDING}

@@ -1,5 +1,5 @@
 import { THEME } from '../constants';
-import type { ColorValue, GradeLetter } from '../types';
+import type { ColorAxis, ColorValue, GradeLetter } from '../types';
 import { clampBinary } from './math';
 
 const SURFACE_WEIGHT = 0.68;
@@ -18,9 +18,18 @@ const GRADES: readonly { minimum: number; grade: GradeLetter }[] = [
 export function getColorAccuracy(
   value: ColorValue,
   target: ColorValue,
+  colorAxes: ColorAxis[] = ['temperature', 'tint'],
 ): number {
   const temperature = getAxisAccuracy(value.temperature, target.temperature);
   const tint = getAxisAccuracy(value.tint, target.tint);
+
+  if (!colorAxes.length) {
+    return 1;
+  }
+
+  if (colorAxes.length === 1 && colorAxes[0] === 'temperature') {
+    return temperature;
+  }
 
   return clampBinary((temperature + tint) / 2);
 }

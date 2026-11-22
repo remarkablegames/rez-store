@@ -29,17 +29,20 @@ import {
 export class Game extends Phaser.Scene {
   private restorer?: PhotoRestorer;
   private hud?: HudController;
+  private colorTarget?: ColorValue;
+  private surface?: SurfaceResult;
   private startedAt = 0;
   private level = 0;
   private grimeSeed = '';
-  private colorTarget: ColorValue = { temperature: 0.5, tint: 0.5 };
-  private surface: SurfaceResult | null = null;
   private colorValue: ColorValue = { temperature: 0, tint: 0 };
 
   constructor() {
     super(KEY.SCENE.GAME);
   }
 
+  /**
+   * Initialize game.
+   */
   init({
     level = 0,
     grimeSeed = Phaser.Math.RND.uuid(),
@@ -50,22 +53,33 @@ export class Game extends Phaser.Scene {
     this.level = LEVELS[level] ? level : 0;
     this.grimeSeed = grimeSeed;
 
-    const random = createRandom(grimeSeed);
+    const levelConfig = LEVELS[this.level];
 
-    this.colorTarget = {
-      temperature: random.realInRange(0.35, 0.65),
-      tint: random.realInRange(0.35, 0.65),
-    };
+    if (!levelConfig.colorAxes?.length) {
+      this.colorTarget = undefined;
+    } else {
+      const random = createRandom(grimeSeed);
+      this.colorTarget = {
+        temperature: random.realInRange(0.35, 0.65),
+        tint: random.realInRange(0.35, 0.65),
+      };
+    }
   }
 
+  /**
+   * Preload photo if not cached.
+   */
   preload() {
     loadPhoto(this, LEVELS[this.level].image);
   }
 
+  /**
+   * Create game.
+   */
   create() {
     this.startedAt = this.time.now;
     this.hud = undefined;
-    this.surface = null;
+    this.surface = undefined;
     this.colorValue = { temperature: 0, tint: 0 };
 
     const level = LEVELS[this.level];
@@ -139,20 +153,39 @@ export class Game extends Phaser.Scene {
       return;
     }
 
+    const isColorDisabled = !LEVELS[this.level].colorAxes?.length;
+
     this.surface = surface;
-    this.hud?.setStage('color');
+    if (!isColorDisabled) {
+      this.hud?.setStage('color');
+    }
     this.restorer?.setColorValue(this.colorValue);
   }
 
   private handleDeliver(): void {
-    if (!this.restorer?.finishColor()) {
+    const level = LEVELS[this.level];
+    const colorDisabled = !level.colorAxes?.length;
+
+    if (colorDisabled) {
+      const committedSurface = this.restorer?.commitSurface();
+      if (!committedSurface) {
+        return;
+      }
+      this.surface = committedSurface;
+    } else if (!this.restorer?.finishColor()) {
       return;
     }
 
-    const level = LEVELS[this.level];
     const surface = this.surface?.cleanliness ?? 0;
     const damage = this.surface?.damage ?? 0;
-    const color = getColorAccuracy(this.colorValue, this.colorTarget);
+    const color = colorDisabled
+      ? 1
+      : getColorAccuracy(
+          this.colorValue,
+          this.colorTarget ?? { temperature: 0.5, tint: 0.5 },
+          level.colorAxes,
+        );
+
     const overall = getOverall(surface, color, damage);
     const grade = getGrade(overall);
     const payout = getPayout(level.fee, overall);
@@ -163,14 +196,21 @@ export class Game extends Phaser.Scene {
       grade,
       this.colorTarget,
     );
+
     const elapsedSeconds = Math.max(
       0,
       Math.round((this.time.now - this.startedAt) / 1000),
     );
+
     const colorOffset: ColorValue = {
-      temperature: this.colorValue.temperature - this.colorTarget.temperature,
-      tint: this.colorValue.tint - this.colorTarget.tint,
+      temperature: colorDisabled
+        ? 0
+        : this.colorValue.temperature - (this.colorTarget?.temperature ?? 0),
+      tint: colorDisabled
+        ? 0
+        : this.colorValue.tint - (this.colorTarget?.tint ?? 0),
     };
+
     const report: JobReport = {
       surface,
       color,

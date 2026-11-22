@@ -102,39 +102,17 @@ export function Hud({
     brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.standard;
   const tip = isClean ? (level.tip ?? BRUSH_TIPS[activeBrush.id]) : copy.tip;
 
-  const selectBrush = (brush: Brush): void => {
-    setSelectedBrush(brush.id);
-    onBrushChange(brush);
-  };
-
-  const updateTemperature = (temperature: number): void => {
-    const next = { ...colorValue, temperature };
-
-    setColorValue(next);
-    onColorChange(next);
-  };
-
-  const updateTint = (tint: number): void => {
-    const next = { ...colorValue, tint };
-
-    setColorValue(next);
-    onColorChange(next);
-  };
-
-  const toggleInspection = (): void => {
-    const next = !inspecting;
-
-    setInspecting(next);
-    onInspectChange(next);
-    uiSound.play('select');
-  };
+  const isColorDisabled = !level.colorAxes?.length;
+  const isColorTemperatureOnly = Boolean(
+    level.colorAxes?.includes('temperature'),
+  );
+  const isColorTintOnly = Boolean(level.colorAxes?.includes('tint'));
 
   const continueToColor = (): void => {
     if (inspecting) {
       setInspecting(false);
       onInspectChange(false);
     }
-
     onContinue();
   };
 
@@ -211,7 +189,12 @@ export function Hud({
           y={292}
           width={90}
           height={24}
-          onClick={toggleInspection}
+          onClick={() => {
+            const next = !inspecting;
+            setInspecting(next);
+            onInspectChange(next);
+            uiSound.play('select');
+          }}
           variant="secondary"
         >
           {inspecting ? 'HIDE MAP' : 'INSPECT'}
@@ -260,7 +243,10 @@ export function Hud({
           <BrushPicker
             brushes={brushes}
             selected={selectedBrush}
-            onSelect={selectBrush}
+            onSelect={(brush: Brush) => {
+              setSelectedBrush(brush.id);
+              onBrushChange(brush);
+            }}
           />
 
           <Text
@@ -279,25 +265,37 @@ export function Hud({
         </>
       )}
 
-      {isColor && (
+      {isColor && !isColorDisabled && (
         <>
-          <Slider
-            y={LAYOUT.COLOR_SLIDER.TEMPERATURE_Y}
-            label="TEMPERATURE"
-            lowLabel="WARM"
-            highLabel="COOL"
-            value={colorValue.temperature}
-            onChange={updateTemperature}
-          />
+          {isColorTemperatureOnly && (
+            <Slider
+              y={LAYOUT.COLOR_SLIDER.TEMPERATURE_Y}
+              label="TEMPERATURE"
+              lowLabel="WARM"
+              highLabel="COOL"
+              value={colorValue.temperature}
+              onChange={(temperature: number) => {
+                const next = { ...colorValue, temperature };
+                setColorValue(next);
+                onColorChange(next);
+              }}
+            />
+          )}
 
-          <Slider
-            y={LAYOUT.COLOR_SLIDER.TINT_Y}
-            label="TINT"
-            lowLabel="MAGENTA"
-            highLabel="GREEN"
-            value={colorValue.tint}
-            onChange={updateTint}
-          />
+          {isColorTintOnly && (
+            <Slider
+              y={LAYOUT.COLOR_SLIDER.TINT_Y}
+              label="TINT"
+              lowLabel="MAGENTA"
+              highLabel="GREEN"
+              value={colorValue.tint}
+              onChange={(tint: number) => {
+                const next = { ...colorValue, tint };
+                setColorValue(next);
+                onColorChange(next);
+              }}
+            />
+          )}
         </>
       )}
 
@@ -398,9 +396,19 @@ export function Hud({
           y={638}
           width={LAYOUT.HUD.CONTENT_WIDTH}
           height={44}
-          onClick={isClean ? continueToColor : onDeliver}
+          onClick={
+            isClean
+              ? isColorDisabled
+                ? onDeliver
+                : continueToColor
+              : onDeliver
+          }
         >
-          {isClean ? 'CONTINUE TO COLOR' : 'DELIVER PHOTO'}
+          {isClean
+            ? isColorDisabled
+              ? 'DELIVER PHOTO'
+              : 'CONTINUE TO COLOR'
+            : 'DELIVER PHOTO'}
         </Button>
       )}
 

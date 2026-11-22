@@ -142,6 +142,10 @@ export class PhotoRestorer {
       return;
     }
 
+    if (!this.level.colorAxes?.length) {
+      return;
+    }
+
     const target = this.level.colorTarget ?? DEFAULT_COLOR_TARGET;
     const temperatureTarget = Phaser.Math.Clamp(target.temperature, 0.1, 0.9);
     const tintTarget = Phaser.Math.Clamp(target.tint, 0.1, 0.9);
@@ -225,7 +229,9 @@ export class PhotoRestorer {
       this.getDamage(),
     );
 
-    this.stage = 'color';
+    const isColorDisabled = !this.level.colorAxes?.length;
+
+    this.stage = isColorDisabled ? 'complete' : 'color';
     this.isScrubbing = false;
     this.lastPoint = null;
     this.pointerOverPhotoFrame = false;
@@ -233,8 +239,11 @@ export class PhotoRestorer {
     this.inspection.clear().setVisible(false);
     this.brushCursor.setVisible(false);
     this.scene.input.setDefaultCursor('default');
-    this.colorCast.setVisible(true);
-    this.tintCast.setVisible(true);
+
+    if (!isColorDisabled) {
+      this.colorCast.setVisible(true);
+      this.tintCast.setVisible(true);
+    }
 
     return result;
   }

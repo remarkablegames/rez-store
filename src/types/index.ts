@@ -6,5 +6,6 @@ export * from './grading';
 export * from './hud';
 export * from './photoTextures';
 export * from './progress';
+export * from './puzzle';
 export * from './restoreStage';
 export * from './upgrade';

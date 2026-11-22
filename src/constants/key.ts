@@ -45,6 +45,7 @@ export const TEXTURE = {
   PHOTO_DAMAGE: 'PhotoDamage',
   PHOTO_GRIME: 'PhotoGrime',
   PHOTO_GRIME_DEEP: 'PhotoGrimeDeep',
+  PHOTO_PIECE: 'PhotoPiece',
 } as const;
 
 export const SCENE = {

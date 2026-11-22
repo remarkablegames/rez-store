@@ -1,1 +1,1 @@
-export type RestoreStage = 'clean' | 'color' | 'complete';
+export type RestoreStage = 'reassemble' | 'clean' | 'color' | 'complete';

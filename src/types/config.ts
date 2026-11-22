@@ -1,3 +1,5 @@
+import type { PuzzleConfig } from './puzzle';
+
 export type ColorAxis = 'temperature' | 'tint';
 
 export interface Grime {
@@ -30,6 +32,9 @@ export interface Level {
 
   /** Tip shown during inspection when abrasion is relevant to this level. */
   tip?: string;
+
+  /** Torn-photo reassembly stage. Omit to skip reassembly. */
+  puzzle?: PuzzleConfig;
 
   grime: Grime;
 }

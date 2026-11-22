@@ -13,7 +13,6 @@ import type {
 import {
   clampBinary,
   createParticles,
-  createPhotoTextures,
   measureSurface,
   rgba,
   ScratchSound,
@@ -35,7 +34,7 @@ interface PhotoRestorerOptions {
   level: Level;
   colorAxes: ColorAxis[];
   colorTarget: ColorValue;
-  grimeSeed: string;
+  textures: PhotoTextures;
   brush: Brush;
   inspect: boolean;
 }
@@ -85,11 +84,7 @@ export class PhotoRestorer {
     this.y = y;
     this.brush = options.brush;
     this.inspect = options.inspect;
-    this.photoTextures = createPhotoTextures(
-      scene,
-      options.level,
-      options.grimeSeed,
-    );
+    this.photoTextures = options.textures;
     this.looseCells = this.photoTextures.looseCells;
     this.setInCells = this.photoTextures.setInCells;
     this.damageCells = new Float32Array(

@@ -1,6 +1,6 @@
 import { Rectangle, Text, useState } from 'phaser-jsx';
 
-import { BRUSHES, LAYOUT, THEME } from '../constants';
+import { BRUSHES, LAYOUT, PUZZLE_TIP, THEME } from '../constants';
 import { useUiSound } from '../hooks';
 import type {
   Brush,
@@ -24,7 +24,13 @@ interface StageCopy {
   tip: string;
 }
 
-const COPY: Record<'clean' | 'color', StageCopy> = {
+const COPY: Record<'reassemble' | 'clean' | 'color', StageCopy> = {
+  reassemble: {
+    step: 'REASSEMBLE',
+    title: 'Torn Photo',
+    instruction: 'Drag the torn pieces back into place.',
+    tip: 'The picture will guide you.',
+  },
   clean: {
     step: 'SURFACE',
     title: 'Surface Cleaning',
@@ -83,8 +89,14 @@ export function Hud({
   onBrushChange,
   onInspectChange,
 }: HudProps) {
-  const [stage, setStage] = useState<RestoreStage>('clean');
+  const [stage, setStage] = useState<RestoreStage>(
+    level.puzzle ? 'reassemble' : 'clean',
+  );
   const [report, setReport] = useState<JobReport | null>(null);
+  const [puzzleProgress, setPuzzleProgress] = useState({
+    placed: 0,
+    total: level.puzzle?.pieces ?? 0,
+  });
   const [colorValue, setColorValue] = useState<ColorValue>({
     temperature: 0,
     tint: 0,
@@ -93,17 +105,28 @@ export function Hud({
   const [inspecting, setInspecting] = useState(false);
   const uiSound = useUiSound();
 
-  onReady({ setStage, setReport });
+  onReady({
+    setStage,
+    setReport,
+    setPuzzleProgress: (placed, total) => {
+      setPuzzleProgress({ placed, total });
+    },
+  });
 
+  const isReassemble = stage === 'reassemble';
   const isClean = stage === 'clean';
   const isColor = stage === 'color';
   const isComplete = stage === 'complete';
-  const copy = COPY[isClean ? 'clean' : 'color'];
+  const copy = stage === 'complete' ? COPY.clean : COPY[stage];
   const jobNumber = String(levelIndex + 1).padStart(2, '0');
   const step = `JOB ${jobNumber} / ${copy.step}`;
   const activeBrush =
     brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.default;
-  const tip = isClean ? (level.tip ?? BRUSH_TIPS[activeBrush.id]) : copy.tip;
+  const tip = isReassemble
+    ? (level.puzzle?.tip ?? PUZZLE_TIP)
+    : isClean
+      ? (level.tip ?? BRUSH_TIPS[activeBrush.id])
+      : copy.tip;
 
   const isColorDisabled = !colors.length;
   const isColorTemperatureOnly = colors.includes('temperature');
@@ -182,6 +205,33 @@ export function Hud({
           letterSpacing: 1.5,
         }}
         visible={isClean}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={298}
+        text="PIECES"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 12,
+          color: THEME.TEXT_COLOR.GOLD,
+          letterSpacing: 1.5,
+        }}
+        visible={isReassemble}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X}
+        y={318}
+        text={`${String(puzzleProgress.placed)} / ${String(
+          puzzleProgress.total,
+        )}`}
+        style={{
+          fontFamily: THEME.FONT.SERIF,
+          fontSize: 24,
+          color: THEME.TEXT_COLOR.CREAM,
+        }}
+        visible={isReassemble}
       />
 
       {isClean && inspect && (
@@ -302,7 +352,7 @@ export function Hud({
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={isClean ? 386 : 436}
+        y={isColor ? 436 : 386}
         text={tip}
         style={{
           fontFamily: THEME.FONT.SANS,
@@ -391,7 +441,7 @@ export function Hud({
         visible={!isComplete}
       />
 
-      {!isComplete && (
+      {!isComplete && !isReassemble && (
         <Button
           x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH / 2}
           y={638}

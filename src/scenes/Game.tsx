@@ -3,7 +3,7 @@ import { render } from 'phaser-jsx';
 
 import { Chrome, Flash, Hud, Stamp } from '../components';
 import { BRUSHES, GRADING, KEY, LAYOUT, LEVELS } from '../constants';
-import { PhotoRestorer } from '../gameobjects';
+import { PhotoRestorer, TornPuzzle } from '../gameobjects';
 import type {
   ColorAxis,
   ColorValue,
@@ -14,6 +14,7 @@ import type {
 import {
   createBackgroundTexture,
   createParticles,
+  createPhotoTextures,
   createRandom,
   equipBrush,
   getClientNote,
@@ -71,6 +72,7 @@ export class Game extends Phaser.Scene {
    */
   create() {
     this.startedAt = this.time.now;
+    this.restorer = undefined;
     this.hud = undefined;
     this.surface = undefined;
     this.colorValue = { temperature: 0, tint: 0 };
@@ -92,14 +94,32 @@ export class Game extends Phaser.Scene {
     this.createPhotoFrame();
     this.createHudPanel();
 
-    this.restorer = new PhotoRestorer(this, LAYOUT.PHOTO.X, LAYOUT.PHOTO.Y, {
-      level,
-      colorAxes: this.colors,
-      colorTarget: this.colorTarget,
-      grimeSeed: this.grimeSeed,
-      brush: BRUSHES[progress.equippedBrush],
-      inspect: progress.inspect,
-    });
+    const textures = createPhotoTextures(this, level, this.grimeSeed);
+    const startRestoration = () => {
+      this.restorer = new PhotoRestorer(this, LAYOUT.PHOTO.X, LAYOUT.PHOTO.Y, {
+        level,
+        colorAxes: this.colors,
+        colorTarget: this.colorTarget,
+        textures,
+        brush: BRUSHES[progress.equippedBrush],
+        inspect: progress.inspect,
+      });
+      this.hud?.setStage('clean');
+    };
+
+    if (level.puzzle) {
+      new TornPuzzle(this, {
+        textures,
+        config: level.puzzle,
+        seed: this.grimeSeed,
+        onProgress: (placed, total) => {
+          this.hud?.setPuzzleProgress(placed, total);
+        },
+        onComplete: startRestoration,
+      });
+    } else {
+      startRestoration();
+    }
 
     render(
       <Hud

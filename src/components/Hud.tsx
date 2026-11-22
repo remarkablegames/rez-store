@@ -100,11 +100,7 @@ export function Hud({
   const step = `JOB ${jobNumber} / ${copy.step}`;
   const activeBrush =
     brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.standard;
-  const tip = isClean
-    ? inspecting
-      ? (level.tip ?? 'Blue cells are missed grime. Red marks are abrasion.')
-      : BRUSH_TIPS[activeBrush.id]
-    : copy.tip;
+  const tip = isClean ? (level.tip ?? BRUSH_TIPS[activeBrush.id]) : copy.tip;
 
   const selectBrush = (brush: Brush): void => {
     setSelectedBrush(brush.id);

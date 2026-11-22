@@ -38,7 +38,7 @@ export function Shop({ level, onNext }: ShopProps) {
   const [progress, setProgress] = useState<Progress>(loadProgress());
   const nextLevelIndex = (level + 1) % LEVELS.length;
   const nextLevel = LEVELS[nextLevelIndex];
-  const nextMemory = String(nextLevelIndex + 1).padStart(3, '0');
+  const nextJob = String(nextLevelIndex + 1).padStart(2, '0');
 
   const handleBrushAction = (brush: Brush): void => {
     const next = progress.brushes.includes(brush.id)
@@ -180,7 +180,7 @@ export function Shop({ level, onNext }: ShopProps) {
       <Text
         x={CENTER_X}
         y={616}
-        text={`NEXT UP  /  JOB NO. ${nextMemory}  ${nextLevel.title.toUpperCase()}`}
+        text={`NEXT UP  /  JOB NO. ${nextJob}  ${nextLevel.title.toUpperCase()}`}
         originX={0.5}
         style={{
           fontFamily: THEME.FONT.MONO,

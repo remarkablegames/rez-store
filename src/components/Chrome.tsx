@@ -20,7 +20,7 @@ interface ChromeProps {
 
 export function Chrome({ level, title }: ChromeProps) {
   const left = LAYOUT.PHOTO.X - LAYOUT.PHOTO.WIDTH / 2;
-  const memoryLabel = [
+  const jobLabel = [
     `JOB NO. ${String(level + 1).padStart(2, '0')}`,
     title.toUpperCase(),
   ].join('  /  ');
@@ -65,7 +65,7 @@ export function Chrome({ level, title }: ChromeProps) {
       <Text
         x={LAYOUT.PHOTO.X}
         y={LAYOUT.PHOTO.Y + LAYOUT.PHOTO.HEIGHT / 2 + LAYOUT.PHOTO.BORDER + 20}
-        text={memoryLabel}
+        text={jobLabel}
         style={{
           fontFamily: FONT.MONO,
           fontSize: 14,

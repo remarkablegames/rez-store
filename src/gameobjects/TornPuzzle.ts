@@ -154,6 +154,13 @@ export class TornPuzzle {
       ease: 'Cubic.easeOut',
     });
 
+    // Keep unsolved pieces above solved pieces so they stay visible and grabbable.
+    this.pieces.forEach((piece) => {
+      if (!piece.placed) {
+        this.scene.children.bringToTop(piece.image);
+      }
+    });
+
     this.uiSound.play('drop');
     this.placedCount++;
     this.onProgress?.(this.placedCount, this.pieces.length);

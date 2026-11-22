@@ -1,4 +1,4 @@
-export type BrushId = 'standard' | 'wide' | 'detail';
+export type BrushId = 'default' | 'wide' | 'detail';
 
 export interface Brush {
   id: BrushId;
@@ -22,6 +22,6 @@ export interface Brush {
   /** Bristle width used by the brush icon. */
   bristleWidth: number;
 
-  /** Cost in the supply shop. The standard brush is free. */
+  /** Cost in the supply shop. The default brush is free. */
   price: number;
 }

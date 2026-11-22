@@ -41,7 +41,7 @@ const COPY: Record<'clean' | 'color', StageCopy> = {
 };
 
 const BRUSH_TIPS: Record<BrushId, string> = {
-  standard: 'Steady pressure. Set-in grime needs another pass.',
+  default: 'Steady pressure. Set-in grime needs another pass.',
   wide: 'Sweep the loose dust, then switch to a firmer tip.',
   detail: 'Firm strokes lift set-in grime. Do not linger on clean areas.',
 };
@@ -102,7 +102,7 @@ export function Hud({
   const jobNumber = String(levelIndex + 1).padStart(2, '0');
   const step = `JOB ${jobNumber} / ${copy.step}`;
   const activeBrush =
-    brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.standard;
+    brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.default;
   const tip = isClean ? (level.tip ?? BRUSH_TIPS[activeBrush.id]) : copy.tip;
 
   const isColorDisabled = !colors.length;

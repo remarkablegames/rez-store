@@ -1,10 +1,10 @@
 import type { Brush, BrushId } from '../types';
 
 export const BRUSHES: Record<BrushId, Brush> = {
-  standard: {
-    id: 'standard',
+  default: {
+    id: 'default',
     name: 'Default',
-    shortName: 'STANDARD',
+    shortName: 'DEFAULT',
     trait: 'BALANCED · STR 50',
     description:
       'The reliable workshop brush. A steady middle ground for dust and smudges.',
@@ -43,8 +43,8 @@ export const BRUSHES: Record<BrushId, Brush> = {
   },
 };
 
-export const BRUSH_ORDER: readonly BrushId[] = ['standard', 'wide', 'detail'];
+export const BRUSH_ORDER: readonly BrushId[] = ['default', 'wide', 'detail'];
 
-export const DEFAULT_BRUSH_ID: BrushId = 'standard';
+export const DEFAULT_BRUSH_ID: BrushId = 'default';
 
 export const SHOP_BRUSHES: readonly Brush[] = [BRUSHES.wide, BRUSHES.detail];

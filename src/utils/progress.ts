@@ -313,7 +313,7 @@ function parseBest(value: unknown): Partial<Record<string, JobRecord>> | null {
 }
 
 /**
- * Normalize owned brushes, always keeping the standard brush.
+ * Normalize owned brushes, always keeping the default brush.
  */
 function normalizeBrushes(value: unknown): BrushId[] {
   const brushes: BrushId[] = [DEFAULT_BRUSH_ID];

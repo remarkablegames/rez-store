@@ -9,7 +9,7 @@ export const LEVELS: Level[] = [
     fee: 50,
     abrasion: 0,
     tip: 'Hover over the picture and press and drag to clear the dust.',
-    grime: { haze: 0.18, density: 1.5 },
+    grime: { haze: 0.25, density: 1.8 },
   },
 
   // 1
@@ -20,7 +20,7 @@ export const LEVELS: Level[] = [
     focusY: 0.55,
     abrasion: 0,
     tip: 'Clear the dust to recover this photo.',
-    grime: { haze: 0.22, density: 1.8 },
+    grime: { haze: 0.27, density: 2.0 },
   },
 
   // 2
@@ -29,7 +29,7 @@ export const LEVELS: Level[] = [
     title: 'Playing in the Playground',
     fee: 90,
     abrasion: 0,
-    grime: { haze: 0.26, density: 2.0 },
+    grime: { haze: 0.29, density: 2.2 },
   },
 
   // 3
@@ -39,7 +39,7 @@ export const LEVELS: Level[] = [
     fee: 110,
     abrasion: 0.25,
     tip: 'Be careful... hard scrubbing can damage the print.',
-    grime: { haze: 0.28, density: 2.1 },
+    grime: { haze: 0.31, density: 2.4 },
   },
 
   // 4
@@ -50,7 +50,7 @@ export const LEVELS: Level[] = [
     focusY: 0.35,
     abrasion: 0.5,
     tip: 'Over-scrubbing leaves scratches on delicate prints.',
-    grime: { haze: 0.3, density: 2.2 },
+    grime: { haze: 0.33, density: 2.6 },
   },
 
   // 5
@@ -60,7 +60,7 @@ export const LEVELS: Level[] = [
     fee: 150,
     abrasion: 1,
     tip: 'Hard scrubbing damages this print.',
-    grime: { haze: 0.32, density: 2.3 },
+    grime: { haze: 0.35, density: 2.8 },
   },
 
   // 6
@@ -72,7 +72,7 @@ export const LEVELS: Level[] = [
       pieces: 4,
       tip: 'The photo came in torn. Rebuild it before cleaning.',
     },
-    grime: { haze: 0.34, density: 2.4 },
+    grime: { haze: 0.37, density: 3.0 },
   },
 
   // 7
@@ -84,7 +84,7 @@ export const LEVELS: Level[] = [
       pieces: 4,
       tip: 'Stitch the photo together before cleaning.',
     },
-    grime: { haze: 0.36, density: 2.5 },
+    grime: { haze: 0.39, density: 3.2 },
   },
 
   // 8
@@ -93,7 +93,7 @@ export const LEVELS: Level[] = [
     title: 'Sunset Street',
     fee: 210,
     puzzle: { pieces: 4 },
-    grime: { haze: 0.38, density: 2.6 },
+    grime: { haze: 0.41, density: 3.4 },
   },
 
   // 9
@@ -103,7 +103,7 @@ export const LEVELS: Level[] = [
     fee: 230,
     focusY: 0.45,
     puzzle: { pieces: 4 },
-    grime: { haze: 0.4, density: 2.7 },
+    grime: { haze: 0.43, density: 3.6 },
   },
 
   // 10
@@ -117,7 +117,7 @@ export const LEVELS: Level[] = [
       pieces: 6,
       tip: 'There are more pieces to put back together.',
     },
-    grime: { haze: 0.42, density: 2.8 },
+    grime: { haze: 0.45, density: 3.8 },
   },
 
   // 11
@@ -127,7 +127,7 @@ export const LEVELS: Level[] = [
     fee: 270,
     focusY: 0.4,
     puzzle: { pieces: 6 },
-    grime: { haze: 0.44, density: 2.9 },
+    grime: { haze: 0.47, density: 4.0 },
   },
 
   // 12
@@ -138,7 +138,7 @@ export const LEVELS: Level[] = [
     abrasion: 1.5,
     tip: 'This delicate keepsake bruises under hard scrubbing.',
     puzzle: { pieces: 6 },
-    grime: { haze: 0.46, density: 3.0 },
+    grime: { haze: 0.49, density: 4.2 },
   },
 
   // 13
@@ -147,7 +147,7 @@ export const LEVELS: Level[] = [
     title: 'Bonsai Tree',
     fee: 310,
     puzzle: { pieces: 6 },
-    grime: { haze: 0.48, density: 3.1 },
+    grime: { haze: 0.51, density: 4.4 },
   },
 
   // 14
@@ -156,7 +156,7 @@ export const LEVELS: Level[] = [
     title: 'Cat on the Sofa',
     fee: 330,
     puzzle: { pieces: 8 },
-    grime: { haze: 0.5, density: 3.2 },
+    grime: { haze: 0.53, density: 4.6 },
   },
 
   // 15
@@ -166,7 +166,7 @@ export const LEVELS: Level[] = [
     fee: 350,
     tip: 'Adjust both temperature and tint for a natural look.',
     puzzle: { pieces: 8 },
-    grime: { haze: 0.5, density: 3.3 },
+    grime: { haze: 0.55, density: 4.8 },
   },
 
   // 16
@@ -177,7 +177,7 @@ export const LEVELS: Level[] = [
     abrasion: 1.5,
     tip: 'A precious portrait... go easy on the brush.',
     puzzle: { pieces: 8 },
-    grime: { haze: 0.5, density: 3.4 },
+    grime: { haze: 0.57, density: 5.0 },
   },
 
   // 17
@@ -187,7 +187,7 @@ export const LEVELS: Level[] = [
     fee: 390,
     focusY: 0.45,
     puzzle: { pieces: 8 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.58, density: 5.0 },
   },
 
   // 18
@@ -197,7 +197,7 @@ export const LEVELS: Level[] = [
     fee: 410,
     focusY: 0.5,
     puzzle: { pieces: 9 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.59, density: 5.0 },
   },
 
   // 19
@@ -206,7 +206,7 @@ export const LEVELS: Level[] = [
     title: 'Graduation',
     fee: 430,
     puzzle: { pieces: 9 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.6, density: 5.0 },
   },
 
   // 20
@@ -216,7 +216,7 @@ export const LEVELS: Level[] = [
     fee: 450,
     focusY: 0.6,
     puzzle: { pieces: 9 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.6, density: 5.0 },
   },
 
   // 21
@@ -225,7 +225,7 @@ export const LEVELS: Level[] = [
     title: 'Sandy Toes and Salty Air',
     fee: 470,
     puzzle: { pieces: 9 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.6, density: 5.0 },
   },
 
   // 22
@@ -237,7 +237,7 @@ export const LEVELS: Level[] = [
       pieces: 12,
       tip: 'Take your time to piece them together.',
     },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.6, density: 5.0 },
   },
 
   // 23
@@ -247,7 +247,7 @@ export const LEVELS: Level[] = [
     fee: 510,
     focusY: 0.35,
     puzzle: { pieces: 12 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.62, density: 5.2 },
   },
 
   // 24
@@ -256,7 +256,7 @@ export const LEVELS: Level[] = [
     title: 'Sailing in the River',
     fee: 530,
     puzzle: { pieces: 12 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.64, density: 5.6 },
   },
 
   // 25
@@ -266,7 +266,7 @@ export const LEVELS: Level[] = [
     fee: 550,
     abrasion: 1.25,
     puzzle: { pieces: 12 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.66, density: 5.8 },
   },
 
   // 26
@@ -276,7 +276,7 @@ export const LEVELS: Level[] = [
     fee: 570,
     abrasion: 1.25,
     puzzle: { pieces: 12 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.68, density: 6.0 },
   },
 
   // 27
@@ -286,7 +286,7 @@ export const LEVELS: Level[] = [
     fee: 590,
     abrasion: 1.25,
     puzzle: { pieces: 15 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.7, density: 6.0 },
   },
 
   // 28
@@ -296,7 +296,7 @@ export const LEVELS: Level[] = [
     fee: 610,
     abrasion: 1.25,
     puzzle: { pieces: 15 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.72, density: 6.0 },
   },
 
   // 29
@@ -306,7 +306,7 @@ export const LEVELS: Level[] = [
     fee: 630,
     abrasion: 1.25,
     puzzle: { pieces: 15 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.74, density: 6.0 },
   },
 
   // 30
@@ -316,7 +316,7 @@ export const LEVELS: Level[] = [
     fee: 650,
     abrasion: 1.5,
     puzzle: { pieces: 15 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.76, density: 6.0 },
   },
 
   // 31
@@ -326,7 +326,7 @@ export const LEVELS: Level[] = [
     fee: 670,
     abrasion: 1.5,
     puzzle: { pieces: 15 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.78, density: 6.0 },
   },
 
   // 32
@@ -336,7 +336,7 @@ export const LEVELS: Level[] = [
     fee: 690,
     abrasion: 1.5,
     puzzle: { pieces: 16 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.8, density: 6.0 },
   },
 
   // 33
@@ -347,7 +347,7 @@ export const LEVELS: Level[] = [
     focusY: 0.45,
     abrasion: 1.5,
     puzzle: { pieces: 16 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.82, density: 6.0 },
   },
 
   // 34
@@ -357,7 +357,7 @@ export const LEVELS: Level[] = [
     fee: 730,
     abrasion: 1.5,
     puzzle: { pieces: 16 },
-    grime: { haze: 0.5, density: 3.5 },
+    grime: { haze: 0.84, density: 6.0 },
   },
 
   // 35
@@ -367,7 +367,7 @@ export const LEVELS: Level[] = [
     fee: 770,
     abrasion: 1.5,
     puzzle: { pieces: 16 },
-    grime: { haze: 0.6, density: 4 },
+    grime: { haze: 0.87, density: 6.0 },
   },
 
   // 36
@@ -380,6 +380,6 @@ export const LEVELS: Level[] = [
       pieces: 16,
       tip: 'Last photo...',
     },
-    grime: { haze: 0.75, density: 4 },
+    grime: { haze: 0.9, density: 6.0 },
   },
 ] as const;

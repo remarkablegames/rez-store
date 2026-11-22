@@ -1,19 +1,6 @@
-import { THEME } from '../constants';
+import { GRADING, THEME } from '../constants';
 import type { ColorAxis, ColorValue, GradeLetter } from '../types';
 import { clampBinary } from './math';
-
-const SURFACE_WEIGHT = 0.68;
-const COLOR_WEIGHT = 0.32;
-const DAMAGE_WEIGHT = 0.35;
-const COLOR_TOLERANCE = 0.4;
-
-const GRADES: readonly { minimum: number; grade: GradeLetter }[] = [
-  { minimum: 0.95, grade: 'S' },
-  { minimum: 0.88, grade: 'A' },
-  { minimum: 0.78, grade: 'B' },
-  { minimum: 0.68, grade: 'C' },
-  { minimum: 0.55, grade: 'D' },
-];
 
 export function getColorAccuracy(
   value: ColorValue,
@@ -38,14 +25,16 @@ export function getOverall(
   surface: number,
   color: number,
   damage: number,
+  colorWeight = GRADING.COLOR_WEIGHT,
 ): number {
-  const base = surface * SURFACE_WEIGHT + color * COLOR_WEIGHT;
+  const surfaceWeight = 1 - colorWeight;
+  const base = surface * surfaceWeight + color * colorWeight;
 
-  return clampBinary(base - damage * DAMAGE_WEIGHT);
+  return clampBinary(base - damage * GRADING.DAMAGE_WEIGHT);
 }
 
 export function getGrade(overall: number): GradeLetter {
-  return GRADES.find(({ minimum }) => overall >= minimum)?.grade ?? 'F';
+  return GRADING.GRADES.find(({ minimum }) => overall >= minimum)?.grade ?? 'F';
 }
 
 export function getPayout(fee: number, overall: number): number {
@@ -106,7 +95,7 @@ export function getHeatColor(value: number): number {
 }
 
 function getAxisAccuracy(value: number, target: number): number {
-  return clampBinary(1 - Math.abs(value - target) / COLOR_TOLERANCE);
+  return clampBinary(1 - Math.abs(value - target) / GRADING.COLOR_TOLERANCE);
 }
 
 function getColorNote(offset: ColorValue): string {

@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { render } from 'phaser-jsx';
 
 import { Chrome, Flash, Hud, Stamp } from '../components';
-import { BRUSHES, KEY, LAYOUT, LEVELS } from '../constants';
+import { BRUSHES, GRADING, KEY, LAYOUT, LEVELS } from '../constants';
 import { PhotoRestorer } from '../gameobjects';
 import type {
   ColorValue,
@@ -164,9 +164,9 @@ export class Game extends Phaser.Scene {
 
   private handleDeliver(): void {
     const level = LEVELS[this.level];
-    const colorDisabled = !level.colorAxes?.length;
+    const isColorDisabled = !level.colorAxes?.length;
 
-    if (colorDisabled) {
+    if (isColorDisabled) {
       const committedSurface = this.restorer?.commitSurface();
       if (!committedSurface) {
         return;
@@ -178,7 +178,9 @@ export class Game extends Phaser.Scene {
 
     const surface = this.surface?.cleanliness ?? 0;
     const damage = this.surface?.damage ?? 0;
-    const color = colorDisabled
+    const colorWeight = isColorDisabled ? 0 : GRADING.COLOR_WEIGHT;
+
+    const color = isColorDisabled
       ? 1
       : getColorAccuracy(
           this.colorValue,
@@ -186,7 +188,7 @@ export class Game extends Phaser.Scene {
           level.colorAxes,
         );
 
-    const overall = getOverall(surface, color, damage);
+    const overall = getOverall(surface, color, damage, colorWeight);
     const grade = getGrade(overall);
     const payout = getPayout(level.fee, overall);
     const award = recordJob(
@@ -203,10 +205,10 @@ export class Game extends Phaser.Scene {
     );
 
     const colorOffset: ColorValue = {
-      temperature: colorDisabled
+      temperature: isColorDisabled
         ? 0
         : this.colorValue.temperature - (this.colorTarget?.temperature ?? 0),
-      tint: colorDisabled
+      tint: isColorDisabled
         ? 0
         : this.colorValue.tint - (this.colorTarget?.tint ?? 0),
     };

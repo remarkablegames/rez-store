@@ -48,11 +48,11 @@ export const TEXTURE = {
 } as const;
 
 export const SCENE = {
-  BOOT: 'Boot',
-  TITLE: 'Title',
-  GAME: 'Game',
-  SHOP: 'Shop',
-  MUSIC: 'Music',
+  BOOT: 'boot',
+  TITLE: 'title',
+  GAME: 'game',
+  SHOP: 'shop',
+  MUSIC: 'music',
 } as const;
 
 export const SOUND = {

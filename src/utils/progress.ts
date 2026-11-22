@@ -71,6 +71,15 @@ export function resetProgress(): void {
 }
 
 /**
+ * Set earnings (for query-string debug overrides).
+ */
+export function saveEarnings(earnings: number): void {
+  const progress = loadProgress();
+  const next: Progress = { ...progress, earnings };
+  saveProgress(next);
+}
+
+/**
  * Record job result.
  */
 export function recordJob(

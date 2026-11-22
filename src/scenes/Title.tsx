@@ -3,7 +3,12 @@ import { Container, Rectangle, render, Text } from 'phaser-jsx';
 
 import { Button } from '../components';
 import { KEY, LAYOUT, THEME } from '../constants';
-import { hasSavedProgress, loadProgress, resetProgress } from '../utils';
+import {
+  getQuery,
+  hasSavedProgress,
+  loadProgress,
+  resetProgress,
+} from '../utils';
 import { Music } from './Music';
 
 export class Title extends Phaser.Scene {
@@ -20,6 +25,7 @@ export class Title extends Phaser.Scene {
     const centerX = LAYOUT.GAME.WIDTH / 2;
     const centerY = LAYOUT.GAME.HEIGHT / 2;
     const hasSave = hasSavedProgress();
+    const query = getQuery();
 
     render(
       <Container x={centerX} y={centerY}>
@@ -69,8 +75,9 @@ export class Title extends Phaser.Scene {
               height={44}
               onClick={() => {
                 this.startMusic();
-                const progress = loadProgress();
-                this.scene.start(KEY.SCENE.GAME, { level: progress.level });
+                this.scene.start(KEY.SCENE.GAME, {
+                  level: query.level ?? loadProgress().level,
+                });
               }}
             >
               CONTINUE
@@ -99,7 +106,7 @@ export class Title extends Phaser.Scene {
             height={44}
             onClick={() => {
               this.startMusic();
-              this.scene.start(KEY.SCENE.GAME, { level: 0 });
+              this.scene.start(KEY.SCENE.GAME, { level: query.level ?? 0 });
             }}
           >
             PLAY

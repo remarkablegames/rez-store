@@ -9,6 +9,7 @@ export * from './music';
 export * from './particles';
 export * from './photoTextures';
 export * from './progress';
+export * from './query';
 export * from './scratchSound';
 export * from './time';
 export * from './uiSound';

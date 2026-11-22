@@ -153,3 +153,29 @@ Your game is ready to be deployed!
 Builds the game and compresses the contents into a ZIP archive in the `dist` folder.
 
 Your game can be uploaded to your server, [itch.io](https://itch.io/), etc.
+
+## Testing
+
+Start the game at a level (0-36):
+
+```
+http://localhost:5173/?level=3
+```
+
+Start the game at a scene (title, game, shop):
+
+```
+http://localhost:5173/?scene=shop
+```
+
+Override earnings:
+
+```
+http://localhost:5173/?money=500
+```
+
+Start at level 5 and open shop with $999:
+
+```
+http://localhost:5173/?level=5&scene=shop&money=999
+```

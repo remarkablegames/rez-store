@@ -45,13 +45,7 @@ export class Game extends Phaser.Scene {
   /**
    * Initialize game.
    */
-  init({
-    level = 0,
-    grimeSeed = Phaser.Math.RND.uuid(),
-  }: {
-    level?: number;
-    grimeSeed?: string;
-  } = {}) {
+  init({ level = 0, grimeSeed = Phaser.Math.RND.uuid() }) {
     this.level = LEVELS[level] ? level : 0;
     this.grimeSeed = grimeSeed;
 

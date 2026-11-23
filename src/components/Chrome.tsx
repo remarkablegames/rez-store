@@ -1,17 +1,6 @@
 import { Fragment, Rectangle, Text } from 'phaser-jsx';
 
-import { LAYOUT } from '../constants';
-
-const FONT = {
-  MONO: '"Courier New", Courier, monospace',
-  SERIF: 'Georgia, "Times New Roman", serif',
-} as const;
-
-const TEXT_COLOR = {
-  GOLD: '#c8a566',
-  CREAM: '#f1e6d2',
-  MUTED: '#897b66',
-} as const;
+import { LAYOUT, THEME } from '../constants';
 
 interface ChromeProps {
   level: number;
@@ -32,9 +21,9 @@ export function Chrome({ level, title }: ChromeProps) {
         y={28}
         text="REZ STORE"
         style={{
-          fontFamily: FONT.MONO,
+          fontFamily: THEME.FONT.MONO,
           fontSize: 14,
-          color: TEXT_COLOR.GOLD,
+          color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 4,
         }}
       />
@@ -44,9 +33,9 @@ export function Chrome({ level, title }: ChromeProps) {
         y={44}
         text="Photo Repair"
         style={{
-          fontFamily: FONT.SERIF,
+          fontFamily: THEME.FONT.SERIF,
           fontSize: 32,
-          color: TEXT_COLOR.CREAM,
+          color: THEME.TEXT_COLOR.CREAM,
           padding: { bottom: 1 },
         }}
       />
@@ -56,7 +45,7 @@ export function Chrome({ level, title }: ChromeProps) {
         y={90}
         width={48}
         height={2}
-        fillColor={0xc8a566}
+        fillColor={THEME.SHAPE_COLOR.GOLD}
         fillAlpha={0.55}
         originX={0}
         originY={0.5}
@@ -67,9 +56,9 @@ export function Chrome({ level, title }: ChromeProps) {
         y={LAYOUT.PHOTO.Y + LAYOUT.PHOTO.HEIGHT / 2 + LAYOUT.PHOTO.BORDER + 20}
         text={jobLabel}
         style={{
-          fontFamily: FONT.MONO,
+          fontFamily: THEME.FONT.MONO,
           fontSize: 14,
-          color: TEXT_COLOR.MUTED,
+          color: THEME.TEXT_COLOR.MUTED,
           letterSpacing: 1.5,
         }}
         originX={0.5}

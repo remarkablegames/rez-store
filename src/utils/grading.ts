@@ -80,18 +80,17 @@ export function getClientNote(
   }
 }
 
-/**
- * Heat color used by the inspection overlay and client report.
- */
-export function getHeatColor(value: number): number {
-  const clamped = clampBinary(value);
-  const from =
-    clamped <= 0.5 ? THEME.SHAPE_COLOR.HEAT_CLEAN : THEME.SHAPE_COLOR.HEAT_MID;
-  const to =
-    clamped <= 0.5 ? THEME.SHAPE_COLOR.HEAT_MID : THEME.SHAPE_COLOR.HEAT_DIRT;
-  const local = clamped <= 0.5 ? clamped * 2 : (clamped - 0.5) * 2;
+const GRIME_CLEAN = 0x26313a;
 
-  return mixColor(from, to, local);
+/**
+ * Blue ramp for missed grime, matching the inspection overlay.
+ */
+export function getGrimeColor(value: number): number {
+  return mixColor(
+    GRIME_CLEAN,
+    THEME.SHAPE_COLOR.INSPECT_GRIME,
+    clampBinary(value),
+  );
 }
 
 function getAxisAccuracy(value: number, target: number): number {

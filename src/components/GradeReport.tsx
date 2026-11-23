@@ -3,12 +3,14 @@ import { Container, Rectangle, Text, useEffect } from 'phaser-jsx';
 import { LAYOUT, THEME } from '../constants';
 import { useUiSound } from '../hooks';
 import type { GradeLetter, JobReport } from '../types';
-import { formatElapsed, getHeatColor } from '../utils';
+import { formatElapsed, getGrimeColor } from '../utils';
 import { Button } from './Button';
 
 const HEATMAP_CELL = 22;
 const HEATMAP_GAP = 2;
 const HEATMAP_START_Y = 406;
+const HEATMAP_PANEL_PADDING = 6;
+const HEATMAP_PANEL_ALPHA = 0.04;
 
 interface GradeReportProps {
   report: JobReport;
@@ -38,6 +40,10 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
   const gridWidth =
     report.zoneColumns > 0
       ? report.zoneColumns * (HEATMAP_CELL + HEATMAP_GAP) - HEATMAP_GAP
+      : 0;
+  const gridHeight =
+    report.zoneRows > 0
+      ? report.zoneRows * (HEATMAP_CELL + HEATMAP_GAP) - HEATMAP_GAP
       : 0;
   const gridX =
     LAYOUT.HUD.CONTENT_X + (LAYOUT.HUD.CONTENT_WIDTH - gridWidth) / 2;
@@ -154,6 +160,19 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
       />
 
       <Container x={gridX} y={HEATMAP_START_Y}>
+        {gridWidth > 0 && gridHeight > 0 && (
+          <Rectangle
+            x={gridWidth / 2}
+            y={gridHeight / 2}
+            width={gridWidth + HEATMAP_PANEL_PADDING * 2}
+            height={gridHeight + HEATMAP_PANEL_PADDING * 2}
+            originX={0.5}
+            originY={0.5}
+            fillColor={THEME.SHAPE_COLOR.CREAM}
+            fillAlpha={HEATMAP_PANEL_ALPHA}
+          />
+        )}
+
         {report.zones.map((value, index) => {
           const column = index % report.zoneColumns;
           const row = Math.floor(index / report.zoneColumns);
@@ -167,7 +186,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
               height={HEATMAP_CELL}
               originX={0}
               originY={0}
-              fillColor={getHeatColor(value)}
+              fillColor={getGrimeColor(value)}
               fillAlpha={0.95}
             />
           );

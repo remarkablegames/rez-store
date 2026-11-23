@@ -6,7 +6,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.SMILING_GIRL,
     title: 'The Smiling Girl',
-    fee: 50,
+    fee: 40,
     abrasion: 0,
     tip: 'Hover over the picture and press and drag to clear the dust.',
     grime: { haze: 0.25, density: 1.8 },
@@ -16,7 +16,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.HANDS_TOGETHER,
     title: 'Our Hands Together',
-    fee: 70,
+    fee: 56,
     focusY: 0.55,
     abrasion: 0,
     tip: 'Clear the dust to recover this photo.',
@@ -27,7 +27,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.TODDLER_IN_PLAYGROUND,
     title: 'Playing in the Playground',
-    fee: 90,
+    fee: 72,
     abrasion: 0,
     grime: { haze: 0.29, density: 2.2 },
   },
@@ -36,7 +36,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.WHITE_DAFFODIL,
     title: 'White Daffodil Flower',
-    fee: 110,
+    fee: 88,
     abrasion: 0.25,
     tip: 'Be careful... hard scrubbing can damage the print.',
     grime: { haze: 0.31, density: 2.4 },
@@ -46,7 +46,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.BOY_DIVING_INTO_POOL,
     title: 'Diving into the Swimming Pool',
-    fee: 130,
+    fee: 104,
     focusY: 0.35,
     abrasion: 0.5,
     tip: 'Over-scrubbing leaves scratches on delicate prints.',
@@ -57,7 +57,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.WOMAN_TAKING_PICTURE,
     title: 'Say Cheese!',
-    fee: 150,
+    fee: 120,
     abrasion: 1,
     tip: 'Hard scrubbing damages this print.',
     grime: { haze: 0.35, density: 2.8 },
@@ -67,7 +67,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.MAN_ON_SOFA,
     title: 'Sitting on the Sofa',
-    fee: 170,
+    fee: 136,
     puzzle: {
       pieces: 4,
       tip: 'The photo came in torn. Rebuild it before cleaning.',
@@ -79,7 +79,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.GUITARIST,
     title: 'Street Guitarist',
-    fee: 190,
+    fee: 152,
     puzzle: {
       pieces: 4,
       tip: 'Stitch the photo together before cleaning.',
@@ -91,7 +91,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.STREET_VIEW_AT_SUNSET,
     title: 'Sunset Street',
-    fee: 210,
+    fee: 168,
     puzzle: { pieces: 4 },
     grime: { haze: 0.41, density: 3.4 },
   },
@@ -100,7 +100,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.BIKING_ON_BEACH,
     title: 'Biking on the Beach',
-    fee: 230,
+    fee: 184,
     focusY: 0.45,
     puzzle: { pieces: 4 },
     grime: { haze: 0.43, density: 3.6 },
@@ -110,7 +110,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.PADDLEBOARDER,
     title: 'Paddleboarding',
-    fee: 250,
+    fee: 200,
     focusY: 0.4,
     tip: 'Balance the temperature until skin tones feel natural.',
     puzzle: {
@@ -124,7 +124,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.WOMAN_IN_POOL,
     title: 'Taking a Pic from the Pool',
-    fee: 270,
+    fee: 216,
     focusY: 0.4,
     puzzle: { pieces: 6 },
     grime: { haze: 0.47, density: 4.0 },
@@ -134,7 +134,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.WEDDING_RING,
     title: 'Wedding Ring',
-    fee: 290,
+    fee: 232,
     abrasion: 1.5,
     tip: 'This delicate keepsake bruises under hard scrubbing.',
     puzzle: { pieces: 6 },
@@ -145,7 +145,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.BONSAI_TREE,
     title: 'Bonsai Tree',
-    fee: 310,
+    fee: 248,
     puzzle: { pieces: 6 },
     grime: { haze: 0.51, density: 4.4 },
   },
@@ -154,7 +154,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.CAT_ON_SOFA,
     title: 'Cat on the Sofa',
-    fee: 330,
+    fee: 264,
     puzzle: { pieces: 8 },
     grime: { haze: 0.53, density: 4.6 },
   },
@@ -163,7 +163,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.DOG_SLEEPING_ON_COUCH,
     title: 'Napping Dog',
-    fee: 350,
+    fee: 280,
     tip: 'Adjust both temperature and tint for a natural look.',
     puzzle: { pieces: 8 },
     grime: { haze: 0.55, density: 4.8 },
@@ -173,7 +173,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.BABY_SUCKING_ON_THUMB,
     title: 'Baby Boy',
-    fee: 370,
+    fee: 296,
     abrasion: 1.5,
     tip: 'A precious portrait... go easy on the brush.',
     puzzle: { pieces: 8 },
@@ -184,7 +184,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.KOI_FISH,
     title: 'Koi Fish in a Pond',
-    fee: 390,
+    fee: 312,
     focusY: 0.45,
     puzzle: { pieces: 8 },
     grime: { haze: 0.58, density: 5.0 },
@@ -194,7 +194,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.SWIMMING_TURTLE,
     title: 'Swimming Turtle',
-    fee: 410,
+    fee: 328,
     focusY: 0.5,
     puzzle: { pieces: 9 },
     grime: { haze: 0.59, density: 5.0 },
@@ -204,7 +204,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.GRADUATION,
     title: 'Graduation',
-    fee: 430,
+    fee: 344,
     puzzle: { pieces: 9 },
     grime: { haze: 0.6, density: 5.0 },
   },
@@ -213,7 +213,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.TORTOISE_ON_SIDEWALK,
     title: 'Tortoise on the Sidewalk',
-    fee: 450,
+    fee: 360,
     focusY: 0.6,
     puzzle: { pieces: 9 },
     grime: { haze: 0.6, density: 5.0 },
@@ -223,7 +223,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.CRASHING_WAVES,
     title: 'Sandy Toes and Salty Air',
-    fee: 470,
+    fee: 376,
     puzzle: { pieces: 9 },
     grime: { haze: 0.6, density: 5.0 },
   },
@@ -232,7 +232,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.SANDPIPERS_ON_BEACH,
     title: 'Birds at the Beach',
-    fee: 490,
+    fee: 392,
     puzzle: {
       pieces: 12,
       tip: 'Take your time to piece them together.',
@@ -244,7 +244,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.SURFING,
     title: 'Catching Waves',
-    fee: 510,
+    fee: 408,
     focusY: 0.35,
     puzzle: { pieces: 12 },
     grime: { haze: 0.62, density: 5.2 },
@@ -254,7 +254,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.BOAT_IN_RIVER,
     title: 'Sailing in the River',
-    fee: 530,
+    fee: 424,
     puzzle: { pieces: 12 },
     grime: { haze: 0.64, density: 5.6 },
   },
@@ -263,7 +263,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.WINDING_BOARDWALK,
     title: 'Winding Road',
-    fee: 550,
+    fee: 440,
     abrasion: 1.25,
     puzzle: { pieces: 12 },
     grime: { haze: 0.66, density: 5.8 },
@@ -273,7 +273,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.RED_FIRE_HYDRANT,
     title: 'Red Fire Hydrant',
-    fee: 570,
+    fee: 456,
     abrasion: 1.25,
     puzzle: { pieces: 12 },
     grime: { haze: 0.68, density: 6.0 },
@@ -283,7 +283,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.TRAFFIC_LIGHTS,
     title: 'Going through Traffic',
-    fee: 590,
+    fee: 472,
     abrasion: 1.25,
     puzzle: { pieces: 15 },
     grime: { haze: 0.7, density: 6.0 },
@@ -293,7 +293,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.HIGHWAY_EXIT,
     title: 'Highway Exit 276',
-    fee: 610,
+    fee: 488,
     abrasion: 1.25,
     puzzle: { pieces: 15 },
     grime: { haze: 0.72, density: 6.0 },
@@ -303,7 +303,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.THE_ORANGE_SHOP,
     title: 'The Orange Shop',
-    fee: 630,
+    fee: 504,
     abrasion: 1.25,
     puzzle: { pieces: 15 },
     grime: { haze: 0.74, density: 6.0 },
@@ -313,7 +313,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.DUCK_CROSSING_SIGN,
     title: 'Duck Crossing Sign',
-    fee: 650,
+    fee: 520,
     abrasion: 1.5,
     puzzle: { pieces: 15 },
     grime: { haze: 0.76, density: 6.0 },
@@ -323,7 +323,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.SNOWY_DAY,
     title: 'Snowy Day',
-    fee: 670,
+    fee: 536,
     abrasion: 1.5,
     puzzle: { pieces: 15 },
     grime: { haze: 0.78, density: 6.0 },
@@ -333,7 +333,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.PEOPLE_ON_SNOWY_SIDEWALK,
     title: 'Winter Stroll',
-    fee: 690,
+    fee: 552,
     abrasion: 1.5,
     puzzle: { pieces: 16 },
     grime: { haze: 0.8, density: 6.0 },
@@ -343,7 +343,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.PERSON_IN_FOREST,
     title: 'Enjoying the Nature',
-    fee: 710,
+    fee: 568,
     focusY: 0.45,
     abrasion: 1.5,
     puzzle: { pieces: 16 },
@@ -354,7 +354,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.PHOTOGRAPHER_IN_SNOW,
     title: 'Christmas Photo',
-    fee: 730,
+    fee: 584,
     abrasion: 1.5,
     puzzle: { pieces: 16 },
     grime: { haze: 0.84, density: 6.0 },
@@ -364,7 +364,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.SAXOPHONIST,
     title: 'Making Music',
-    fee: 770,
+    fee: 616,
     abrasion: 1.5,
     puzzle: { pieces: 16 },
     grime: { haze: 0.87, density: 6.0 },
@@ -374,7 +374,7 @@ export const LEVELS: Level[] = [
   {
     image: IMAGE.RAINBOW,
     title: 'Rainbow in the Sky',
-    fee: 750,
+    fee: 600,
     abrasion: 1.5,
     puzzle: {
       pieces: 16,

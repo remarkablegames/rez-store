@@ -14,14 +14,14 @@ export const COLORS: Record<ColorAxis, ColorUpgrade> = {
     name: 'Temperature',
     trait: 'COLOR BALANCE',
     description: 'Slide between warm versus cool tones.',
-    price: 100,
+    price: 125,
   },
   tint: {
     axis: 'tint',
     name: 'Tint',
     trait: 'COLOR BALANCE',
     description: 'Slide between magenta versus green tones.',
-    price: 150,
+    price: 190,
   },
 };
 

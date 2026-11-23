@@ -5,5 +5,5 @@ export const INSPECT_TOOL: Upgrade = {
   name: 'Inspect',
   trait: 'INSPECTION TOOL',
   description: 'Highlight grime and abrasions while you clean.',
-  price: 50,
+  price: 65,
 };

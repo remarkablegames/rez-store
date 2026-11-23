@@ -1,4 +1,4 @@
-import { Arc, Rectangle, Text, useState } from 'phaser-jsx';
+import { Rectangle, Text, useState } from 'phaser-jsx';
 
 import {
   BRUSH_ORDER,
@@ -22,6 +22,8 @@ import {
 } from '../utils';
 import { BrushIcon } from './BrushIcon';
 import { Button } from './Button';
+import { ColorSliderIcon } from './ColorSliderIcon';
+import { InspectIcon } from './InspectIcon';
 
 const MARGIN = 72;
 const CENTER_X = LAYOUT.GAME.WIDTH / 2;
@@ -272,6 +274,7 @@ export function Shop({ level, onNext }: ShopProps) {
               owned={owned}
               buttonLabel={owned ? 'OWNED' : `BUY $${String(upgrade.price)}`}
               disabled={owned || progress.earnings < upgrade.price}
+              colorAxis={upgrade.axis}
               onAction={() => {
                 handleColorAction(upgrade.axis);
               }}
@@ -330,6 +333,7 @@ interface ShopCardProps {
   buttonLabel: string;
   disabled: boolean;
   brush?: Brush;
+  colorAxis?: ColorAxis;
   onAction: () => void;
 }
 
@@ -344,6 +348,7 @@ function ShopCard({
   buttonLabel,
   disabled,
   brush,
+  colorAxis,
   onAction,
 }: ShopCardProps) {
   const centerX = x + CARD.WIDTH / 2;
@@ -435,43 +440,10 @@ function ShopCard({
 
       {brush ? (
         <BrushIcon x={centerX} y={PREVIEW_Y} brush={brush} scale={1.5} />
+      ) : colorAxis ? (
+        <ColorSliderIcon x={centerX} y={PREVIEW_Y} axis={colorAxis} />
       ) : (
-        <>
-          <Arc
-            x={centerX}
-            y={PREVIEW_Y}
-            radius={44}
-            fillColor={THEME.SHAPE_COLOR.CREAM}
-            fillAlpha={0.07}
-          />
-
-          <Arc
-            x={centerX}
-            y={PREVIEW_Y}
-            radius={28}
-            fillColor={THEME.SHAPE_COLOR.CREAM}
-            fillAlpha={0.14}
-          />
-
-          <Arc
-            x={centerX}
-            y={PREVIEW_Y}
-            radius={13}
-            fillColor={THEME.SHAPE_COLOR.GOLD}
-            fillAlpha={0.5}
-          />
-
-          <Rectangle
-            x={centerX + 18}
-            y={PREVIEW_Y + 18}
-            width={14}
-            height={6}
-            originX={0}
-            originY={0.5}
-            fillColor={THEME.SHAPE_COLOR.GOLD}
-            fillAlpha={0.5}
-          />
-        </>
+        <InspectIcon x={centerX} y={PREVIEW_Y} />
       )}
 
       <Text

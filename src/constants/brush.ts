@@ -67,6 +67,17 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
       strength: 0.6,
       abrasion: 0.45,
     },
+
+    {
+      level: 3,
+      name: 'Basic 3',
+      trait: 'BALANCED\nSTR 65',
+      description: 'Capacious and forgiving on any print.',
+      price: 500,
+      radius: 58,
+      strength: 0.65,
+      abrasion: 0.4,
+    },
   ],
 
   wide: [
@@ -91,6 +102,17 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
       strength: 0.3,
       abrasion: 0.25,
     },
+
+    {
+      level: 3,
+      name: 'Wide Head 3',
+      trait: 'BROAD & SOFT\nSTR 34',
+      description: 'Covers a large area with one sweep.',
+      price: 600,
+      radius: 90,
+      strength: 0.34,
+      abrasion: 0.22,
+    },
   ],
 
   detail: [
@@ -114,6 +136,17 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
       radius: 26,
       strength: 1.05,
       abrasion: 0.8,
+    },
+
+    {
+      level: 3,
+      name: 'Detail Tip 3',
+      trait: 'FINE & FIRM\nSTR 115',
+      description: 'Pierces set-in grime with surgical precision.',
+      price: 700,
+      radius: 30,
+      strength: 1.15,
+      abrasion: 0.7,
     },
   ],
 };

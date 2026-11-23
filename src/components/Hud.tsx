@@ -53,7 +53,7 @@ const COPY: Record<'reassemble' | 'clean' | 'color', StageCopy> = {
 };
 
 const BRUSH_TIPS: Record<BrushId, string> = {
-  default: 'Steady pressure. Set-in grime needs another pass.',
+  basic: 'Steady pressure. Set-in grime needs another pass.',
   wide: 'Sweep the loose dust, then switch to a firmer tip.',
   detail: 'Firm strokes lift set-in grime. Do not linger on clean areas.',
 };
@@ -129,7 +129,7 @@ export function Hud({
   const jobNumber = String(levelIndex + 1).padStart(2, '0');
   const step = `JOB ${jobNumber} / ${copy.step}`;
   const baseBrush =
-    brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.default;
+    brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.basic;
   const brushLevel = brushLevels[selectedBrush];
   const tiers = BRUSH_UPGRADES[selectedBrush];
   const tier = brushLevel > 0 ? tiers[brushLevel - 1] : undefined;

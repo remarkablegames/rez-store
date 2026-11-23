@@ -1,10 +1,10 @@
 import type { Brush, BrushId, BrushUpgradeTier } from '../types';
 
 export const BRUSHES: Record<BrushId, Brush> = {
-  default: {
-    id: 'default',
-    name: 'Default',
-    shortName: 'DEFAULT',
+  basic: {
+    id: 'basic',
+    name: 'Basic',
+    shortName: 'BASIC',
     trait: 'BALANCED\nSTR 50',
     description: 'A middle ground for dust and smudges.',
     radius: 36,
@@ -45,10 +45,10 @@ export const BRUSHES: Record<BrushId, Brush> = {
 };
 
 export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
-  default: [
+  basic: [
     {
       level: 1,
-      name: 'Default 1',
+      name: 'Basic 1',
       trait: 'BALANCED\nSTR 55',
       description: 'Slightly larger head with gentler bristles.',
       price: 100,
@@ -59,7 +59,7 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
 
     {
       level: 2,
-      name: 'Default 2',
+      name: 'Basic 2',
       trait: 'BALANCED\nSTR 60',
       description: 'Broader reach, softer on delicate prints.',
       price: 250,
@@ -118,8 +118,8 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
   ],
 };
 
-export const BRUSH_ORDER: readonly BrushId[] = ['default', 'wide', 'detail'];
+export const BRUSH_ORDER: readonly BrushId[] = ['basic', 'wide', 'detail'];
 
-export const DEFAULT_BRUSH_ID: BrushId = 'default';
+export const BASIC_BRUSH_ID: BrushId = 'basic';
 
 export const SHOP_BRUSHES: readonly Brush[] = [BRUSHES.wide, BRUSHES.detail];

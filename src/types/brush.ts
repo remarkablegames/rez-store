@@ -1,4 +1,4 @@
-export type BrushId = 'default' | 'wide' | 'detail';
+export type BrushId = 'basic' | 'wide' | 'detail';
 
 export interface Brush {
   id: BrushId;

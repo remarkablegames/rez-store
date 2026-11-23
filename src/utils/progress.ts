@@ -1,9 +1,9 @@
 import {
+  BASIC_BRUSH_ID,
   BRUSH_ORDER,
   BRUSH_UPGRADES,
   BRUSHES,
   COLORS,
-  DEFAULT_BRUSH_ID,
   INSPECT_TOOL,
 } from '../constants';
 import type {
@@ -321,7 +321,7 @@ function parseProgress(value: unknown): Progress | null {
   const equippedBrush: BrushId =
     isBrushId(rawEquipped) && brushes.includes(rawEquipped)
       ? rawEquipped
-      : DEFAULT_BRUSH_ID;
+      : BASIC_BRUSH_ID;
 
   const rawLevels: unknown = value.brushLevels;
   const brushLevels: Record<BrushId, number> =
@@ -334,7 +334,7 @@ function parseProgress(value: unknown): Progress | null {
               : [brushId, 0];
           }),
         ) as Record<BrushId, number>)
-      : { default: 0, wide: 0, detail: 0 };
+      : { basic: 0, wide: 0, detail: 0 };
 
   const rawColors: unknown = value.colors;
   const colors: ColorAxis[] =
@@ -401,7 +401,7 @@ function parseBest(value: unknown): Partial<Record<string, JobRecord>> | null {
  * Normalize owned brushes, always keeping the default brush.
  */
 function normalizeBrushes(value: unknown): BrushId[] {
-  const brushes: BrushId[] = [DEFAULT_BRUSH_ID];
+  const brushes: BrushId[] = [BASIC_BRUSH_ID];
 
   if (!Array.isArray(value)) {
     return brushes;
@@ -439,9 +439,9 @@ function createEmptyProgress(): Progress {
     level: 0,
     earnings: 0,
     best: {},
-    brushes: [DEFAULT_BRUSH_ID],
-    equippedBrush: DEFAULT_BRUSH_ID,
-    brushLevels: { default: 0, wide: 0, detail: 0 },
+    brushes: [BASIC_BRUSH_ID],
+    equippedBrush: BASIC_BRUSH_ID,
+    brushLevels: { basic: 0, wide: 0, detail: 0 },
     colors: [],
     inspect: false,
   };

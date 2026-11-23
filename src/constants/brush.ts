@@ -38,7 +38,7 @@ export const BRUSHES: Record<BrushId, Brush> = {
     radius: 18,
     edge: 0.78,
     strength: 0.85,
-    abrasion: 1.1,
+    abrasion: 0.85,
     bristleWidth: 6,
     price: 110,
   },
@@ -124,7 +124,7 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
       price: 180,
       radius: 22,
       strength: 0.95,
-      abrasion: 0.95,
+      abrasion: 0.78,
     },
 
     {
@@ -135,7 +135,7 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
       price: 400,
       radius: 26,
       strength: 1.05,
-      abrasion: 0.8,
+      abrasion: 0.68,
     },
 
     {
@@ -146,7 +146,7 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
       price: 700,
       radius: 30,
       strength: 1.15,
-      abrasion: 0.7,
+      abrasion: 0.58,
     },
   ],
 };

@@ -422,10 +422,25 @@ export function Hud({
         visible={!isComplete}
       />
 
+      {bestPayout > 0 && (
+        <Text
+          x={LAYOUT.HUD.CONTENT_X + (level.fee >= 100 ? 74 : 60)}
+          y={508}
+          text={`(BEST: $${String(bestPayout)})`}
+          style={{
+            fontFamily: THEME.FONT.MONO,
+            fontSize: 12,
+            color: THEME.TEXT_COLOR.FAINT,
+            letterSpacing: 0.2,
+          }}
+          visible={!isComplete}
+        />
+      )}
+
       <Text
         x={LAYOUT.HUD.CONTENT_X}
         y={544}
-        text="EARNINGS"
+        text="TOTAL EARNINGS"
         style={{
           fontFamily: THEME.FONT.MONO,
           fontSize: 12,
@@ -443,19 +458,6 @@ export function Hud({
           fontFamily: THEME.FONT.SERIF,
           fontSize: 22,
           color: THEME.TEXT_COLOR.CREAM,
-        }}
-        visible={!isComplete}
-      />
-
-      <Text
-        x={LAYOUT.HUD.CONTENT_X}
-        y={590}
-        text={bestPayout > 0 ? `BEST $${String(bestPayout)}` : 'FIRST DELIVERY'}
-        style={{
-          fontFamily: THEME.FONT.MONO,
-          fontSize: 12,
-          color: THEME.TEXT_COLOR.FAINT,
-          letterSpacing: 0.5,
         }}
         visible={!isComplete}
       />

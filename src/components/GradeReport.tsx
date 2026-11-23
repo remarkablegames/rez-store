@@ -13,8 +13,8 @@ const HEATMAP_LEGEND_Y = 402;
 const HEATMAP_LEGEND_SWATCH = 8;
 const HEATMAP_PANEL_PADDING = 6;
 const HEATMAP_PANEL_ALPHA = 0.04;
-const HEATMAP_DAMAGE_SIZE = 7;
-const HEATMAP_DAMAGE_INSET = 2;
+const HEATMAP_DAMAGE_SIZE = 6;
+const HEATMAP_DAMAGE_OFFSET = (HEATMAP_CELL - HEATMAP_DAMAGE_SIZE) / 2;
 const HEATMAP_DAMAGE_THRESHOLD = 0.02;
 
 interface GradeReportProps {
@@ -246,13 +246,8 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
 
               {damage > HEATMAP_DAMAGE_THRESHOLD && (
                 <Rectangle
-                  x={
-                    x +
-                    HEATMAP_CELL -
-                    HEATMAP_DAMAGE_SIZE -
-                    HEATMAP_DAMAGE_INSET
-                  }
-                  y={y + HEATMAP_DAMAGE_INSET}
+                  x={x + HEATMAP_DAMAGE_OFFSET}
+                  y={y + HEATMAP_DAMAGE_OFFSET}
                   width={HEATMAP_DAMAGE_SIZE}
                   height={HEATMAP_DAMAGE_SIZE}
                   originX={0}

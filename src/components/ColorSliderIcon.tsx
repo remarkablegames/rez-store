@@ -11,7 +11,7 @@ const KNOB_HEIGHT = LAYOUT.COLOR_SLIDER.KNOB_HEIGHT;
 const SEGMENTS = 16;
 
 const AXIS_GRADIENTS: Record<ColorAxis, readonly number[]> = {
-  temperature: createGradient(THEME.SHAPE_COLOR.HEAT_DIRT, 0x6f8fb8),
+  temperature: createGradient(THEME.SHAPE_COLOR.HEATMAP_DIRT, 0x6f8fb8),
   tint: createGradient(
     THEME.SHAPE_COLOR.TINT_MAGENTA,
     THEME.SHAPE_COLOR.TINT_GREEN,

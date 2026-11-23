@@ -64,7 +64,7 @@ export function InspectIcon({ x, y }: InspectIconProps) {
             originY={0}
             fillColor={
               damage > 0
-                ? THEME.SHAPE_COLOR.HEAT_DIRT
+                ? THEME.SHAPE_COLOR.HEATMAP_DIRT
                 : grime > 0
                   ? THEME.SHAPE_COLOR.INSPECT_GRIME
                   : THEME.SHAPE_COLOR.TRACK

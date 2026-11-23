@@ -677,7 +677,7 @@ export class PhotoRestorer {
         }
 
         this.inspection.fillStyle(
-          THEME.SHAPE_COLOR.HEAT_DIRT,
+          THEME.SHAPE_COLOR.HEATMAP_DIRT,
           Math.min(0.55, 0.12 + damage * 0.5),
         );
         this.inspection.fillRect(

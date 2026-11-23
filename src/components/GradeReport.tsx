@@ -194,7 +194,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
         height={HEATMAP_LEGEND_SWATCH}
         originX={0}
         originY={0}
-        fillColor={THEME.SHAPE_COLOR.HEAT_DIRT}
+        fillColor={THEME.SHAPE_COLOR.HEATMAP_DIRT}
         fillAlpha={0.9}
       />
 
@@ -252,7 +252,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
                   height={HEATMAP_DAMAGE_SIZE}
                   originX={0}
                   originY={0}
-                  fillColor={THEME.SHAPE_COLOR.HEAT_DIRT}
+                  fillColor={THEME.SHAPE_COLOR.HEATMAP_DIRT}
                   fillAlpha={0.45 + damage * 0.45}
                 />
               )}

@@ -8,8 +8,8 @@ import { Button } from './Button';
 
 const HEATMAP_CELL = 18;
 const HEATMAP_GAP = 2;
-const HEATMAP_START_Y = 422;
-const HEATMAP_LEGEND_Y = 402;
+const HEATMAP_LEGEND_Y = 398;
+const HEATMAP_START_Y = 420;
 const HEATMAP_LEGEND_SWATCH = 8;
 const HEATMAP_PANEL_PADDING = 6;
 const HEATMAP_PANEL_ALPHA = 0.04;
@@ -154,7 +154,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
 
       <Text
         x={LAYOUT.HUD.CONTENT_X}
-        y={386}
+        y={HEATMAP_LEGEND_Y - 14}
         text="SURFACE MAP"
         style={{
           fontFamily: THEME.FONT.MONO,

@@ -108,6 +108,7 @@ export class PhotoRestorer {
       )
       .setAlpha(0)
       .setVisible(false);
+
     this.tintCast = scene.add
       .rectangle(
         x,
@@ -119,6 +120,7 @@ export class PhotoRestorer {
       )
       .setAlpha(0)
       .setVisible(false);
+
     this.inspection = scene.add.graphics().setVisible(false);
     this.brushCursor = scene.add
       .circle(x, y, this.brush.radius, 0xffffff, 0.045)
@@ -356,15 +358,21 @@ export class PhotoRestorer {
 
     const remaining = this.getMaxGrimeNear(localX, localY);
 
-    this.eraseLayer(this.photoTextures.grime.context, localX, localY, 1);
+    this.eraseLayer(
+      this.photoTextures.grime.context,
+      localX,
+      localY,
+      this.brush.strength,
+    );
+
     this.eraseLayer(
       this.photoTextures.setIn.context,
       localX,
       localY,
       this.brush.strength,
     );
-    this.removeGrimeFromCells(localX, localY);
 
+    this.removeGrimeFromCells(localX, localY);
     this.grimeNeedsRefresh = true;
 
     if (remaining < OVERSCRUB_THRESHOLD) {

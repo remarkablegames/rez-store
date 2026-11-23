@@ -6,9 +6,9 @@ import type { GradeLetter, JobReport } from '../types';
 import { formatElapsed, getHeatColor } from '../utils';
 import { Button } from './Button';
 
-const HEAT_CELL = 22;
-const HEAT_GAP = 2;
-const HEAT_START_Y = 406;
+const HEATMAP_CELL = 22;
+const HEATMAP_GAP = 2;
+const HEATMAP_START_Y = 406;
 
 interface GradeReportProps {
   report: JobReport;
@@ -37,7 +37,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
 
   const gridWidth =
     report.zoneColumns > 0
-      ? report.zoneColumns * (HEAT_CELL + HEAT_GAP) - HEAT_GAP
+      ? report.zoneColumns * (HEATMAP_CELL + HEATMAP_GAP) - HEATMAP_GAP
       : 0;
   const gridX =
     LAYOUT.HUD.CONTENT_X + (LAYOUT.HUD.CONTENT_WIDTH - gridWidth) / 2;
@@ -153,7 +153,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
         }}
       />
 
-      <Container x={gridX} y={HEAT_START_Y}>
+      <Container x={gridX} y={HEATMAP_START_Y}>
         {report.zones.map((value, index) => {
           const column = index % report.zoneColumns;
           const row = Math.floor(index / report.zoneColumns);
@@ -161,10 +161,10 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
           return (
             <Rectangle
               key={index}
-              x={column * (HEAT_CELL + HEAT_GAP)}
-              y={row * (HEAT_CELL + HEAT_GAP)}
-              width={HEAT_CELL}
-              height={HEAT_CELL}
+              x={column * (HEATMAP_CELL + HEATMAP_GAP)}
+              y={row * (HEATMAP_CELL + HEATMAP_GAP)}
+              width={HEATMAP_CELL}
+              height={HEATMAP_CELL}
               originX={0}
               originY={0}
               fillColor={getHeatColor(value)}

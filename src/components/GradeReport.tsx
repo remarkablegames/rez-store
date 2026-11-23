@@ -1,4 +1,4 @@
-import { Rectangle, Text, useEffect } from 'phaser-jsx';
+import { Container, Rectangle, Text, useEffect } from 'phaser-jsx';
 
 import { LAYOUT, THEME } from '../constants';
 import { useUiSound } from '../hooks';
@@ -8,7 +8,7 @@ import { Button } from './Button';
 
 const HEAT_CELL = 22;
 const HEAT_GAP = 2;
-const HEAT_START_Y = 400;
+const HEAT_START_Y = 406;
 
 interface GradeReportProps {
   report: JobReport;
@@ -153,23 +153,26 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
         }}
       />
 
-      {report.zones.map((value, index) => {
-        const column = index % report.zoneColumns;
-        const row = Math.floor(index / report.zoneColumns);
+      <Container x={gridX} y={HEAT_START_Y}>
+        {report.zones.map((value, index) => {
+          const column = index % report.zoneColumns;
+          const row = Math.floor(index / report.zoneColumns);
 
-        return (
-          <Rectangle
-            x={gridX + column * (HEAT_CELL + HEAT_GAP)}
-            y={HEAT_START_Y + row * (HEAT_CELL + HEAT_GAP)}
-            width={HEAT_CELL}
-            height={HEAT_CELL}
-            originX={0}
-            originY={0}
-            fillColor={getHeatColor(value)}
-            fillAlpha={0.95}
-          />
-        );
-      })}
+          return (
+            <Rectangle
+              key={index}
+              x={column * (HEAT_CELL + HEAT_GAP)}
+              y={row * (HEAT_CELL + HEAT_GAP)}
+              width={HEAT_CELL}
+              height={HEAT_CELL}
+              originX={0}
+              originY={0}
+              fillColor={getHeatColor(value)}
+              fillAlpha={0.95}
+            />
+          );
+        })}
+      </Container>
 
       <Rectangle
         x={LAYOUT.HUD.CONTENT_X}

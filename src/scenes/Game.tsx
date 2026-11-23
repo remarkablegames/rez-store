@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { render } from 'phaser-jsx';
 
 import { Chrome, Flash, Hud, Stamp } from '../components';
-import { BRUSHES, GRADING, KEY, LAYOUT, LEVELS } from '../constants';
+import { GRADING, KEY, LAYOUT, LEVELS } from '../constants';
 import { PhotoRestorer, TornPuzzle } from '../gameobjects';
 import type {
   ColorAxis,
@@ -17,6 +17,7 @@ import {
   createPhotoTextures,
   createRandom,
   equipBrush,
+  getBrush,
   getClientNote,
   getColorAccuracy,
   getGrade,
@@ -101,7 +102,7 @@ export class Game extends Phaser.Scene {
         colorAxes: this.colors,
         colorTarget: this.colorTarget,
         textures,
-        brush: BRUSHES[progress.equippedBrush],
+        brush: getBrush(progress.equippedBrush, progress),
         inspect: progress.inspect,
       });
       this.hud?.setStage('clean');
@@ -129,6 +130,7 @@ export class Game extends Phaser.Scene {
         bestPayout={best?.payout ?? 0}
         brushes={getOwnedBrushes(progress)}
         equippedBrush={progress.equippedBrush}
+        brushLevels={progress.brushLevels}
         colors={this.colors}
         inspect={progress.inspect}
         onReady={(controller) => {

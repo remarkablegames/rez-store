@@ -1,19 +1,23 @@
 import { Arc, Rectangle, Text, useState } from 'phaser-jsx';
 
 import {
+  BRUSH_ORDER,
+  BRUSH_UPGRADES,
+  BRUSHES,
   INSPECT_TOOL,
   LAYOUT,
   LEVELS,
-  SHOP_BRUSHES,
   SHOP_COLORS,
   THEME,
 } from '../constants';
-import type { Brush, ColorAxis, Progress } from '../types';
+import type { Brush, BrushId, ColorAxis, Progress } from '../types';
 import {
   buyBrush,
+  buyBrushUpgrade,
   buyColor,
   buyInspect,
   equipBrush,
+  getBrush,
   loadProgress,
 } from '../utils';
 import { BrushIcon } from './BrushIcon';
@@ -23,11 +27,11 @@ const MARGIN = 72;
 const CENTER_X = LAYOUT.GAME.WIDTH / 2;
 const EARNINGS_X = LAYOUT.GAME.WIDTH - MARGIN;
 const CARD = {
-  WIDTH: 180,
+  WIDTH: 155,
   HEIGHT: 392,
   TOP: 182,
-  GAP: 14,
-  PADDING: 20,
+  GAP: 10,
+  PADDING: 16,
 } as const;
 
 const PREVIEW_Y = CARD.TOP + 226;
@@ -56,6 +60,14 @@ export function Shop({ level, onNext }: ShopProps) {
     }
   };
 
+  const handleBrushUpgrade = (brushId: BrushId): void => {
+    const next = buyBrushUpgrade(brushId);
+
+    if (next) {
+      setProgress(next);
+    }
+  };
+
   const handleInspectAction = (): void => {
     const next = buyInspect();
 
@@ -73,7 +85,22 @@ export function Shop({ level, onNext }: ShopProps) {
   };
 
   const shopItems = [
-    ...SHOP_BRUSHES.map((brush) => ({ kind: 'brush' as const, brush })),
+    ...BRUSH_ORDER.map((brushId) => {
+      const brush = BRUSHES[brushId];
+      const owned = progress.brushes.includes(brushId);
+      const currentLevel = progress.brushLevels[brushId];
+      const tiers = BRUSH_UPGRADES[brushId];
+      const canUpgrade = currentLevel < tiers.length;
+      const nextTier = canUpgrade ? tiers[currentLevel] : undefined;
+
+      return {
+        kind: 'brush' as const,
+        brush,
+        owned,
+        currentLevel,
+        nextTier,
+      };
+    }),
     ...SHOP_COLORS.map((upgrade) => ({ kind: 'color' as const, upgrade })),
     { kind: 'inspect' as const, upgrade: INSPECT_TOOL },
   ];
@@ -161,9 +188,54 @@ export function Shop({ level, onNext }: ShopProps) {
 
         if (item.kind === 'brush') {
           const brush = item.brush;
-          const owned = progress.brushes.includes(brush.id);
+          const owned = item.owned;
           const equipped = progress.equippedBrush === brush.id;
+          const nextTier = item.nextTier;
 
+          if (!owned) {
+            return (
+              <ShopCard
+                key={brush.id}
+                x={x}
+                kind="BRUSH"
+                name={brush.name}
+                trait={brush.trait}
+                description={brush.description}
+                price={brush.price}
+                owned={false}
+                buttonLabel={`BUY $${String(brush.price)}`}
+                disabled={progress.earnings < brush.price}
+                brush={brush}
+                onAction={() => {
+                  handleBrushAction(brush);
+                }}
+              />
+            );
+          }
+
+          if (nextTier) {
+            const effectiveBrush = getBrush(brush.id, progress);
+            return (
+              <ShopCard
+                key={`${brush.id}-upgrade`}
+                x={x}
+                kind="BRUSH UPGRADE"
+                name={nextTier.name ?? brush.name}
+                trait={nextTier.trait ?? brush.trait}
+                description={nextTier.description ?? brush.description}
+                price={nextTier.price}
+                owned={true}
+                buttonLabel={`UPGRADE $${String(nextTier.price)}`}
+                disabled={progress.earnings < nextTier.price}
+                brush={effectiveBrush}
+                onAction={() => {
+                  handleBrushUpgrade(brush.id);
+                }}
+              />
+            );
+          }
+
+          const effectiveBrush = getBrush(brush.id, progress);
           return (
             <ShopCard
               key={brush.id}
@@ -173,16 +245,10 @@ export function Shop({ level, onNext }: ShopProps) {
               trait={brush.trait}
               description={brush.description}
               price={brush.price}
-              owned={owned}
-              buttonLabel={
-                owned
-                  ? equipped
-                    ? 'EQUIPPED'
-                    : 'EQUIP'
-                  : `BUY $${String(brush.price)}`
-              }
-              disabled={equipped || (!owned && progress.earnings < brush.price)}
-              brush={brush}
+              owned={true}
+              buttonLabel={equipped ? 'EQUIPPED' : 'EQUIP'}
+              disabled={equipped}
+              brush={effectiveBrush}
               onAction={() => {
                 handleBrushAction(brush);
               }}
@@ -220,7 +286,7 @@ export function Shop({ level, onNext }: ShopProps) {
           <ShopCard
             key={upgrade.id}
             x={x}
-            kind="WORKSHOP UPGRADE"
+            kind="TOOL UPGRADE"
             name={upgrade.name}
             trait={upgrade.trait}
             description={upgrade.description}

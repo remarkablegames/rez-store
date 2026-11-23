@@ -1,6 +1,12 @@
 import { Rectangle, Text, useState } from 'phaser-jsx';
 
-import { BRUSHES, LAYOUT, PUZZLE_TIP, THEME } from '../constants';
+import {
+  BRUSH_UPGRADES,
+  BRUSHES,
+  LAYOUT,
+  PUZZLE_TIP,
+  THEME,
+} from '../constants';
 import { useUiSound } from '../hooks';
 import type {
   Brush,
@@ -59,6 +65,7 @@ interface HudProps {
   bestPayout: number;
   brushes: Brush[];
   equippedBrush: BrushId;
+  brushLevels: Record<BrushId, number>;
   colors: ColorAxis[];
   inspect: boolean;
   onReady: (controller: HudController) => void;
@@ -78,6 +85,7 @@ export function Hud({
   bestPayout,
   brushes,
   equippedBrush,
+  brushLevels,
   colors,
   inspect,
   onReady,
@@ -120,8 +128,19 @@ export function Hud({
   const copy = stage === 'complete' ? COPY.clean : COPY[stage];
   const jobNumber = String(levelIndex + 1).padStart(2, '0');
   const step = `JOB ${jobNumber} / ${copy.step}`;
-  const activeBrush =
+  const baseBrush =
     brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.default;
+  const brushLevel = brushLevels[selectedBrush];
+  const tiers = BRUSH_UPGRADES[selectedBrush];
+  const tier = brushLevel > 0 ? tiers[brushLevel - 1] : undefined;
+  const activeBrush: Brush = {
+    ...baseBrush,
+    radius: tier?.radius ?? baseBrush.radius,
+    strength: tier?.strength ?? baseBrush.strength,
+    abrasion: tier?.abrasion ?? baseBrush.abrasion,
+    edge: tier?.edge ?? baseBrush.edge,
+    bristleWidth: tier?.bristleWidth ?? baseBrush.bristleWidth,
+  };
   const tip = isReassemble
     ? (level.puzzle?.tip ?? PUZZLE_TIP)
     : isClean

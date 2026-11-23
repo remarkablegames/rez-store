@@ -25,3 +25,17 @@ export interface Brush {
   /** Cost in the supply shop. The default brush is free. */
   price: number;
 }
+
+/** A single upgrade tier for a brush. Omitted fields inherit the base brush stat. */
+export interface BrushUpgradeTier {
+  level: number;
+  price: number;
+  name?: string;
+  trait?: string;
+  description?: string;
+  radius?: number;
+  edge?: number;
+  strength?: number;
+  abrasion?: number;
+  bristleWidth?: number;
+}

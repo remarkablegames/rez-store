@@ -17,6 +17,7 @@ export interface Progress {
   best: Partial<Record<string, JobRecord>>;
   brushes: BrushId[];
   equippedBrush: BrushId;
+  brushLevels: Record<BrushId, number>;
   colors: ColorAxis[];
   inspect: boolean;
 }

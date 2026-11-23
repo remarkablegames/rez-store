@@ -1,5 +1,6 @@
 import {
   BRUSH_ORDER,
+  BRUSH_UPGRADES,
   BRUSHES,
   COLORS,
   DEFAULT_BRUSH_ID,
@@ -8,6 +9,7 @@ import {
 import type {
   Brush,
   BrushId,
+  BrushUpgradeTier,
   ColorAxis,
   ColorValue,
   GradeLetter,
@@ -158,6 +160,75 @@ export function buyBrush(brushId: BrushId): Progress | null {
 }
 
 /**
+ * Get the effective brush for a given brush id, merging base stats with the
+ * active upgrade tier from progress. Missing tier fields fall back to base.
+ */
+export function getBrush(brushId: BrushId, progress: Progress): Brush {
+  const base = BRUSHES[brushId];
+  const tier = getBrushUpgradeTier(brushId, progress);
+
+  return {
+    ...base,
+    ...(tier ? { ...tier, id: brushId } : {}),
+    id: brushId,
+  };
+}
+
+/**
+ * Get the active upgrade tier for a brush, or undefined if none applied.
+ */
+function getBrushUpgradeTier(
+  brushId: BrushId,
+  progress: Progress,
+): BrushUpgradeTier | undefined {
+  const tiers = BRUSH_UPGRADES[brushId];
+  const level = progress.brushLevels[brushId];
+
+  if (level <= 0 || level > tiers.length) {
+    return undefined;
+  }
+
+  return tiers[level - 1];
+}
+
+/**
+ * Buy the next upgrade tier for an owned brush.
+ */
+export function buyBrushUpgrade(brushId: BrushId): Progress | null {
+  const progress = loadProgress();
+
+  if (!progress.brushes.includes(brushId)) {
+    return null;
+  }
+
+  const tiers = BRUSH_UPGRADES[brushId];
+  const currentLevel = progress.brushLevels[brushId];
+
+  if (currentLevel >= tiers.length) {
+    return null;
+  }
+
+  const tier = tiers[currentLevel];
+
+  if (progress.earnings < tier.price) {
+    return null;
+  }
+
+  const brushLevels: Record<BrushId, number> = { ...progress.brushLevels };
+  brushLevels[brushId] = currentLevel + 1;
+
+  const next: Progress = {
+    ...progress,
+    earnings: progress.earnings - tier.price,
+    brushLevels,
+  };
+
+  saveProgress(next);
+
+  return next;
+}
+
+/**
  * Equip an owned brush.
  */
 export function equipBrush(brushId: BrushId): Progress | null {
@@ -252,6 +323,19 @@ function parseProgress(value: unknown): Progress | null {
       ? rawEquipped
       : DEFAULT_BRUSH_ID;
 
+  const rawLevels: unknown = value.brushLevels;
+  const brushLevels: Record<BrushId, number> =
+    isRecord(rawLevels) && !Array.isArray(rawLevels)
+      ? (Object.fromEntries(
+          BRUSH_ORDER.map((brushId) => {
+            const raw = rawLevels[brushId];
+            return typeof raw === 'number' && Number.isFinite(raw)
+              ? [brushId, raw]
+              : [brushId, 0];
+          }),
+        ) as Record<BrushId, number>)
+      : { default: 0, wide: 0, detail: 0 };
+
   const rawColors: unknown = value.colors;
   const colors: ColorAxis[] =
     Array.isArray(rawColors) &&
@@ -265,6 +349,7 @@ function parseProgress(value: unknown): Progress | null {
     ...base,
     brushes,
     equippedBrush,
+    brushLevels,
     colors,
     inspect: value.inspect === true,
   };
@@ -356,6 +441,7 @@ function createEmptyProgress(): Progress {
     best: {},
     brushes: [DEFAULT_BRUSH_ID],
     equippedBrush: DEFAULT_BRUSH_ID,
+    brushLevels: { default: 0, wide: 0, detail: 0 },
     colors: [],
     inspect: false,
   };

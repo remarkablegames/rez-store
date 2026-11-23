@@ -12,6 +12,9 @@ export interface SurfaceResult {
   /** Severity of abrasion caused by over-scrubbing (0-1). */
   damage: number;
 
+  /** Abrasion severity per inspection zone (0-1). */
+  damageZones: number[];
+
   /** Proportion of original grime still remaining in each inspection zone. */
   zones: number[];
 

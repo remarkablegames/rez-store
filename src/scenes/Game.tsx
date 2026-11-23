@@ -233,6 +233,7 @@ export class Game extends Phaser.Scene {
       grade,
       timeSeconds: elapsedSeconds,
       zones: this.surface?.zones ?? [],
+      damageZones: this.surface?.damageZones ?? [],
       zoneColumns: this.surface?.columns ?? 0,
       zoneRows: this.surface?.rows ?? 0,
       payout,

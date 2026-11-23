@@ -1,4 +1,4 @@
-import { Container, Rectangle, Text, useEffect } from 'phaser-jsx';
+import { Container, Fragment, Rectangle, Text, useEffect } from 'phaser-jsx';
 
 import { LAYOUT, THEME } from '../constants';
 import { useUiSound } from '../hooks';
@@ -6,11 +6,16 @@ import type { GradeLetter, JobReport } from '../types';
 import { formatElapsed, getGrimeColor } from '../utils';
 import { Button } from './Button';
 
-const HEATMAP_CELL = 22;
+const HEATMAP_CELL = 18;
 const HEATMAP_GAP = 2;
-const HEATMAP_START_Y = 406;
+const HEATMAP_START_Y = 422;
+const HEATMAP_LEGEND_Y = 402;
+const HEATMAP_LEGEND_SWATCH = 8;
 const HEATMAP_PANEL_PADDING = 6;
 const HEATMAP_PANEL_ALPHA = 0.04;
+const HEATMAP_DAMAGE_SIZE = 7;
+const HEATMAP_DAMAGE_INSET = 2;
+const HEATMAP_DAMAGE_THRESHOLD = 0.02;
 
 interface GradeReportProps {
   report: JobReport;
@@ -150,12 +155,58 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
       <Text
         x={LAYOUT.HUD.CONTENT_X}
         y={386}
-        text="MISSED GRIME"
+        text="SURFACE MAP"
         style={{
           fontFamily: THEME.FONT.MONO,
           fontSize: 12,
           color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 1.5,
+        }}
+      />
+
+      <Rectangle
+        x={LAYOUT.HUD.CONTENT_X}
+        y={HEATMAP_LEGEND_Y + 3}
+        width={HEATMAP_LEGEND_SWATCH}
+        height={HEATMAP_LEGEND_SWATCH}
+        originX={0}
+        originY={0}
+        fillColor={THEME.SHAPE_COLOR.INSPECT_GRIME}
+        fillAlpha={0.9}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X + 12}
+        y={HEATMAP_LEGEND_Y}
+        text="GRIME"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 12,
+          color: THEME.TEXT_COLOR.MUTED,
+          letterSpacing: 0.5,
+        }}
+      />
+
+      <Rectangle
+        x={LAYOUT.HUD.CONTENT_X + 62}
+        y={HEATMAP_LEGEND_Y + 3}
+        width={HEATMAP_LEGEND_SWATCH}
+        height={HEATMAP_LEGEND_SWATCH}
+        originX={0}
+        originY={0}
+        fillColor={THEME.SHAPE_COLOR.HEAT_DIRT}
+        fillAlpha={0.9}
+      />
+
+      <Text
+        x={LAYOUT.HUD.CONTENT_X + 74}
+        y={HEATMAP_LEGEND_Y}
+        text="ABRASION"
+        style={{
+          fontFamily: THEME.FONT.MONO,
+          fontSize: 12,
+          color: THEME.TEXT_COLOR.MUTED,
+          letterSpacing: 0.5,
         }}
       />
 
@@ -176,19 +227,41 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
         {report.zones.map((value, index) => {
           const column = index % report.zoneColumns;
           const row = Math.floor(index / report.zoneColumns);
+          const x = column * (HEATMAP_CELL + HEATMAP_GAP);
+          const y = row * (HEATMAP_CELL + HEATMAP_GAP);
+          const damage = report.damageZones[index] ?? 0;
 
           return (
-            <Rectangle
-              key={index}
-              x={column * (HEATMAP_CELL + HEATMAP_GAP)}
-              y={row * (HEATMAP_CELL + HEATMAP_GAP)}
-              width={HEATMAP_CELL}
-              height={HEATMAP_CELL}
-              originX={0}
-              originY={0}
-              fillColor={getGrimeColor(value)}
-              fillAlpha={0.95}
-            />
+            <Fragment key={index}>
+              <Rectangle
+                x={x}
+                y={y}
+                width={HEATMAP_CELL}
+                height={HEATMAP_CELL}
+                originX={0}
+                originY={0}
+                fillColor={getGrimeColor(value)}
+                fillAlpha={0.95}
+              />
+
+              {damage > HEATMAP_DAMAGE_THRESHOLD && (
+                <Rectangle
+                  x={
+                    x +
+                    HEATMAP_CELL -
+                    HEATMAP_DAMAGE_SIZE -
+                    HEATMAP_DAMAGE_INSET
+                  }
+                  y={y + HEATMAP_DAMAGE_INSET}
+                  width={HEATMAP_DAMAGE_SIZE}
+                  height={HEATMAP_DAMAGE_SIZE}
+                  originX={0}
+                  originY={0}
+                  fillColor={THEME.SHAPE_COLOR.HEAT_DIRT}
+                  fillAlpha={0.45 + damage * 0.45}
+                />
+              )}
+            </Fragment>
           );
         })}
       </Container>

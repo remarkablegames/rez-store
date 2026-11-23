@@ -13,6 +13,8 @@ import type {
 import {
   clampBinary,
   createParticles,
+  DIRT_ZONE_COLUMNS,
+  DIRT_ZONE_ROWS,
   measureSurface,
   rgba,
   ScratchSound,
@@ -230,6 +232,7 @@ export class PhotoRestorer {
       ],
       this.photoTextures.dirt,
       this.getDamage(),
+      this.getDamageZones(),
     );
 
     const isColorDisabled = !this.colorAxes.length;
@@ -586,6 +589,41 @@ export class PhotoRestorer {
     return clampBinary(
       total / (this.damageCells.length * DAMAGE_FULL_CELL_FRACTION),
     );
+  }
+
+  private getDamageZones(): number[] {
+    const zoneTotals = new Array<number>(
+      DIRT_ZONE_COLUMNS * DIRT_ZONE_ROWS,
+    ).fill(0);
+    const zoneCounts = new Array<number>(
+      DIRT_ZONE_COLUMNS * DIRT_ZONE_ROWS,
+    ).fill(0);
+    const { columns, rows } = this.photoTextures;
+
+    for (let row = 0; row < rows; row++) {
+      for (let column = 0; column < columns; column++) {
+        const zoneColumn = Math.min(
+          DIRT_ZONE_COLUMNS - 1,
+          Math.floor(((column + 0.5) / columns) * DIRT_ZONE_COLUMNS),
+        );
+        const zoneRow = Math.min(
+          DIRT_ZONE_ROWS - 1,
+          Math.floor(((row + 0.5) / rows) * DIRT_ZONE_ROWS),
+        );
+        const zoneIndex = zoneRow * DIRT_ZONE_COLUMNS + zoneColumn;
+
+        zoneCounts[zoneIndex] += 1;
+        zoneTotals[zoneIndex] += this.damageCells[row * columns + column];
+      }
+    }
+
+    return zoneTotals.map((total, index) => {
+      const count = zoneCounts[index] ?? 0;
+
+      return count > 0
+        ? clampBinary(total / (count * DAMAGE_FULL_CELL_FRACTION))
+        : 0;
+    });
   }
 
   private refreshInspection(): void {

@@ -19,6 +19,9 @@ export interface JobReport {
   /** Remaining grime per inspection zone (0-1). */
   zones: number[];
 
+  /** Abrasion severity per inspection zone (0-1). */
+  damageZones: number[];
+
   zoneColumns: number;
   zoneRows: number;
 

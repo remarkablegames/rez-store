@@ -94,6 +94,7 @@ export function measureSurface(
   layers: readonly DirtLayer[],
   initial: DirtProfile,
   damage = 0,
+  damageZones: number[] = [],
 ): SurfaceResult {
   const residual = combineDirtProfiles(
     ...layers.map(({ context, weight = 1 }) =>
@@ -111,6 +112,7 @@ export function measureSurface(
   return {
     cleanliness,
     damage,
+    damageZones,
     zones,
     columns: initial.columns,
     rows: initial.rows,

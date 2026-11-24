@@ -325,11 +325,11 @@ export class TornPuzzle {
     }
 
     this.completed = true;
-    this.uiSound.play('success');
 
     this.scene.time.delayedCall(240, () => {
-      this.onComplete();
+      this.uiSound.play('shutter');
       this.flash();
+      this.onComplete();
     });
   }
 

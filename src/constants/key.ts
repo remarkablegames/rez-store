@@ -70,6 +70,7 @@ export const SOUND = {
   UI_HOVER: 'sounds/ui/hover',
   UI_SUCCESS: 'sounds/ui/success',
   UI_FAIL: 'sounds/ui/fail',
+  UI_SHUTTER: 'sounds/ui/shutter',
 } as const;
 
 export const MUSIC = {

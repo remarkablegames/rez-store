@@ -4,6 +4,7 @@ import {
   BRUSH_UPGRADES,
   BRUSHES,
   LAYOUT,
+  PUZZLE_DIFFICULTY,
   PUZZLE_TIP,
   THEME,
 } from '../constants';
@@ -128,6 +129,11 @@ export function Hud({
   const copy = stage === 'complete' ? COPY.clean : COPY[stage];
   const jobNumber = String(levelIndex + 1).padStart(2, '0');
   const step = `JOB ${jobNumber} / ${copy.step}`;
+  const puzzleDifficulty = level.puzzle?.difficulty ?? 'gentle';
+  const instruction =
+    isReassemble && PUZZLE_DIFFICULTY[puzzleDifficulty].rotationShare > 0
+      ? 'Assemble the picture. Tap a piece to rotate it.'
+      : copy.instruction;
   const baseBrush =
     brushes.find((brush) => brush.id === selectedBrush) ?? BRUSHES.basic;
   const brushLevel = brushLevels[selectedBrush];
@@ -190,7 +196,7 @@ export function Hud({
       <Text
         x={LAYOUT.HUD.CONTENT_X}
         y={188}
-        text={copy.instruction}
+        text={instruction}
         style={{
           fontFamily: THEME.FONT.SANS,
           fontSize: 14,

@@ -1,6 +1,12 @@
 import Phaser from 'phaser';
 
-import { KEY, LAYOUT, PUZZLE, PUZZLE_GRID } from '../constants';
+import {
+  KEY,
+  LAYOUT,
+  PUZZLE,
+  PUZZLE_DIFFICULTY,
+  PUZZLE_GRID,
+} from '../constants';
 import type {
   PhotoTextures,
   PuzzleBounds,
@@ -8,6 +14,8 @@ import type {
   PuzzlePieceLayout,
   PuzzlePoint,
   PuzzleSlot,
+  PuzzleTuning,
+  PuzzleTurn,
 } from '../types';
 import { createCanvasTexture } from './canvasTexture';
 import { createRandom } from './math';
@@ -25,6 +33,13 @@ interface PhotoSources {
 }
 
 /**
+ * Resolve difficulty tuning for a puzzle config.
+ */
+export function getPuzzleTuning(config: PuzzleConfig): PuzzleTuning {
+  return PUZZLE_DIFFICULTY[config.difficulty ?? 'gentle'];
+}
+
+/**
  * Bake each torn piece into its own texture.
  */
 export function createPuzzlePieces(
@@ -32,11 +47,12 @@ export function createPuzzlePieces(
   textures: PhotoTextures,
   config: PuzzleConfig,
   seed: string,
+  tuning: PuzzleTuning,
 ): PuzzlePieceLayout[] {
   clearPuzzleTextures(scene);
 
   const { columns, rows } = PUZZLE_GRID[config.pieces];
-  const layouts = createPuzzleLayouts(columns, rows, seed);
+  const layouts = createPuzzleLayouts(columns, rows, seed, tuning);
   const photo = textures.aged.context.canvas;
   const grime = textures.grime.context.canvas;
   const setIn = textures.setIn.context.canvas;
@@ -72,44 +88,96 @@ export function createPuzzlePieces(
 }
 
 /**
- * Scatter pieces over the photo in a shuffled grid.
+ * Scatter pieces over the photo in a grid.
  */
 export function createPuzzleSlots(
   columns: number,
   rows: number,
   seed: string,
+  tuning: PuzzleTuning,
 ): PuzzleSlot[] {
   const random = createRandom(`${seed}:slots`);
   const total = columns * rows;
-  const offset = total > 1 ? random.between(1, total - 1) : 0;
+  const cells = createDerangement(total, random);
   const cellWidth = LAYOUT.PHOTO.WIDTH / columns;
   const cellHeight = LAYOUT.PHOTO.HEIGHT / rows;
   const left = LAYOUT.PHOTO.X - LAYOUT.PHOTO.WIDTH / 2;
   const top = LAYOUT.PHOTO.Y - LAYOUT.PHOTO.HEIGHT / 2;
+  const jitterX = Math.min(tuning.maxScatter, cellWidth * tuning.scatter);
+  const jitterY = Math.min(tuning.maxScatter, cellHeight * tuning.scatter);
+  const turns = createTurns(total, tuning.rotationShare, random);
+  const rotationEnabled = tuning.rotationShare > 0;
   const slots: PuzzleSlot[] = [];
 
   for (let index = 0; index < total; index++) {
-    const slotIndex = (index + offset) % total;
+    const slotIndex = cells[index];
     const column = slotIndex % columns;
     const row = Math.floor(slotIndex / columns);
+    const turn = turns.get(index) ?? 0;
 
     slots.push({
       x:
         left +
         (column + 0.5) * cellWidth +
-        random.realInRange(-PUZZLE.START_JITTER, PUZZLE.START_JITTER),
-      y:
-        top +
-        (row + 0.5) * cellHeight +
-        random.realInRange(-PUZZLE.START_JITTER, PUZZLE.START_JITTER),
-      rotation: random.realInRange(
-        -PUZZLE.START_ROTATION,
-        PUZZLE.START_ROTATION,
-      ),
+        random.realInRange(-jitterX, jitterX),
+      y: top + (row + 0.5) * cellHeight + random.realInRange(-jitterY, jitterY),
+      rotation: rotationEnabled
+        ? turn * (Math.PI / 2)
+        : random.realInRange(-PUZZLE.START_ROTATION, PUZZLE.START_ROTATION),
+      turn,
     });
   }
 
   return slots;
+}
+
+/**
+ * Shuffle piece cells until no piece starts in its own slot.
+ */
+function createDerangement(total: number, random: Random): number[] {
+  const cells = Array.from({ length: total }, (_, index) => index);
+
+  for (let attempt = 0; attempt < 100; attempt++) {
+    random.shuffle(cells);
+
+    if (cells.every((cell, index) => cell !== index)) {
+      return cells;
+    }
+  }
+
+  const fallback: number[] = [];
+
+  for (let index = 0; index < total; index++) {
+    fallback.push((index + 1) % total);
+  }
+
+  return fallback;
+}
+
+/**
+ * Pick which pieces start rotated and by how many quarter turns.
+ */
+function createTurns(
+  total: number,
+  share: number,
+  random: Random,
+): Map<number, PuzzleTurn> {
+  const turns = new Map<number, PuzzleTurn>();
+  const count = Math.round(total * share);
+
+  if (count <= 0) {
+    return turns;
+  }
+
+  const indices = Array.from({ length: total }, (_, index) => index);
+  const options: PuzzleTurn[] = [1, 2, 3];
+  random.shuffle(indices);
+
+  for (let index = 0; index < count; index++) {
+    turns.set(indices[index], random.pick(options));
+  }
+
+  return turns;
 }
 
 function clearPuzzleTextures(scene: Phaser.Scene): void {
@@ -126,20 +194,26 @@ function createPuzzleLayouts(
   columns: number,
   rows: number,
   seed: string,
+  tuning: PuzzleTuning,
 ): PuzzlePieceLayout[] {
   const random = createRandom(`${seed}:puzzle`);
   const cellWidth = LAYOUT.PHOTO.WIDTH / columns;
   const cellHeight = LAYOUT.PHOTO.HEIGHT / rows;
-  const jitter = Math.min(
+  const minCell = Math.min(cellWidth, cellHeight);
+  const cornerJitter = Math.min(
+    PUZZLE.MAX_CORNER_JITTER,
+    minCell * PUZZLE.CORNER_JITTER,
+  );
+  const edgeJitter = Math.min(
     PUZZLE.MAX_EDGE_JITTER,
-    Math.min(cellWidth, cellHeight) * PUZZLE.EDGE_JITTER,
+    minCell * tuning.edgeJitter,
   );
   const corners = createCorners(
     columns,
     rows,
     cellWidth,
     cellHeight,
-    jitter,
+    cornerJitter,
     random,
   );
   const verticalEdges = createVerticalEdges(
@@ -147,7 +221,7 @@ function createPuzzleLayouts(
     rows,
     corners,
     cellWidth,
-    jitter,
+    edgeJitter,
     random,
   );
   const horizontalEdges = createHorizontalEdges(
@@ -155,7 +229,7 @@ function createPuzzleLayouts(
     rows,
     corners,
     cellHeight,
-    jitter,
+    edgeJitter,
     random,
   );
   const left = LAYOUT.PHOTO.X - LAYOUT.PHOTO.WIDTH / 2;
@@ -292,8 +366,7 @@ function createEdge(
   const points: PuzzlePoint[] = [start];
   const limit = cellSize * 0.35;
 
-  for (let index = 1; index < PUZZLE.EDGE_SEGMENTS; index++) {
-    const progress = index / PUZZLE.EDGE_SEGMENTS;
+  for (const progress of createEdgeSteps(random)) {
     const x = start.x + (end.x - start.x) * progress;
     const y = start.y + (end.y - start.y) * progress;
 
@@ -321,6 +394,30 @@ function createEdge(
   points.push(end);
 
   return points;
+}
+
+/**
+ * Generate uneven progress values so tears do not look like a regular wave.
+ */
+function createEdgeSteps(random: Random): number[] {
+  const weights: number[] = [];
+  let total = 0;
+
+  for (let index = 0; index < PUZZLE.EDGE_SEGMENTS; index++) {
+    const weight = random.realInRange(0.5, 1.5);
+    weights.push(weight);
+    total += weight;
+  }
+
+  const steps: number[] = [];
+  let progress = 0;
+
+  for (let index = 0; index < PUZZLE.EDGE_SEGMENTS - 1; index++) {
+    progress += weights[index] / total;
+    steps.push(progress);
+  }
+
+  return steps;
 }
 
 function createPiecePolygon(

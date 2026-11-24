@@ -120,7 +120,8 @@ export const LEVELS: Level[] = [
     tip: 'Scrub gently.',
     puzzle: {
       pieces: 6,
-      tip: 'There are more pieces to put back together.',
+      difficulty: 'standard',
+      tip: 'The guide appears only while you’re dragging.',
     },
     grime: { haze: 0.45, density: 3.8 },
   },
@@ -128,12 +129,12 @@ export const LEVELS: Level[] = [
   // 11
   {
     image: IMAGE.WOMAN_IN_POOL,
-    title: 'Taking a Pic from the Pool',
+    title: 'Pool Pic',
     fee: 216,
     abrasion: 0.46,
     focusY: 0.4,
     tip: 'Scrub lightly',
-    puzzle: { pieces: 6 },
+    puzzle: { pieces: 6, difficulty: 'standard' },
     grime: { haze: 0.47, density: 4.0 },
   },
 
@@ -144,7 +145,7 @@ export const LEVELS: Level[] = [
     fee: 232,
     abrasion: 0.5,
     tip: 'This delicate keepsake bruises under hard scrubbing.',
-    puzzle: { pieces: 6 },
+    puzzle: { pieces: 6, difficulty: 'standard' },
     grime: { haze: 0.49, density: 4.2 },
   },
 
@@ -155,7 +156,7 @@ export const LEVELS: Level[] = [
     fee: 248,
     abrasion: 0.54,
     tip: 'Use a gentle touch.',
-    puzzle: { pieces: 6 },
+    puzzle: { pieces: 6, difficulty: 'standard' },
     grime: { haze: 0.51, density: 4.4 },
   },
 
@@ -166,7 +167,7 @@ export const LEVELS: Level[] = [
     fee: 264,
     abrasion: 0.58,
     tip: 'Be gentle when scrubbing.',
-    puzzle: { pieces: 8 },
+    puzzle: { pieces: 8, difficulty: 'standard' },
     grime: { haze: 0.53, density: 4.6 },
   },
 
@@ -177,7 +178,7 @@ export const LEVELS: Level[] = [
     fee: 280,
     abrasion: 0.63,
     tip: 'Avoid scrubbing too hard.',
-    puzzle: { pieces: 8 },
+    puzzle: { pieces: 8, difficulty: 'standard' },
     grime: { haze: 0.55, density: 4.8 },
   },
 
@@ -188,7 +189,7 @@ export const LEVELS: Level[] = [
     fee: 296,
     abrasion: 0.67,
     tip: 'A precious portrait... go easy on the brush.',
-    puzzle: { pieces: 8 },
+    puzzle: { pieces: 8, difficulty: 'standard' },
     grime: { haze: 0.57, density: 5.0 },
   },
 
@@ -200,7 +201,7 @@ export const LEVELS: Level[] = [
     abrasion: 0.71,
     focusY: 0.45,
     tip: 'Don’t scrub too much.',
-    puzzle: { pieces: 8 },
+    puzzle: { pieces: 8, difficulty: 'standard' },
     grime: { haze: 0.58, density: 5.0 },
   },
 
@@ -212,7 +213,7 @@ export const LEVELS: Level[] = [
     abrasion: 0.75,
     focusY: 0.5,
     tip: 'Don’t over-scrub.',
-    puzzle: { pieces: 9 },
+    puzzle: { pieces: 9, difficulty: 'standard' },
     grime: { haze: 0.59, density: 5.0 },
   },
 
@@ -223,7 +224,7 @@ export const LEVELS: Level[] = [
     fee: 344,
     abrasion: 0.79,
     tip: 'Take care not to scrub too vigorously.',
-    puzzle: { pieces: 9 },
+    puzzle: { pieces: 9, difficulty: 'standard' },
     grime: { haze: 0.6, density: 5.0 },
   },
 
@@ -235,7 +236,7 @@ export const LEVELS: Level[] = [
     abrasion: 0.83,
     focusY: 0.6,
     tip: 'This print scratches easily... use a light touch.',
-    puzzle: { pieces: 9 },
+    puzzle: { pieces: 9, difficulty: 'standard' },
     grime: { haze: 0.6, density: 5.0 },
   },
 
@@ -246,7 +247,7 @@ export const LEVELS: Level[] = [
     fee: 376,
     abrasion: 0.88,
     tip: 'Clean it with gentle strokes.',
-    puzzle: { pieces: 9 },
+    puzzle: { pieces: 9, difficulty: 'standard' },
     grime: { haze: 0.6, density: 5.0 },
   },
 
@@ -259,7 +260,8 @@ export const LEVELS: Level[] = [
     tip: 'Use only light pressure.',
     puzzle: {
       pieces: 12,
-      tip: 'Take your time to piece them together.',
+      difficulty: 'tricky',
+      tip: 'Some pieces are rotated. Tap a piece to turn it.',
     },
     grime: { haze: 0.6, density: 5.0 },
   },
@@ -272,7 +274,7 @@ export const LEVELS: Level[] = [
     abrasion: 0.96,
     tip: 'Scrub gently.',
     focusY: 0.35,
-    puzzle: { pieces: 12 },
+    puzzle: { pieces: 12, difficulty: 'tricky' },
     grime: { haze: 0.62, density: 5.2 },
   },
 
@@ -283,7 +285,7 @@ export const LEVELS: Level[] = [
     fee: 424,
     abrasion: 1,
     tip: 'Hard scrubbing leaves deep scratches on this print.',
-    puzzle: { pieces: 12 },
+    puzzle: { pieces: 12, difficulty: 'tricky' },
     grime: { haze: 0.64, density: 5.6 },
   },
 
@@ -294,7 +296,7 @@ export const LEVELS: Level[] = [
     fee: 440,
     abrasion: 1.04,
     tip: 'Scrub lightly.',
-    puzzle: { pieces: 12 },
+    puzzle: { pieces: 12, difficulty: 'tricky' },
     grime: { haze: 0.66, density: 5.8 },
   },
 
@@ -305,7 +307,7 @@ export const LEVELS: Level[] = [
     fee: 456,
     abrasion: 1.08,
     tip: 'Avoid over-scrubbing.',
-    puzzle: { pieces: 12 },
+    puzzle: { pieces: 12, difficulty: 'tricky' },
     grime: { haze: 0.68, density: 6.0 },
   },
 
@@ -316,7 +318,11 @@ export const LEVELS: Level[] = [
     fee: 472,
     abrasion: 1.13,
     tip: 'Don’t over-scrub.',
-    puzzle: { pieces: 15 },
+    puzzle: {
+      pieces: 15,
+      difficulty: 'hard',
+      tip: 'The guide appears while you drag or turn a piece.',
+    },
     grime: { haze: 0.7, density: 6.0 },
   },
 
@@ -327,7 +333,7 @@ export const LEVELS: Level[] = [
     fee: 488,
     abrasion: 1.17,
     tip: 'Don’t scrub too hard.',
-    puzzle: { pieces: 15 },
+    puzzle: { pieces: 15, difficulty: 'hard' },
     grime: { haze: 0.72, density: 6.0 },
   },
 
@@ -338,7 +344,7 @@ export const LEVELS: Level[] = [
     fee: 504,
     abrasion: 1.21,
     tip: 'Use a gentle touch.',
-    puzzle: { pieces: 15 },
+    puzzle: { pieces: 15, difficulty: 'hard' },
     grime: { haze: 0.74, density: 6.0 },
   },
 
@@ -349,7 +355,7 @@ export const LEVELS: Level[] = [
     fee: 520,
     abrasion: 1.25,
     tip: 'Delicate surface: scrub gently.',
-    puzzle: { pieces: 15 },
+    puzzle: { pieces: 15, difficulty: 'hard' },
     grime: { haze: 0.76, density: 6.0 },
   },
 
@@ -360,7 +366,7 @@ export const LEVELS: Level[] = [
     fee: 536,
     abrasion: 1.29,
     tip: 'Scrub lightly.',
-    puzzle: { pieces: 15 },
+    puzzle: { pieces: 15, difficulty: 'hard' },
     grime: { haze: 0.78, density: 6.0 },
   },
 
@@ -371,7 +377,7 @@ export const LEVELS: Level[] = [
     fee: 552,
     abrasion: 1.33,
     tip: 'Don’t over-scrub.',
-    puzzle: { pieces: 16 },
+    puzzle: { pieces: 16, difficulty: 'hard' },
     grime: { haze: 0.8, density: 6.0 },
   },
 
@@ -383,7 +389,7 @@ export const LEVELS: Level[] = [
     abrasion: 1.38,
     tip: 'Be gentle.',
     focusY: 0.45,
-    puzzle: { pieces: 16 },
+    puzzle: { pieces: 16, difficulty: 'hard' },
     grime: { haze: 0.82, density: 6.0 },
   },
 
@@ -394,7 +400,7 @@ export const LEVELS: Level[] = [
     fee: 584,
     abrasion: 1.42,
     tip: 'Use light pressure.',
-    puzzle: { pieces: 16 },
+    puzzle: { pieces: 16, difficulty: 'hard' },
     grime: { haze: 0.84, density: 6.0 },
   },
 
@@ -405,7 +411,11 @@ export const LEVELS: Level[] = [
     fee: 616,
     abrasion: 1.46,
     tip: 'Don’t scrub too vigorously.',
-    puzzle: { pieces: 16 },
+    puzzle: {
+      pieces: 20,
+      difficulty: 'expert',
+      tip: 'No guide now. Start with the torn edges.',
+    },
     grime: { haze: 0.87, density: 6.0 },
   },
 
@@ -417,7 +427,8 @@ export const LEVELS: Level[] = [
     abrasion: 1.5,
     tip: 'Don’t scrub too hard.',
     puzzle: {
-      pieces: 16,
+      pieces: 20,
+      difficulty: 'expert',
       tip: 'Final picture...',
     },
     grime: { haze: 0.9, density: 6.0 },

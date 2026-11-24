@@ -1,8 +1,18 @@
 import Phaser from 'phaser';
 
 import { LAYOUT, PUZZLE, PUZZLE_GRID } from '../constants';
-import type { PhotoTextures, PuzzleConfig, PuzzlePieceLayout } from '../types';
-import { createPuzzlePieces, createPuzzleSlots, UiSound } from '../utils';
+import type {
+  PhotoTextures,
+  PuzzleConfig,
+  PuzzlePieceLayout,
+  PuzzleTuning,
+} from '../types';
+import {
+  createPuzzlePieces,
+  createPuzzleSlots,
+  getPuzzleTuning,
+  UiSound,
+} from '../utils';
 
 interface TornPuzzleOptions {
   textures: PhotoTextures;
@@ -16,6 +26,12 @@ interface PuzzlePieceView {
   image: Phaser.GameObjects.Image;
   layout: PuzzlePieceLayout;
   placed: boolean;
+  anchored: boolean;
+  moved: boolean;
+  turn: number;
+  spin: number;
+  anchorTween?: Phaser.Tweens.Tween;
+  rotationTween?: Phaser.Tweens.Tween;
   dragOffsetX: number;
   dragOffsetY: number;
 }
@@ -26,6 +42,11 @@ export class TornPuzzle {
   private readonly uiSound: UiSound;
   private readonly onComplete: () => void;
   private readonly onProgress?: (placed: number, total: number) => void;
+  private readonly tuning: PuzzleTuning;
+  private readonly rotationEnabled: boolean;
+  private readonly ghost?: Phaser.GameObjects.Image;
+  private readonly dragPointers = new Set<number>();
+  private peekTimer?: Phaser.Time.TimerEvent;
   private placedCount = 0;
   private completed = false;
 
@@ -33,20 +54,25 @@ export class TornPuzzle {
     this.scene = scene;
     this.onComplete = options.onComplete;
     this.onProgress = options.onProgress;
+    this.tuning = getPuzzleTuning(options.config);
+    this.rotationEnabled = this.tuning.rotationShare > 0;
     this.uiSound = new UiSound(scene);
 
-    scene.add
-      .image(LAYOUT.PHOTO.X, LAYOUT.PHOTO.Y, options.textures.aged.key)
-      .setAlpha(PUZZLE.GHOST_ALPHA);
+    if (this.tuning.ghostAlpha > 0 || this.tuning.ghostPeekAlpha > 0) {
+      this.ghost = scene.add
+        .image(LAYOUT.PHOTO.X, LAYOUT.PHOTO.Y, options.textures.aged.key)
+        .setAlpha(this.tuning.ghostAlpha);
+    }
 
     const layouts = createPuzzlePieces(
       scene,
       options.textures,
       options.config,
       options.seed,
+      this.tuning,
     );
     const { columns, rows } = PUZZLE_GRID[options.config.pieces];
-    const slots = createPuzzleSlots(columns, rows, options.seed);
+    const slots = createPuzzleSlots(columns, rows, options.seed, this.tuning);
 
     layouts.forEach((layout, index) => {
       const slot = slots[index];
@@ -72,6 +98,10 @@ export class TornPuzzle {
         image,
         layout,
         placed: false,
+        anchored: false,
+        moved: false,
+        turn: slot.turn,
+        spin: slot.rotation,
         dragOffsetX: 0,
         dragOffsetY: 0,
       };
@@ -85,8 +115,8 @@ export class TornPuzzle {
           this.handleDrag(view, pointer);
         }
       });
-      image.on('dragend', () => {
-        this.handleDragEnd(view);
+      image.on('dragend', (pointer: Phaser.Input.Pointer) => {
+        this.handleDragEnd(view, pointer);
       });
     });
 
@@ -101,9 +131,12 @@ export class TornPuzzle {
       return;
     }
 
+    this.dragPointers.add(pointer.id);
+    view.moved = false;
     this.scene.children.bringToTop(view.image);
     view.dragOffsetX = view.image.x - pointer.worldX;
     view.dragOffsetY = view.image.y - pointer.worldY;
+    this.syncGhost();
     this.uiSound.play('select');
   }
 
@@ -115,6 +148,20 @@ export class TornPuzzle {
       return;
     }
 
+    if (!view.moved) {
+      if (pointer.getDistance() <= PUZZLE.TAP_DISTANCE) {
+        return;
+      }
+
+      view.moved = true;
+    }
+
+    if (view.anchorTween) {
+      view.anchorTween.stop();
+      view.anchorTween = undefined;
+      view.anchored = false;
+    }
+
     const position = this.clampPosition(
       view.image,
       pointer.worldX + view.dragOffsetX,
@@ -123,8 +170,21 @@ export class TornPuzzle {
     view.image.setPosition(position.x, position.y);
   }
 
-  private handleDragEnd(view: PuzzlePieceView): void {
+  private handleDragEnd(
+    view: PuzzlePieceView,
+    pointer: Phaser.Input.Pointer,
+  ): void {
+    this.dragPointers.delete(pointer.id);
+
     if (view.placed || this.completed) {
+      this.syncGhost();
+      return;
+    }
+
+    const tapped = !view.moved;
+
+    if (this.rotationEnabled && tapped && view.turn) {
+      this.turn(view, 1);
       return;
     }
 
@@ -135,14 +195,101 @@ export class TornPuzzle {
       view.layout.targetY,
     );
 
-    if (distance <= PUZZLE.SNAP_DISTANCE) {
-      this.snap(view);
+    if (distance <= this.tuning.snapDistance) {
+      if (!this.rotationEnabled || !view.turn) {
+        this.snap(view);
+      } else {
+        this.anchor(view);
+      }
+    }
+
+    this.syncGhost();
+  }
+
+  private turn(view: PuzzlePieceView, direction: 1 | -1): void {
+    if (view.placed || this.completed) {
+      return;
+    }
+
+    view.rotationTween?.stop();
+    view.turn = (view.turn + direction + 4) % 4;
+    view.spin += (direction * Math.PI) / 2;
+
+    view.rotationTween = this.scene.tweens.add({
+      targets: view.image,
+      rotation: view.spin,
+      duration: PUZZLE.ROTATION_DURATION,
+      ease: 'Cubic.easeOut',
+      onComplete: () => {
+        view.image.setRotation(Phaser.Math.Angle.Wrap(view.image.rotation));
+        view.spin = view.image.rotation;
+        view.rotationTween = undefined;
+      },
+    });
+
+    this.uiSound.play('click');
+
+    const snapped = !view.turn ? this.trySnap(view) : false;
+
+    if (!snapped) {
+      this.peekGhost();
     }
   }
 
+  private trySnap(view: PuzzlePieceView): boolean {
+    if (!this.rotationEnabled || view.turn) {
+      return false;
+    }
+
+    const distance = Phaser.Math.Distance.Between(
+      view.image.x,
+      view.image.y,
+      view.layout.targetX,
+      view.layout.targetY,
+    );
+
+    if (distance <= this.tuning.snapDistance) {
+      this.snap(view);
+      return true;
+    }
+
+    return false;
+  }
+
+  private anchor(view: PuzzlePieceView): void {
+    if (view.anchored) {
+      return;
+    }
+
+    view.anchored = true;
+    view.anchorTween = this.scene.tweens.add({
+      targets: view.image,
+      x: view.layout.targetX,
+      y: view.layout.targetY,
+      duration: 150,
+      ease: 'Cubic.easeOut',
+      onComplete: () => {
+        view.anchorTween = undefined;
+      },
+    });
+
+    this.uiSound.play('click');
+  }
+
   private snap(view: PuzzlePieceView): void {
+    view.rotationTween?.stop();
+    view.rotationTween = undefined;
+    view.anchorTween?.stop();
+    view.anchorTween = undefined;
     view.placed = true;
+    view.anchored = false;
+    view.turn = 0;
+    view.spin = 0;
     view.image.disableInteractive();
+
+    // Keep the snap tween on the shortest path from the current angle.
+    view.image.setRotation(Phaser.Math.Angle.Wrap(view.image.rotation));
+    this.scene.tweens.killTweensOf(view.image);
 
     this.scene.tweens.add({
       targets: view.image,
@@ -168,6 +315,8 @@ export class TornPuzzle {
     if (this.placedCount === this.pieces.length) {
       this.complete();
     }
+
+    this.syncGhost();
   }
 
   private complete(): void {
@@ -207,6 +356,48 @@ export class TornPuzzle {
       onComplete: () => {
         flash.destroy();
       },
+    });
+  }
+
+  /**
+   * Show the photo while dragging a piece.
+   */
+  private syncGhost(): void {
+    const peek = this.dragPointers.size > 0;
+
+    this.setGhostAlpha(
+      peek ? this.tuning.ghostPeekAlpha : this.tuning.ghostAlpha,
+      peek ? PUZZLE.GHOST_FADE_IN : PUZZLE.GHOST_FADE_OUT,
+    );
+  }
+
+  /**
+   * Briefly show the photo after turning a piece so it can be checked.
+   */
+  private peekGhost(): void {
+    if (!this.ghost) {
+      return;
+    }
+
+    this.peekTimer?.remove(false);
+    this.setGhostAlpha(this.tuning.ghostPeekAlpha, PUZZLE.GHOST_FADE_IN);
+    this.peekTimer = this.scene.time.delayedCall(PUZZLE.GHOST_PEEK_HOLD, () => {
+      this.peekTimer = undefined;
+      this.syncGhost();
+    });
+  }
+
+  private setGhostAlpha(alpha: number, duration: number): void {
+    if (!this.ghost || this.ghost.alpha === alpha) {
+      return;
+    }
+
+    this.scene.tweens.killTweensOf(this.ghost);
+    this.scene.tweens.add({
+      targets: this.ghost,
+      alpha,
+      duration,
+      ease: 'Sine.easeOut',
     });
   }
 

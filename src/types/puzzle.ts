@@ -1,4 +1,7 @@
-export type PuzzlePieceCount = 4 | 6 | 8 | 9 | 12 | 15 | 16;
+export type PuzzlePieceCount = 4 | 6 | 8 | 9 | 12 | 15 | 16 | 20;
+
+export type PuzzleDifficulty =
+  'gentle' | 'standard' | 'tricky' | 'hard' | 'expert';
 
 export interface PuzzleConfig {
   /** Number of torn pieces to reassemble. */
@@ -6,6 +9,32 @@ export interface PuzzleConfig {
 
   /** Tip shown while reassembling the photo. */
   tip?: string;
+
+  /** Difficulty tuning preset. Defaults to `gentle`. */
+  difficulty?: PuzzleDifficulty;
+}
+
+export interface PuzzleTuning {
+  /** Completed photo alpha while idle. */
+  ghostAlpha: number;
+
+  /** Completed photo alpha while dragging a piece. */
+  ghostPeekAlpha: number;
+
+  /** Spawn scatter as a fraction of cell size. */
+  scatter: number;
+
+  /** Maximum spawn scatter in pixels. */
+  maxScatter: number;
+
+  /** Snap radius in pixels. */
+  snapDistance: number;
+
+  /** Share of pieces that start rotated (0-1). */
+  rotationShare: number;
+
+  /** Tear jitter as a fraction of cell size. */
+  edgeJitter: number;
 }
 
 export interface PuzzlePoint {
@@ -38,8 +67,12 @@ export interface PuzzlePieceLayout {
   hitArea: PuzzlePoint[];
 }
 
+/** Quarter turns from upright (0-3). */
+export type PuzzleTurn = 0 | 1 | 2 | 3;
+
 export interface PuzzleSlot {
   x: number;
   y: number;
   rotation: number;
+  turn: PuzzleTurn;
 }

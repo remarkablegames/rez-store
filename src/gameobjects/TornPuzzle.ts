@@ -44,7 +44,7 @@ export class TornPuzzle {
   private readonly onProgress?: (placed: number, total: number) => void;
   private readonly tuning: PuzzleTuning;
   private readonly rotationEnabled: boolean;
-  private readonly ghost?: Phaser.GameObjects.Image;
+  private readonly guide?: Phaser.GameObjects.Image;
   private readonly dragPointers = new Set<number>();
   private peekTimer?: Phaser.Time.TimerEvent;
   private placedCount = 0;
@@ -58,10 +58,10 @@ export class TornPuzzle {
     this.rotationEnabled = this.tuning.rotationShare > 0;
     this.uiSound = new UiSound(scene);
 
-    if (this.tuning.ghostAlpha > 0 || this.tuning.ghostPeekAlpha > 0) {
-      this.ghost = scene.add
+    if (this.tuning.guideAlpha > 0 || this.tuning.guidePeekAlpha > 0) {
+      this.guide = scene.add
         .image(LAYOUT.PHOTO.X, LAYOUT.PHOTO.Y, options.textures.aged.key)
-        .setAlpha(this.tuning.ghostAlpha);
+        .setAlpha(this.tuning.guideAlpha);
     }
 
     const layouts = createPuzzlePieces(
@@ -136,7 +136,7 @@ export class TornPuzzle {
     this.scene.children.bringToTop(view.image);
     view.dragOffsetX = view.image.x - pointer.worldX;
     view.dragOffsetY = view.image.y - pointer.worldY;
-    this.syncGhost();
+    this.syncGuide();
     this.uiSound.play('select');
   }
 
@@ -177,7 +177,7 @@ export class TornPuzzle {
     this.dragPointers.delete(pointer.id);
 
     if (view.placed || this.completed) {
-      this.syncGhost();
+      this.syncGuide();
       return;
     }
 
@@ -203,7 +203,7 @@ export class TornPuzzle {
       }
     }
 
-    this.syncGhost();
+    this.syncGuide();
   }
 
   private turn(view: PuzzlePieceView, direction: 1 | -1): void {
@@ -232,7 +232,7 @@ export class TornPuzzle {
     const snapped = !view.turn ? this.trySnap(view) : false;
 
     if (!snapped) {
-      this.peekGhost();
+      this.peekGuide();
     }
   }
 
@@ -316,7 +316,7 @@ export class TornPuzzle {
       this.complete();
     }
 
-    this.syncGhost();
+    this.syncGuide();
   }
 
   private complete(): void {
@@ -362,39 +362,39 @@ export class TornPuzzle {
   /**
    * Show the photo while dragging a piece.
    */
-  private syncGhost(): void {
+  private syncGuide(): void {
     const peek = this.dragPointers.size > 0;
 
-    this.setGhostAlpha(
-      peek ? this.tuning.ghostPeekAlpha : this.tuning.ghostAlpha,
-      peek ? PUZZLE.GHOST_FADE_IN : PUZZLE.GHOST_FADE_OUT,
+    this.setGuideAlpha(
+      peek ? this.tuning.guidePeekAlpha : this.tuning.guideAlpha,
+      peek ? PUZZLE.GUIDE_FADE_IN : PUZZLE.GUIDE_FADE_OUT,
     );
   }
 
   /**
    * Briefly show the photo after turning a piece so it can be checked.
    */
-  private peekGhost(): void {
-    if (!this.ghost) {
+  private peekGuide(): void {
+    if (!this.guide) {
       return;
     }
 
     this.peekTimer?.remove(false);
-    this.setGhostAlpha(this.tuning.ghostPeekAlpha, PUZZLE.GHOST_FADE_IN);
-    this.peekTimer = this.scene.time.delayedCall(PUZZLE.GHOST_PEEK_HOLD, () => {
+    this.setGuideAlpha(this.tuning.guidePeekAlpha, PUZZLE.GUIDE_FADE_IN);
+    this.peekTimer = this.scene.time.delayedCall(PUZZLE.GUIDE_PEEK_HOLD, () => {
       this.peekTimer = undefined;
-      this.syncGhost();
+      this.syncGuide();
     });
   }
 
-  private setGhostAlpha(alpha: number, duration: number): void {
-    if (!this.ghost || this.ghost.alpha === alpha) {
+  private setGuideAlpha(alpha: number, duration: number): void {
+    if (!this.guide || this.guide.alpha === alpha) {
       return;
     }
 
-    this.scene.tweens.killTweensOf(this.ghost);
+    this.scene.tweens.killTweensOf(this.guide);
     this.scene.tweens.add({
-      targets: this.ghost,
+      targets: this.guide,
       alpha,
       duration,
       ease: 'Sine.easeOut',

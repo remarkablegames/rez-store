@@ -14,9 +14,9 @@ export const PUZZLE = {
   SHADOW_BLUR: 5,
   SHADOW_OFFSET_X: 2,
   SHADOW_OFFSET_Y: 3,
-  GHOST_FADE_IN: 120,
-  GHOST_FADE_OUT: 160,
-  GHOST_PEEK_HOLD: 600,
+  GUIDE_FADE_IN: 120,
+  GUIDE_FADE_OUT: 160,
+  GUIDE_PEEK_HOLD: 600,
   START_ROTATION: 0.1,
   START_SCALE: 0.9,
   EDGE_SEGMENTS: 12,
@@ -31,8 +31,8 @@ export const PUZZLE = {
 
 export const PUZZLE_DIFFICULTY: Record<PuzzleDifficulty, PuzzleTuning> = {
   gentle: {
-    ghostAlpha: 0.1,
-    ghostPeekAlpha: 0.1,
+    guideAlpha: 0.1,
+    guidePeekAlpha: 0.1,
     scatter: 0.07,
     maxScatter: 20,
     snapDistance: 32,
@@ -40,8 +40,8 @@ export const PUZZLE_DIFFICULTY: Record<PuzzleDifficulty, PuzzleTuning> = {
     edgeJitter: 0.045,
   },
   standard: {
-    ghostAlpha: 0,
-    ghostPeekAlpha: 0.2,
+    guideAlpha: 0,
+    guidePeekAlpha: 0.2,
     scatter: 0.28,
     maxScatter: 48,
     snapDistance: 28,
@@ -49,8 +49,8 @@ export const PUZZLE_DIFFICULTY: Record<PuzzleDifficulty, PuzzleTuning> = {
     edgeJitter: 0.1,
   },
   tricky: {
-    ghostAlpha: 0,
-    ghostPeekAlpha: 0.16,
+    guideAlpha: 0,
+    guidePeekAlpha: 0.16,
     scatter: 0.32,
     maxScatter: 52,
     snapDistance: 26,
@@ -58,8 +58,8 @@ export const PUZZLE_DIFFICULTY: Record<PuzzleDifficulty, PuzzleTuning> = {
     edgeJitter: 0.12,
   },
   hard: {
-    ghostAlpha: 0,
-    ghostPeekAlpha: 0.1,
+    guideAlpha: 0,
+    guidePeekAlpha: 0.1,
     scatter: 0.34,
     maxScatter: 56,
     snapDistance: 25,
@@ -67,8 +67,8 @@ export const PUZZLE_DIFFICULTY: Record<PuzzleDifficulty, PuzzleTuning> = {
     edgeJitter: 0.14,
   },
   expert: {
-    ghostAlpha: 0,
-    ghostPeekAlpha: 0,
+    guideAlpha: 0,
+    guidePeekAlpha: 0,
     scatter: 0.34,
     maxScatter: 56,
     snapDistance: 24,

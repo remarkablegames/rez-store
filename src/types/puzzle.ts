@@ -16,10 +16,10 @@ export interface PuzzleConfig {
 
 export interface PuzzleTuning {
   /** Completed photo alpha while idle. */
-  ghostAlpha: number;
+  guideAlpha: number;
 
   /** Completed photo alpha while dragging a piece. */
-  ghostPeekAlpha: number;
+  guidePeekAlpha: number;
 
   /** Spawn scatter as a fraction of cell size. */
   scatter: number;

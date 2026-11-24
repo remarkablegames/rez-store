@@ -14,8 +14,8 @@ export function getColorAccuracy(
     return 1;
   }
 
-  if (colorAxes.length === 1 && colorAxes[0] === 'temperature') {
-    return temperature;
+  if (colorAxes.length === 1) {
+    return colorAxes[0] === 'temperature' ? temperature : tint;
   }
 
   return clampBinary((temperature + tint) / 2);

@@ -7,7 +7,7 @@
 [![release](https://img.shields.io/github/v/release/remarkablegames/rez-store)](https://github.com/remarkablegames/rez-store/releases)
 [![build](https://github.com/remarkablegames/rez-store/actions/workflows/build.yml/badge.svg)](https://github.com/remarkablegames/rez-store/actions/workflows/build.yml)
 
-📸 A casual game about repairing photographs.
+📸 Run a photo-repair shop. Restore dirty, torn, and discolored photographs, then earn a score and payment based on your work. Spend your earnings in the shop to upgrade your brushes, tools, and workbench equipment.
 
 Play in your browser:
 
@@ -18,6 +18,26 @@ Or download for desktop:
 - [Windows](https://github.com/remarkablegames/rez-store/releases/latest/download/windows.zip)
 - [macOS](https://github.com/remarkablegames/rez-store/releases/latest/download/macos.zip)
 - [Linux](https://github.com/remarkablegames/rez-store/releases/latest/download/linux.zip)
+
+## How to Play
+
+1. Each job can have up to three phases:
+   - **Puzzle**: Reassemble torn photo pieces by dragging and dropping them. Click a piece to rotate it 90° clockwise, or right-click to rotate it counterclockwise.
+   - **Clean**: Drag the brush across the photo to remove dirt and grime. On some photos, scrubbing too much can damage the print.
+   - **Color**: Adjust the temperature and tint sliders to correct the photo's color.
+2. Deliver the photo to receive a grade (S-F) and earn money based on your score.
+3. Spend your earnings in the shop on brushes, tools, and other upgrades before starting your next job.
+
+## Features
+
+- 37 photo-repair jobs with increasing difficulty
+- Jigsaw puzzles with piece rotation in later jobs
+- Brush-based cleaning, with damage from over-scrubbing
+- Color temperature and tint correction
+- Shop with three brushes, upgrade tiers, an inspection tool, and color sliders
+- S-F grading system with score-based payouts
+- Game progress is autosaved in your browser
+- Relaxing lo-fi soundtrack
 
 ## Credits
 

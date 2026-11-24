@@ -28,8 +28,8 @@ const MAX_COOL_CAST = 0.55;
 const MAX_TINT_CAST = 0.32;
 const COOL_CAST_COLOR = 0x6f8fb8;
 const OVERSCRUB_THRESHOLD = 0.045;
-const DAMAGE_INTERVAL = 70;
-const DAMAGE_PER_STAMP = 0.05;
+const DAMAGE_INTERVAL = 100;
+const DAMAGE_PER_STAMP = 0.03;
 const DAMAGE_FULL_CELL_FRACTION = 0.1;
 
 interface PhotoRestorerOptions {

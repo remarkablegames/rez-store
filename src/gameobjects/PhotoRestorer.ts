@@ -505,7 +505,7 @@ export class PhotoRestorer {
       return;
     }
 
-    if ((this.level.abrasion ?? 1) <= 0) {
+    if ((this.level.abrasion ?? 0) <= 0) {
       return;
     }
 
@@ -522,7 +522,7 @@ export class PhotoRestorer {
     const minRow = Math.max(0, Math.floor((localY - radius) / cellSize));
     const maxRow = Math.min(rows - 1, Math.floor((localY + radius) / cellSize));
     const amount =
-      DAMAGE_PER_STAMP * this.brush.abrasion * (this.level.abrasion ?? 1);
+      DAMAGE_PER_STAMP * this.brush.abrasion * (this.level.abrasion ?? 0);
 
     for (let row = minRow; row <= maxRow; row++) {
       for (let column = minColumn; column <= maxColumn; column++) {

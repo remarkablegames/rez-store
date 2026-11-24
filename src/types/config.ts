@@ -26,7 +26,7 @@ export interface Level {
 
   /**
    * Multiplier (0-1) applied to brush abrasion on this level.
-   * 0 disables over-scrub damage entirely; defaults to 1 (full abrasion).
+   * Defaults to 0 (no over-scrub damage); 1 means full abrasion.
    */
   abrasion?: number;
 

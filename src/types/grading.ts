@@ -7,6 +7,9 @@ export interface JobReport {
   /** Color accuracy (0-1). */
   color: number;
 
+  /** True when the player owned no color axes, so color was not graded. */
+  colorDisabled: boolean;
+
   /** Abrasion severity from over-scrubbing (0-1). */
   damage: number;
 

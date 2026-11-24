@@ -115,7 +115,11 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
       />
 
       <ReportRow label="SURFACE" y={232} value={percent(report.surface)} />
-      <ReportRow label="COLOR" y={254} value={percent(report.color)} />
+      <ReportRow
+        label="COLOR"
+        y={254}
+        value={report.colorDisabled ? 'NONE' : percent(report.color)}
+      />
       <ReportRow
         label="ABRASION"
         y={276}

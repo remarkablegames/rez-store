@@ -228,6 +228,7 @@ export class Game extends Phaser.Scene {
     const report: JobReport = {
       surface,
       color,
+      colorDisabled: isColorDisabled,
       damage,
       overall,
       grade,

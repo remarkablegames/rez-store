@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="public/logo192.png" alt="Rez Store: Photo Repair">
+  <img src="public/logo192.png" alt="Rez Store: Photo Repair Shop">
 </p>
 
-# Rez Store: Photo Repair
+# Rez Store: Photo Repair Shop
 
 [![release](https://img.shields.io/github/v/release/remarkablegames/rez-store)](https://github.com/remarkablegames/rez-store/releases)
 [![build](https://github.com/remarkablegames/rez-store/actions/workflows/build.yml/badge.svg)](https://github.com/remarkablegames/rez-store/actions/workflows/build.yml)

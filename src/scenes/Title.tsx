@@ -45,7 +45,7 @@ export class Title extends Phaser.Scene {
         <Text
           x={0}
           y={-125}
-          text="Photo Repair"
+          text="Photo Repair Shop"
           style={{
             fontFamily: THEME.FONT.SERIF,
             fontSize: 48,

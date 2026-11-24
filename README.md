@@ -79,6 +79,7 @@ Or download for desktop:
 
 - [Kenney Interface Sounds](https://kenney.nl/assets/interface-sounds)
 - Pixabay
+  - [Camera Shutter](https://pixabay.com/sound-effects/technology-camera-shutter-6305/)
   - [scratching](https://pixabay.com/sound-effects/film-special-effects-scratching-85152/)
 
 ## Prerequisites

@@ -39,7 +39,7 @@ const CARD = {
 const PREVIEW_Y = CARD.TOP + 226;
 const PRICE_LABEL_Y = CARD.TOP + 278;
 const PRICE_VALUE_Y = CARD.TOP + 292;
-const ACTION_Y = CARD.TOP + 350;
+const ACTION_BUTTON_Y = CARD.TOP + 352;
 
 interface ShopProps {
   level: number;
@@ -471,7 +471,7 @@ function ShopCard({
 
       <Button
         x={centerX}
-        y={ACTION_Y}
+        y={ACTION_BUTTON_Y}
         width={CARD.WIDTH - CARD.PADDING * 2}
         height={40}
         onClick={onAction}

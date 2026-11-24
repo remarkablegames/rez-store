@@ -253,7 +253,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
                   originX={0}
                   originY={0}
                   fillColor={THEME.SHAPE_COLOR.HEATMAP_DIRT}
-                  fillAlpha={0.45 + damage * 0.45}
+                  fillAlpha={0.25 + damage * 0.35}
                 />
               )}
             </Fragment>

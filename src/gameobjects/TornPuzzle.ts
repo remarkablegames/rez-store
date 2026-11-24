@@ -118,6 +118,11 @@ export class TornPuzzle {
       image.on('dragend', (pointer: Phaser.Input.Pointer) => {
         this.handleDragEnd(view, pointer);
       });
+      image.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+        if (pointer.rightButtonDown()) {
+          this.handleRightClick(view);
+        }
+      });
     });
 
     this.onProgress?.(0, layouts.length);
@@ -170,6 +175,20 @@ export class TornPuzzle {
     view.image.setPosition(position.x, position.y);
   }
 
+  private handleRightClick(view: PuzzlePieceView): void {
+    if (
+      !this.rotationEnabled ||
+      this.dragPointers.size > 0 ||
+      view.placed ||
+      this.completed
+    ) {
+      return;
+    }
+
+    this.scene.children.bringToTop(view.image);
+    this.turn(view, -1);
+  }
+
   private handleDragEnd(
     view: PuzzlePieceView,
     pointer: Phaser.Input.Pointer,
@@ -183,7 +202,7 @@ export class TornPuzzle {
 
     const tapped = !view.moved;
 
-    if (this.rotationEnabled && tapped && view.turn) {
+    if (this.rotationEnabled && tapped) {
       this.turn(view, 1);
       return;
     }

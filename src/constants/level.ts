@@ -261,7 +261,7 @@ export const LEVELS: Level[] = [
     puzzle: {
       pieces: 12,
       difficulty: 'tricky',
-      tip: 'Some pieces are rotated. Tap a piece to turn it.',
+      tip: 'Some pieces are rotated. Tap a piece to turn it. Right-click reverses.',
     },
     grime: { haze: 0.6, density: 5.0 },
   },

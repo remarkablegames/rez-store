@@ -221,7 +221,7 @@ export function Shop({ level, onNext }: ShopProps) {
               <ShopCard
                 key={`${brush.id}-upgrade`}
                 x={x}
-                kind="BRUSH UPGRADE"
+                kind="BRUSH"
                 name={nextTier.name ?? brush.name}
                 trait={nextTier.trait ?? brush.trait}
                 description={nextTier.description ?? brush.description}
@@ -242,7 +242,7 @@ export function Shop({ level, onNext }: ShopProps) {
             <ShopCard
               key={brush.id}
               x={x}
-              kind="BRUSH UPGRADE"
+              kind="BRUSH"
               name={brush.name}
               trait={brush.trait}
               description={brush.description}
@@ -266,7 +266,7 @@ export function Shop({ level, onNext }: ShopProps) {
             <ShopCard
               key={upgrade.axis}
               x={x}
-              kind="COLOR UPGRADE"
+              kind="COLOR"
               name={upgrade.name}
               trait={upgrade.trait}
               description={upgrade.description}
@@ -289,7 +289,7 @@ export function Shop({ level, onNext }: ShopProps) {
           <ShopCard
             key={upgrade.id}
             x={x}
-            kind="TOOL UPGRADE"
+            kind="TOOL"
             name={upgrade.name}
             trait={upgrade.trait}
             description={upgrade.description}

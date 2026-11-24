@@ -1,7 +1,7 @@
 {
   "name": "Rez Store: Photo Repair",
   "short_name": "Rez Store",
-  "description": "📸 A casual game about repairing photographs.",
+  "description": "📸 Run a photo-repair shop. Restore dirty, torn, and discolored photographs, then earn a score and payment based on your work. Spend your earnings in the shop to upgrade your brushes, tools, and workbench equipment.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#000000",

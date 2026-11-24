@@ -38,7 +38,7 @@ interface PhotoRestorerOptions {
   colorTarget: ColorValue;
   textures: PhotoTextures;
   brush: Brush;
-  inspect: boolean;
+  inspectLevel: number;
 }
 
 export class PhotoRestorer {
@@ -58,7 +58,7 @@ export class PhotoRestorer {
   private readonly x: number;
   private readonly y: number;
   private brush: Brush;
-  private readonly inspect: boolean;
+  private readonly inspectLevel: number;
   private stage: RestoreStage = 'clean';
   private isScrubbing = false;
   private inspecting = false;
@@ -85,7 +85,7 @@ export class PhotoRestorer {
     this.x = x;
     this.y = y;
     this.brush = options.brush;
-    this.inspect = options.inspect;
+    this.inspectLevel = options.inspectLevel;
     this.photoTextures = options.textures;
     this.looseCells = this.photoTextures.looseCells;
     this.setInCells = this.photoTextures.setInCells;
@@ -201,7 +201,7 @@ export class PhotoRestorer {
   }
 
   setInspecting(inspecting: boolean): void {
-    if (this.stage !== 'clean' || !this.inspect) {
+    if (this.stage !== 'clean' || this.inspectLevel < 1) {
       return;
     }
 
@@ -668,24 +668,26 @@ export class PhotoRestorer {
 
     const { cellSize, columns, rows } = this.photoTextures;
 
-    for (let row = 0; row < rows; row++) {
-      for (let column = 0; column < columns; column++) {
-        const damage = this.damageCells[row * columns + column];
+    if (this.inspectLevel >= 2) {
+      for (let row = 0; row < rows; row++) {
+        for (let column = 0; column < columns; column++) {
+          const damage = this.damageCells[row * columns + column];
 
-        if (damage <= 0.04) {
-          continue;
+          if (damage <= 0.04) {
+            continue;
+          }
+
+          this.inspection.fillStyle(
+            THEME.SHAPE_COLOR.HEATMAP_DIRT,
+            Math.min(0.55, 0.12 + damage * 0.5),
+          );
+          this.inspection.fillRect(
+            left + column * cellSize,
+            top + row * cellSize,
+            cellSize - 1,
+            cellSize - 1,
+          );
         }
-
-        this.inspection.fillStyle(
-          THEME.SHAPE_COLOR.HEATMAP_DIRT,
-          Math.min(0.55, 0.12 + damage * 0.5),
-        );
-        this.inspection.fillRect(
-          left + column * cellSize,
-          top + row * cellSize,
-          cellSize - 1,
-          cellSize - 1,
-        );
       }
     }
   }

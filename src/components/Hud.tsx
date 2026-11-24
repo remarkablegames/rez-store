@@ -68,7 +68,7 @@ interface HudProps {
   equippedBrush: BrushId;
   brushLevels: Record<BrushId, number>;
   colors: ColorAxis[];
-  inspect: boolean;
+  inspectLevel: number;
   onReady: (controller: HudController) => void;
   onColorChange: (value: ColorValue) => void;
   onContinue: () => void;
@@ -88,7 +88,7 @@ export function Hud({
   equippedBrush,
   brushLevels,
   colors,
-  inspect,
+  inspectLevel,
   onReady,
   onColorChange,
   onContinue,
@@ -259,7 +259,7 @@ export function Hud({
         visible={isReassemble}
       />
 
-      {isClean && inspect && (
+      {isClean && inspectLevel > 0 && (
         <Button
           x={LAYOUT.HUD.CONTENT_X + LAYOUT.HUD.CONTENT_WIDTH - 45}
           y={292}

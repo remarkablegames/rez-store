@@ -1,6 +1,6 @@
-import type { ColorAxis } from '../types/config';
+import type { ColorAxis } from '../types';
 
-export interface ColorUpgrade {
+export interface ColorTier {
   axis: ColorAxis;
   name: string;
   trait: string;
@@ -8,21 +8,20 @@ export interface ColorUpgrade {
   price: number;
 }
 
-export const COLORS: Record<ColorAxis, ColorUpgrade> = {
-  temperature: {
+export const COLOR_TIERS: ColorTier[] = [
+  {
     axis: 'temperature',
     name: 'Temperature',
     trait: 'COLOR BALANCE',
     description: 'Slide between warm versus cool tones.',
     price: 125,
   },
-  tint: {
+
+  {
     axis: 'tint',
     name: 'Tint',
     trait: 'COLOR BALANCE',
     description: 'Slide between magenta versus green tones.',
     price: 190,
   },
-};
-
-export const SHOP_COLORS = [COLORS.temperature, COLORS.tint] as const;
+] as const;

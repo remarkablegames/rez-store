@@ -4,18 +4,18 @@ import {
   BRUSH_ORDER,
   BRUSH_UPGRADES,
   BRUSHES,
-  INSPECT_TOOL,
+  COLOR_TIERS,
+  INSPECT_TIERS,
   LAYOUT,
   LEVELS,
-  SHOP_COLORS,
   THEME,
 } from '../constants';
 import type { Brush, BrushId, ColorAxis, Progress } from '../types';
 import {
   buyBrush,
   buyBrushUpgrade,
-  buyColor,
-  buyInspect,
+  buyColorTier,
+  buyInspectTier,
   equipBrush,
   getBrush,
   loadProgress,
@@ -29,7 +29,7 @@ const MARGIN = 72;
 const CENTER_X = LAYOUT.GAME.WIDTH / 2;
 const EARNINGS_X = LAYOUT.GAME.WIDTH - MARGIN;
 const CARD = {
-  WIDTH: 155,
+  WIDTH: 190,
   HEIGHT: 392,
   TOP: 182,
   GAP: 10,
@@ -71,20 +71,30 @@ export function Shop({ level, onNext }: ShopProps) {
   };
 
   const handleInspectAction = (): void => {
-    const next = buyInspect();
+    const next = buyInspectTier();
 
     if (next) {
       setProgress(next);
     }
   };
 
-  const handleColorAction = (axis: ColorAxis): void => {
-    const next = buyColor(axis);
+  const handleColorAction = (): void => {
+    const next = buyColorTier();
 
     if (next) {
       setProgress(next);
     }
   };
+
+  const inspectOwned = progress.inspect.length >= INSPECT_TIERS.length;
+  const nextInspectTier = INSPECT_TIERS.find(
+    (tier) => !progress.inspect.includes(tier.id.split('-')[1]),
+  );
+
+  const colorOwned = progress.colors.length >= COLOR_TIERS.length;
+  const nextColorTierItem = COLOR_TIERS.find(
+    (tier) => !progress.colors.includes(tier.axis),
+  );
 
   const shopItems = [
     ...BRUSH_ORDER.map((brushId) => {
@@ -103,8 +113,16 @@ export function Shop({ level, onNext }: ShopProps) {
         nextTier,
       };
     }),
-    ...SHOP_COLORS.map((upgrade) => ({ kind: 'color' as const, upgrade })),
-    { kind: 'inspect' as const, upgrade: INSPECT_TOOL },
+    {
+      kind: 'color' as const,
+      tier: nextColorTierItem,
+      owned: colorOwned,
+    },
+    {
+      kind: 'inspect' as const,
+      tier: nextInspectTier,
+      owned: inspectOwned,
+    },
   ];
 
   const cardLeft =
@@ -259,44 +277,50 @@ export function Shop({ level, onNext }: ShopProps) {
         }
 
         if (item.kind === 'color') {
-          const upgrade = item.upgrade;
-          const owned = progress.colors.includes(upgrade.axis);
+          const tier = item.tier;
+          const owned = item.owned;
+
+          if (!tier) {
+            return null;
+          }
 
           return (
             <ShopCard
-              key={upgrade.axis}
+              key={tier.axis}
               x={x}
               kind="COLOR"
-              name={upgrade.name}
-              trait={upgrade.trait}
-              description={upgrade.description}
-              price={upgrade.price}
+              name={tier.name}
+              trait={tier.trait}
+              description={tier.description}
+              price={tier.price}
               owned={owned}
-              buttonLabel={owned ? 'OWNED' : `BUY $${String(upgrade.price)}`}
-              disabled={owned || progress.earnings < upgrade.price}
-              colorAxis={upgrade.axis}
-              onAction={() => {
-                handleColorAction(upgrade.axis);
-              }}
+              buttonLabel={owned ? 'OWNED' : `BUY $${String(tier.price)}`}
+              disabled={owned || progress.earnings < tier.price}
+              colorAxis={tier.axis}
+              onAction={handleColorAction}
             />
           );
         }
 
-        const upgrade = item.upgrade;
-        const owned = progress.inspect;
+        const tier = item.tier;
+        const owned = item.owned;
+
+        if (!tier) {
+          return null;
+        }
 
         return (
           <ShopCard
-            key={upgrade.id}
+            key={tier.id}
             x={x}
             kind="TOOL"
-            name={upgrade.name}
-            trait={upgrade.trait}
-            description={upgrade.description}
-            price={upgrade.price}
+            name={tier.name}
+            trait={tier.trait}
+            description={tier.description}
+            price={tier.price}
             owned={owned}
-            buttonLabel={owned ? 'INSTALLED' : `BUY $${String(upgrade.price)}`}
-            disabled={owned || progress.earnings < upgrade.price}
+            buttonLabel={owned ? 'INSTALLED' : `BUY $${String(tier.price)}`}
+            disabled={owned || progress.earnings < tier.price}
             onAction={handleInspectAction}
           />
         );

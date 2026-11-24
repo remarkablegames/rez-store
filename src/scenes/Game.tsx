@@ -103,7 +103,7 @@ export class Game extends Phaser.Scene {
         colorTarget: this.colorTarget,
         textures,
         brush: getBrush(progress.equippedBrush, progress),
-        inspect: progress.inspect,
+        inspectLevel: progress.inspect.length,
       });
       this.hud?.setStage('clean');
     };
@@ -132,7 +132,7 @@ export class Game extends Phaser.Scene {
         equippedBrush={progress.equippedBrush}
         brushLevels={progress.brushLevels}
         colors={this.colors}
-        inspect={progress.inspect}
+        inspectLevel={progress.inspect.length}
         onReady={(controller) => {
           this.hud = controller;
         }}

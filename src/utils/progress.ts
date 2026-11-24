@@ -3,8 +3,8 @@ import {
   BRUSH_ORDER,
   BRUSH_UPGRADES,
   BRUSHES,
-  COLORS,
-  INSPECT_TOOL,
+  COLOR_TIERS,
+  INSPECT_TIERS,
 } from '../constants';
 import type {
   Brush,
@@ -250,19 +250,27 @@ export function equipBrush(brushId: BrushId): Progress | null {
 }
 
 /**
- * Buy the inspect tool.
+ * Buy the next inspect tier:
+ * 1. grime
+ * 2. abrasion
  */
-export function buyInspect(): Progress | null {
+export function buyInspectTier(): Progress | null {
   const progress = loadProgress();
 
-  if (progress.inspect || progress.earnings < INSPECT_TOOL.price) {
+  const tier = nextInspectTier(progress);
+
+  if (!tier || progress.earnings < tier.price) {
+    return null;
+  }
+
+  if (progress.inspect.includes(tier.id.split('-')[1])) {
     return null;
   }
 
   const next: Progress = {
     ...progress,
-    earnings: progress.earnings - INSPECT_TOOL.price,
-    inspect: true,
+    earnings: progress.earnings - tier.price,
+    inspect: [...progress.inspect, tier.id.split('-')[1]],
   };
 
   saveProgress(next);
@@ -271,26 +279,66 @@ export function buyInspect(): Progress | null {
 }
 
 /**
- * Buy a color axis unlock (temperature or tint).
+ * Get the next purchasable inspect tier (null = all owned):
+ * 1. grime
+ * 2. abrasion
  */
-export function buyColor(axis: ColorAxis): Progress | null {
-  const upgrade = COLORS[axis];
+export function nextInspectTier(
+  progress: Progress,
+): (typeof INSPECT_TIERS)[number] | null {
+  for (const tier of INSPECT_TIERS) {
+    if (!progress.inspect.includes(tier.id.split('-')[1])) {
+      return tier;
+    }
+  }
 
+  return null;
+}
+
+/**
+ * Buy the next color tier:
+ * 1. temperature
+ * 2. tint
+ */
+export function buyColorTier(): Progress | null {
   const progress = loadProgress();
 
-  if (progress.colors.includes(axis) || progress.earnings < upgrade.price) {
+  const tier = nextColorTier(progress);
+
+  if (!tier || progress.colors.includes(tier.axis)) {
+    return null;
+  }
+
+  if (progress.earnings < tier.price) {
     return null;
   }
 
   const next: Progress = {
     ...progress,
-    earnings: progress.earnings - upgrade.price,
-    colors: [...progress.colors, axis],
+    earnings: progress.earnings - tier.price,
+    colors: [...progress.colors, tier.axis],
   };
 
   saveProgress(next);
 
   return next;
+}
+
+/**
+ * Get the next purchasable color tier (null = all owned):
+ * 1. temperature
+ * 2. tint
+ */
+export function nextColorTier(
+  progress: Progress,
+): (typeof COLOR_TIERS)[number] | null {
+  for (const tier of COLOR_TIERS) {
+    if (!progress.colors.includes(tier.axis)) {
+      return tier;
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -339,9 +387,21 @@ function parseProgress(value: unknown): Progress | null {
   const rawColors: unknown = value.colors;
   const colors: ColorAxis[] =
     Array.isArray(rawColors) &&
-    rawColors.every((c): c is ColorAxis => c === 'temperature' || c === 'tint')
+    rawColors.every(
+      (color): color is ColorAxis =>
+        color === 'temperature' || color === 'tint',
+    )
       ? rawColors
       : [];
+
+  const rawInspect: unknown = value.inspect;
+  const inspect: string[] =
+    Array.isArray(rawInspect) &&
+    rawInspect.every((value) => typeof value === 'string')
+      ? rawInspect
+      : rawInspect === true
+        ? ['grime']
+        : [];
 
   return {
     version: 1,
@@ -351,7 +411,7 @@ function parseProgress(value: unknown): Progress | null {
     equippedBrush,
     brushLevels,
     colors,
-    inspect: value.inspect === true,
+    inspect,
   };
 }
 
@@ -443,7 +503,7 @@ function createEmptyProgress(): Progress {
     equippedBrush: BASIC_BRUSH_ID,
     brushLevels: { basic: 0, wide: 0, detail: 0 },
     colors: [],
-    inspect: false,
+    inspect: [],
   };
 }
 

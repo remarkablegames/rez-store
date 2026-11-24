@@ -1,4 +1,4 @@
-export type UpgradeId = 'inspect';
+export type UpgradeId = 'inspect' | 'inspect-grime' | 'inspect-abrasion';
 
 export interface Upgrade {
   id: UpgradeId;

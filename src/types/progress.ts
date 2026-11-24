@@ -19,7 +19,9 @@ export interface Progress {
   equippedBrush: BrushId;
   brushLevels: Record<BrushId, number>;
   colors: ColorAxis[];
-  inspect: boolean;
+
+  /** Owned inspect tiers in order: [], ['grime'], or ['grime','abrasion']. */
+  inspect: string[];
 }
 
 export interface JobAward {

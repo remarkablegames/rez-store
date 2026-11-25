@@ -550,11 +550,13 @@ export class PhotoRestorer {
   private drawAbrasion(localX: number, localY: number): void {
     const context = this.photoTextures.damage.context;
     const random = Phaser.Math.RND;
+    const abrasion = this.level.abrasion ?? 0;
+    const lineCount = Math.max(1, Math.round(2 * abrasion));
 
     context.save();
     context.lineCap = 'round';
 
-    for (let index = 0; index < 2; index++) {
+    for (let index = 0; index < lineCount; index++) {
       const angle = random.realInRange(0, Math.PI * 2);
       const length = random.realInRange(5, 16);
       const startX = localX + random.realInRange(-7, 7);

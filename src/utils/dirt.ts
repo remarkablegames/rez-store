@@ -7,6 +7,13 @@ export const DIRT_ZONE_ROWS = 4;
 /** Hidden score weight for the resistant, set-in grime layer. */
 export const SET_IN_GRIME_WEIGHT = 4;
 
+/**
+ * Fraction of original grime below which the surface counts as perfectly clean.
+ * The brush falloff asymptotically approaches zero, so a tiny residual always
+ * remains; anything under this threshold is scored as 100%.
+ */
+export const CLEAN_THRESHOLD = 0.01;
+
 export interface DirtLayer {
   context: CanvasRenderingContext2D;
   weight?: number;
@@ -102,7 +109,11 @@ export function measureSurface(
     ),
   );
   const cleanliness =
-    initial.total > 0 ? clampBinary(1 - residual.total / initial.total) : 1;
+    initial.total > 0
+      ? residual.total / initial.total <= CLEAN_THRESHOLD
+        ? 1
+        : clampBinary(1 - residual.total / initial.total)
+      : 1;
   const zones = residual.zones.map((value, index) => {
     const initialZone = initial.zones[index] ?? 0;
 

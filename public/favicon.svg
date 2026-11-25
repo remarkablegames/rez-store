@@ -1,22 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="rez-store-title">
   <title id="rez-store-title">Rez Store: Photo Repair Shop</title>
   <defs>
-    <radialGradient id="glow" cx="50%" cy="38%" r="72%">
-      <stop offset="0" stop-color="#2e251d" />
-      <stop offset="1" stop-color="#241c16" />
-    </radialGradient>
     <linearGradient id="restored" x1="17" y1="12" x2="47" y2="42" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#e8d29c" />
       <stop offset="0.55" stop-color="#d2a86a" />
       <stop offset="1" stop-color="#b5532e" />
     </linearGradient>
+    <filter id="photo-shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0.7" dy="1.4" stdDeviation="1.8" flood-color="#171310" flood-opacity="0.55" />
+    </filter>
   </defs>
 
-  <rect width="64" height="64" rx="12" fill="url(#glow)" />
-  <rect x="1" y="1" width="62" height="62" rx="11" fill="none" stroke="#c8a566" stroke-opacity="0.32" stroke-width="1.2" />
-
-  <g transform="rotate(-5 32 32)">
-    <rect x="13" y="8" width="38" height="48" rx="3" fill="#efe5cf" />
+  <g transform="rotate(-5 32 32)" filter="url(#photo-shadow)">
+    <rect x="13" y="8" width="38" height="48" rx="3" fill="#efe5cf" stroke="#352c22" stroke-opacity="0.6" stroke-width="1.2" />
     <rect x="17" y="12" width="30" height="30" fill="#786755" />
     <path d="M17 12H47V42Z" fill="url(#restored)" />
     <line x1="17" y1="12" x2="47" y2="42" stroke="#c8a566" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.9" />

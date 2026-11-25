@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="rez-store-title">
+  <title id="rez-store-title">Rez Store: Photo Repair Shop</title>
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="38%" r="72%">
+      <stop offset="0" stop-color="#2e251d" />
+      <stop offset="1" stop-color="#241c16" />
+    </radialGradient>
+    <linearGradient id="restored" x1="17" y1="12" x2="47" y2="42" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e8d29c" />
+      <stop offset="0.55" stop-color="#d2a86a" />
+      <stop offset="1" stop-color="#b5532e" />
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="12" fill="url(#glow)" />
+  <rect x="1" y="1" width="62" height="62" rx="11" fill="none" stroke="#c8a566" stroke-opacity="0.32" stroke-width="1.2" />
+
+  <g transform="rotate(-5 32 32)">
+    <rect x="13" y="8" width="38" height="48" rx="3" fill="#efe5cf" />
+    <rect x="17" y="12" width="30" height="30" fill="#786755" />
+    <path d="M17 12H47V42Z" fill="url(#restored)" />
+    <line x1="17" y1="12" x2="47" y2="42" stroke="#c8a566" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.9" />
+    <circle cx="38.5" cy="20" r="3" fill="#f6ecd8" fill-opacity="0.92" />
+
+    <path d="M20.5 38.5 28 31M23 40.3 26.5 36.8M29.5 40.8 34.5 35.8" fill="none" stroke="#443528" stroke-width="1.2" stroke-linecap="round" stroke-opacity="0.65" />
+    <path d="M25.8 39.4 29.6 35.6" fill="none" stroke="#a8402f" stroke-width="1" stroke-linecap="round" stroke-opacity="0.7" />
+    <circle cx="21.5" cy="33" r="1" fill="#3f3125" fill-opacity="0.5" />
+    <circle cx="26" cy="36.5" r="0.7" fill="#3f3125" fill-opacity="0.45" />
+    <circle cx="32.5" cy="39" r="0.6" fill="#3f3125" fill-opacity="0.4" />
+
+    <rect x="17" y="12" width="30" height="30" fill="none" stroke="#8f836d" stroke-opacity="0.45" stroke-width="0.8" />
+  </g>
+</svg>

@@ -7,7 +7,7 @@
 [![release](https://img.shields.io/github/v/release/remarkablegames/rez-store)](https://github.com/remarkablegames/rez-store/releases)
 [![build](https://github.com/remarkablegames/rez-store/actions/workflows/build.yml/badge.svg)](https://github.com/remarkablegames/rez-store/actions/workflows/build.yml)
 
-📸 Run a photo-repair shop. Restore dirty, torn, and discolored photographs, then earn a score and payment based on your work. Spend your earnings in the shop to upgrade your brushes, tools, and workbench equipment.
+📷 Run a photo-repair shop. Restore dirty, torn, and discolored photographs, then earn a score and payment based on your work. Spend your earnings in the shop to upgrade your brushes, tools, and workbench equipment.
 
 Play in your browser:
 

@@ -4,9 +4,9 @@ import { LAYOUT } from './constants';
 import * as scenes from './scenes';
 
 new Phaser.Game({
-  width: LAYOUT.GAME.WIDTH,
-  height: LAYOUT.GAME.HEIGHT,
-  title: 'Rez Store',
+  width: LAYOUT.GAME.WIDTH, // 1024
+  height: LAYOUT.GAME.HEIGHT, // 768
+  title: 'Rez Store: Photo Repair Shop',
   url: import.meta.env.VITE_APP_HOMEPAGE,
   version: import.meta.env.VITE_APP_VERSION,
   scene: [

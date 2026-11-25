@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-import { LAYOUT, THEME } from '../constants';
+import { GRADING, LAYOUT, THEME } from '../constants';
 import type {
   Brush,
   ColorAxis,
@@ -675,14 +675,15 @@ export class PhotoRestorer {
         for (let column = 0; column < columns; column++) {
           const damage = this.damageCells[row * columns + column];
 
-          if (damage <= 0.04) {
+          if (damage <= GRADING.DAMAGE_THRESHOLD) {
             continue;
           }
 
           this.inspection.fillStyle(
             THEME.SHAPE_COLOR.HEATMAP_DIRT,
-            Math.min(0.55, 0.12 + damage * 0.5),
+            Math.min(0.5, Math.max(0.12, damage * 0.5)),
           );
+
           this.inspection.fillRect(
             left + column * cellSize,
             top + row * cellSize,

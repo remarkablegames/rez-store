@@ -1,6 +1,6 @@
 import { Container, Fragment, Rectangle, Text, useEffect } from 'phaser-jsx';
 
-import { LAYOUT, THEME } from '../constants';
+import { GRADING, LAYOUT, THEME } from '../constants';
 import { useUiSound } from '../hooks';
 import type { GradeLetter, JobReport } from '../types';
 import { formatElapsed, getGrimeColor } from '../utils';
@@ -15,7 +15,6 @@ const HEATMAP_PANEL_PADDING = 6;
 const HEATMAP_PANEL_ALPHA = 0.04;
 const HEATMAP_DAMAGE_SIZE = 6;
 const HEATMAP_DAMAGE_OFFSET = (HEATMAP_CELL - HEATMAP_DAMAGE_SIZE) / 2;
-const HEATMAP_DAMAGE_THRESHOLD = 0.05;
 
 interface GradeReportProps {
   report: JobReport;
@@ -248,7 +247,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
                 fillAlpha={0.95}
               />
 
-              {damage > HEATMAP_DAMAGE_THRESHOLD && (
+              {damage > GRADING.DAMAGE_THRESHOLD && (
                 <Rectangle
                   x={x + HEATMAP_DAMAGE_OFFSET}
                   y={y + HEATMAP_DAMAGE_OFFSET}

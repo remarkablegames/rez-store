@@ -2,8 +2,8 @@
   <title id="rez-store-title">Rez Store: Photo Repair Shop</title>
   <defs>
     <radialGradient id="glow" cx="50%" cy="38%" r="72%">
-      <stop offset="0" stop-color="#2b241c" />
-      <stop offset="1" stop-color="#171310" />
+      <stop offset="0" stop-color="#2e251d" />
+      <stop offset="1" stop-color="#241c16" />
     </radialGradient>
     <linearGradient id="restored" x1="17" y1="12" x2="47" y2="42" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#e8d29c" />

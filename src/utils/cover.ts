@@ -5,6 +5,6 @@ export function getCoverLayout(width: number, height: number): CoverLayout {
   return (
     LAYOUT.COVERS.find(
       (layout) => layout.WIDTH === width && layout.HEIGHT === height,
-    ) ?? LAYOUT.COVER
+    ) ?? LAYOUT.COVER_WIDE
   );
 }

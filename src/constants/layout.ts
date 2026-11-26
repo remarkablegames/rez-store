@@ -11,7 +11,7 @@ export const PHOTO = {
   BORDER: 16,
 } as const;
 
-export const COVER = {
+export const COVER_WIDE = {
   WIDTH: 1280,
   HEIGHT: 720,
   FRAME_X: 400,
@@ -28,7 +28,7 @@ export const COVER = {
   DIVIDER_WIDTH: 140,
 } as const;
 
-export const COVER_COMPACT = {
+export const COVER_SMALL = {
   WIDTH: 630,
   HEIGHT: 500,
   FRAME_X: 200,
@@ -45,7 +45,7 @@ export const COVER_COMPACT = {
   DIVIDER_WIDTH: 80,
 } as const;
 
-export const COVERS = [COVER, COVER_COMPACT] as const;
+export const COVERS = [COVER_WIDE, COVER_SMALL] as const;
 
 export const HUD = {
   X: 760,

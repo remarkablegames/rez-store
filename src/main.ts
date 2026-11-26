@@ -7,8 +7,8 @@ import { getCoverLayout, getQuery } from './utils';
 const query = getQuery();
 const isCover = query.scene === KEY.SCENE.COVER;
 const coverLayout = getCoverLayout(
-  query.size?.width ?? LAYOUT.COVER.WIDTH,
-  query.size?.height ?? LAYOUT.COVER.HEIGHT,
+  query.size?.width ?? LAYOUT.COVER_WIDE.WIDTH,
+  query.size?.height ?? LAYOUT.COVER_WIDE.HEIGHT,
 );
 
 new Phaser.Game({

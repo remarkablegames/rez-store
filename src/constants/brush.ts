@@ -78,6 +78,28 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
       strength: 0.65,
       abrasion: 0.4,
     },
+
+    {
+      level: 4,
+      name: 'Basic 4',
+      trait: 'BALANCED\nSTR 70',
+      description: 'Broader and kinder to faded ink.',
+      price: 1050,
+      radius: 66,
+      strength: 0.7,
+      abrasion: 0.35,
+    },
+
+    {
+      level: 5,
+      name: 'Basic 5',
+      trait: 'BALANCED\nSTR 75',
+      description: 'Near-full coverage with a forgiving touch.',
+      price: 1600,
+      radius: 74,
+      strength: 0.75,
+      abrasion: 0.32,
+    },
   ],
 
   wide: [
@@ -96,7 +118,7 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
       level: 2,
       name: 'Wide Head 2',
       trait: 'BROAD & SOFT\nSTR 30',
-      description: 'Max coverage with minimal abrasion risk.',
+      description: 'Larger coverage with lower abrasion risk.',
       price: 440,
       radius: 78,
       strength: 0.3,
@@ -112,6 +134,28 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
       radius: 90,
       strength: 0.34,
       abrasion: 0.22,
+    },
+
+    {
+      level: 4,
+      name: 'Wide Head 4',
+      trait: 'BROAD & SOFT\nSTR 38',
+      description: 'Wider sweeps with barely any abrasion risk.',
+      price: 1150,
+      radius: 102,
+      strength: 0.38,
+      abrasion: 0.2,
+    },
+
+    {
+      level: 5,
+      name: 'Wide Head 5',
+      trait: 'BROAD & SOFT\nSTR 42',
+      description: 'Maximum dust-clearing coverage.',
+      price: 1700,
+      radius: 114,
+      strength: 0.42,
+      abrasion: 0.18,
     },
   ],
 
@@ -131,7 +175,7 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
       level: 2,
       name: 'Detail Tip 2',
       trait: 'FINE & FIRM\nSTR 105',
-      description: 'Sharper tip, reduced abrasion on clean areas.',
+      description: 'Sharper tip with reduced abrasion.',
       price: 500,
       radius: 26,
       strength: 1.05,
@@ -147,6 +191,28 @@ export const BRUSH_UPGRADES: Record<BrushId, BrushUpgradeTier[]> = {
       radius: 30,
       strength: 1.15,
       abrasion: 0.58,
+    },
+
+    {
+      level: 4,
+      name: 'Detail Tip 4',
+      trait: 'FINE & FIRM\nSTR 125',
+      description: 'Surgical point that lifts deep-set stains.',
+      price: 1300,
+      radius: 34,
+      strength: 1.25,
+      abrasion: 0.5,
+    },
+
+    {
+      level: 5,
+      name: 'Detail Tip 5',
+      trait: 'FINE & FIRM\nSTR 135',
+      description: 'The sharpest tip against the toughest grime.',
+      price: 1900,
+      radius: 38,
+      strength: 1.35,
+      abrasion: 0.44,
     },
   ],
 };

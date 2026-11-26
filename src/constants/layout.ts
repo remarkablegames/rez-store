@@ -45,6 +45,8 @@ export const COVER_COMPACT = {
   DIVIDER_WIDTH: 80,
 } as const;
 
+export const COVERS = [COVER, COVER_COMPACT] as const;
+
 export const HUD = {
   X: 760,
   Y: 100,

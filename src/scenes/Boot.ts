@@ -35,6 +35,10 @@ export class Boot extends Phaser.Scene {
     }
 
     switch (query.scene) {
+      case KEY.SCENE.COVER:
+        this.scene.start(KEY.SCENE.COVER);
+        break;
+
       case KEY.SCENE.GAME:
         this.scene.start(KEY.SCENE.GAME, {
           level: query.level ?? 0,

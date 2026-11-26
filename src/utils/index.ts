@@ -7,6 +7,7 @@ export * from './loadPhoto';
 export * from './math';
 export * from './music';
 export * from './particles';
+export * from './photoFrame';
 export * from './photoTextures';
 export * from './progress';
 export * from './puzzle';

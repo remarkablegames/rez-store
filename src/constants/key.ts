@@ -50,6 +50,7 @@ export const TEXTURE = {
 
 export const SCENE = {
   BOOT: 'boot',
+  COVER: 'cover',
   TITLE: 'title',
   GAME: 'game',
   SHOP: 'shop',

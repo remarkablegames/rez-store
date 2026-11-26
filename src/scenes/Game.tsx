@@ -14,6 +14,7 @@ import type {
 import {
   createBackgroundTexture,
   createParticles,
+  createPhotoFrame,
   createPhotoTextures,
   createRandom,
   equipBrush,
@@ -92,7 +93,13 @@ export class Game extends Phaser.Scene {
     this.add.image(0, 0, background.key).setOrigin(0);
 
     render(<Chrome level={this.level} title={level.title} />, this);
-    this.createPhotoFrame();
+    createPhotoFrame(this, {
+      x: LAYOUT.PHOTO.X,
+      y: LAYOUT.PHOTO.Y,
+      width: LAYOUT.PHOTO.WIDTH,
+      height: LAYOUT.PHOTO.HEIGHT,
+      border: LAYOUT.PHOTO.BORDER,
+    });
     this.createHudPanel();
 
     const textures = createPhotoTextures(this, level, this.grimeSeed);
@@ -250,33 +257,6 @@ export class Game extends Phaser.Scene {
     if (overall >= 0.88) {
       this.playCompletionEffects();
     }
-  }
-
-  private createPhotoFrame(): void {
-    const frameX =
-      LAYOUT.PHOTO.X - LAYOUT.PHOTO.WIDTH / 2 - LAYOUT.PHOTO.BORDER;
-    const frameY =
-      LAYOUT.PHOTO.Y - LAYOUT.PHOTO.HEIGHT / 2 - LAYOUT.PHOTO.BORDER;
-    const frameWidth = LAYOUT.PHOTO.WIDTH + LAYOUT.PHOTO.BORDER * 2;
-    const frameHeight = LAYOUT.PHOTO.HEIGHT + LAYOUT.PHOTO.BORDER * 2;
-    const frame = this.add.graphics();
-
-    frame.fillStyle(0x000000, 0.22);
-    frame.fillRoundedRect(frameX + 12, frameY + 16, frameWidth, frameHeight, 6);
-
-    frame.fillStyle(0x000000, 0.32);
-    frame.fillRoundedRect(frameX + 6, frameY + 8, frameWidth, frameHeight, 5);
-
-    frame.fillStyle(0xefe5cf, 1);
-    frame.fillRoundedRect(frameX, frameY, frameWidth, frameHeight, 3);
-
-    frame.lineStyle(1, 0x8f836d, 0.65);
-    frame.strokeRect(
-      LAYOUT.PHOTO.X - LAYOUT.PHOTO.WIDTH / 2,
-      LAYOUT.PHOTO.Y - LAYOUT.PHOTO.HEIGHT / 2,
-      LAYOUT.PHOTO.WIDTH,
-      LAYOUT.PHOTO.HEIGHT,
-    );
   }
 
   private createHudPanel(): void {

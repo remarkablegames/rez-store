@@ -3,6 +3,16 @@ export const GAME = {
   HEIGHT: 768,
 } as const;
 
+export const COVER = {
+  WIDTH: 1280,
+  HEIGHT: 720,
+  FRAME_X: 400,
+  FRAME_Y: 360,
+  FRAME_BORDER: 28,
+  TITLE_X: 800,
+  TITLE_Y: 272,
+} as const;
+
 export const PHOTO = {
   X: 392,
   Y: 400,

@@ -3,7 +3,10 @@ import { KEY } from '../constants';
 export interface Query {
   level?: number;
   scene?:
-    typeof KEY.SCENE.TITLE | typeof KEY.SCENE.GAME | typeof KEY.SCENE.SHOP;
+    | typeof KEY.SCENE.COVER
+    | typeof KEY.SCENE.TITLE
+    | typeof KEY.SCENE.GAME
+    | typeof KEY.SCENE.SHOP;
   money?: number;
 }
 
@@ -22,7 +25,8 @@ export function getQuery(): Query {
   const sceneRaw = params.get('scene');
   if (
     sceneRaw !== null &&
-    (sceneRaw === KEY.SCENE.TITLE ||
+    (sceneRaw === KEY.SCENE.COVER ||
+      sceneRaw === KEY.SCENE.TITLE ||
       sceneRaw === KEY.SCENE.GAME ||
       sceneRaw === KEY.SCENE.SHOP)
   ) {

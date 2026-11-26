@@ -2,23 +2,26 @@ import Phaser from 'phaser';
 import { Container, Rectangle, render, Text } from 'phaser-jsx';
 
 import { Button } from '../components';
-import { KEY, LAYOUT, THEME } from '../constants';
+import { KEY, LAYOUT, LEVELS, THEME } from '../constants';
 import {
   getQuery,
   hasSavedProgress,
+  loadPhoto,
   loadProgress,
   resetProgress,
 } from '../utils';
-import { Music } from './Music';
+import type { Music } from './Music';
 
 export class Title extends Phaser.Scene {
+  private musicScene!: Music;
+
   constructor() {
     super(KEY.SCENE.TITLE);
   }
 
-  private startMusic() {
-    const musicScene = this.scene.get(KEY.SCENE.MUSIC) as unknown as Music;
-    void musicScene.musicManager?.play();
+  init() {
+    this.musicScene = this.scene.get(KEY.SCENE.MUSIC) as unknown as Music;
+    this.musicScene.musicManager?.preloadFirst();
   }
 
   create() {
@@ -26,6 +29,7 @@ export class Title extends Phaser.Scene {
     const centerY = LAYOUT.GAME.HEIGHT / 2;
     const hasSave = hasSavedProgress();
     const query = getQuery();
+    loadPhoto(this, LEVELS[loadProgress().level].image);
 
     render(
       <Container x={centerX} y={centerY}>
@@ -74,10 +78,10 @@ export class Title extends Phaser.Scene {
               width={260}
               height={44}
               onClick={() => {
-                this.startMusic();
                 this.scene.start(KEY.SCENE.GAME, {
                   level: query.level ?? loadProgress().level,
                 });
+                void this.musicScene.musicManager?.play();
               }}
             >
               CONTINUE
@@ -89,9 +93,9 @@ export class Title extends Phaser.Scene {
               width={260}
               height={44}
               onClick={() => {
-                this.startMusic();
                 resetProgress();
                 this.scene.start(KEY.SCENE.GAME, { level: 0 });
+                void this.musicScene.musicManager?.play();
               }}
               variant="secondary"
             >
@@ -105,8 +109,8 @@ export class Title extends Phaser.Scene {
             width={260}
             height={44}
             onClick={() => {
-              this.startMusic();
               this.scene.start(KEY.SCENE.GAME, { level: query.level ?? 0 });
+              void this.musicScene.musicManager?.play();
             }}
           >
             PLAY

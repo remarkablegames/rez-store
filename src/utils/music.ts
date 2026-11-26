@@ -23,11 +23,24 @@ export class MusicManager {
     }
 
     this.started = true;
+    this.initPlaylist();
+
+    return this.advance();
+  }
+
+  private initPlaylist(): void {
+    if (this.playlist.length) {
+      return;
+    }
+
     this.playlist.push(...Object.values(KEY.MUSIC));
     Phaser.Utils.Array.Shuffle(this.playlist);
     this.currentIndex = -1;
+  }
 
-    return this.advance();
+  preloadFirst(): void {
+    this.initPlaylist();
+    void this.loadTrack(this.playlist[0]);
   }
 
   private async advance(): Promise<void> {

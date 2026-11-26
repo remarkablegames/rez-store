@@ -159,7 +159,7 @@ export function Shop({ level, onNext }: ShopProps) {
       <Text
         x={MARGIN}
         y={124}
-        text="Workbench equipment."
+        text="Your workbench equipment"
         style={{
           fontFamily: THEME.FONT.SANS,
           fontSize: 14,
@@ -169,12 +169,12 @@ export function Shop({ level, onNext }: ShopProps) {
 
       <Text
         x={EARNINGS_X}
-        y={55}
+        y={56}
         text="EARNINGS"
         originX={1}
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 12,
+          fontSize: 14,
           color: THEME.TEXT_COLOR.GOLD,
           letterSpacing: 1.5,
         }}
@@ -182,7 +182,7 @@ export function Shop({ level, onNext }: ShopProps) {
 
       <Text
         x={EARNINGS_X}
-        y={80}
+        y={82}
         text={`$${String(progress.earnings)}`}
         originX={1}
         style={{
@@ -328,7 +328,7 @@ export function Shop({ level, onNext }: ShopProps) {
         originX={0.5}
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 12,
+          fontSize: 14,
           color: THEME.TEXT_COLOR.FAINT,
           letterSpacing: 0.5,
         }}

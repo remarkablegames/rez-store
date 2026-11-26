@@ -66,7 +66,7 @@ export function Button({
         text={children}
         style={{
           fontFamily: THEME.FONT.MONO,
-          fontSize: 12,
+          fontSize: 14,
           color: getTextColor(variant, disabled),
           letterSpacing: 0.5,
         }}

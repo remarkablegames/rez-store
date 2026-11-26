@@ -11,6 +11,8 @@
 
 Play in your browser:
 
+- [Wavedash](https://wavedash.com/games/rez-store)
+- [itch.io](https://remarkablegames.itch.io/rez-store)
 - [remarkablegames](https://remarkablegames.org/rez-store/)
 
 Or download for desktop:

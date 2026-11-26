@@ -2,13 +2,18 @@ import Phaser from 'phaser';
 
 import { KEY, LAYOUT } from './constants';
 import * as scenes from './scenes';
-import { getQuery } from './utils/query';
+import { getCoverLayout, getQuery } from './utils';
 
-const isCover = getQuery().scene === KEY.SCENE.COVER;
+const query = getQuery();
+const isCover = query.scene === KEY.SCENE.COVER;
+const coverLayout = getCoverLayout(
+  query.size?.width ?? LAYOUT.COVER.WIDTH,
+  query.size?.height ?? LAYOUT.COVER.HEIGHT,
+);
 
 new Phaser.Game({
-  width: isCover ? LAYOUT.COVER.WIDTH : LAYOUT.GAME.WIDTH,
-  height: isCover ? LAYOUT.COVER.HEIGHT : LAYOUT.GAME.HEIGHT,
+  width: isCover ? coverLayout.WIDTH : LAYOUT.GAME.WIDTH,
+  height: isCover ? coverLayout.HEIGHT : LAYOUT.GAME.HEIGHT,
   title: 'Rez Store: Photo Repair Shop',
   url: import.meta.env.VITE_APP_HOMEPAGE,
   version: import.meta.env.VITE_APP_VERSION,

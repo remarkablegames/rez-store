@@ -8,6 +8,7 @@ export interface Query {
     | typeof KEY.SCENE.GAME
     | typeof KEY.SCENE.SHOP;
   money?: number;
+  size?: { width: number; height: number };
 }
 
 export function getQuery(): Query {
@@ -31,6 +32,18 @@ export function getQuery(): Query {
       sceneRaw === KEY.SCENE.SHOP)
   ) {
     query.scene = sceneRaw;
+  }
+
+  const sizeRaw = params.get('size');
+  if (sizeRaw !== null) {
+    const match = /^(\d+)x(\d+)$/i.exec(sizeRaw);
+    if (match) {
+      const width = Number(match[1]);
+      const height = Number(match[2]);
+      if (width > 0 && height > 0) {
+        query.size = { width, height };
+      }
+    }
   }
 
   const moneyRaw = params.get('money');

@@ -209,6 +209,12 @@ Start the cover scene (16:9, press `S` to save a PNG):
 http://localhost:5173/?scene=cover
 ```
 
+Start the cover at 630×500 size:
+
+```
+http://localhost:5173/?scene=cover&size=630x500
+```
+
 Use a different job's photo in the cover:
 
 ```

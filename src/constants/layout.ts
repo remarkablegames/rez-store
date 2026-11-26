@@ -3,22 +3,46 @@ export const GAME = {
   HEIGHT: 768,
 } as const;
 
-export const COVER = {
-  WIDTH: 1280,
-  HEIGHT: 720,
-  FRAME_X: 400,
-  FRAME_Y: 360,
-  FRAME_BORDER: 28,
-  TITLE_X: 800,
-  TITLE_Y: 272,
-} as const;
-
 export const PHOTO = {
   X: 392,
   Y: 400,
   WIDTH: 640,
   HEIGHT: 570,
   BORDER: 16,
+} as const;
+
+export const COVER = {
+  WIDTH: 1280,
+  HEIGHT: 720,
+  FRAME_X: 400,
+  FRAME_Y: 360,
+  FRAME_WIDTH: PHOTO.WIDTH,
+  FRAME_HEIGHT: PHOTO.HEIGHT,
+  FRAME_BORDER: 28,
+  TITLE_X: 800,
+  TITLE_Y: 272,
+  TITLE_SIZE: 72,
+  SUBTITLE_Y: 104,
+  SUBTITLE_SIZE: 48,
+  DIVIDER_Y: 176,
+  DIVIDER_WIDTH: 140,
+} as const;
+
+export const COVER_COMPACT = {
+  WIDTH: 630,
+  HEIGHT: 500,
+  FRAME_X: 200,
+  FRAME_Y: 250,
+  FRAME_WIDTH: 340,
+  FRAME_HEIGHT: 303,
+  FRAME_BORDER: 18,
+  TITLE_X: 410,
+  TITLE_Y: 200,
+  TITLE_SIZE: 36,
+  SUBTITLE_Y: 53,
+  SUBTITLE_SIZE: 20,
+  DIVIDER_Y: 99,
+  DIVIDER_WIDTH: 80,
 } as const;
 
 export const HUD = {

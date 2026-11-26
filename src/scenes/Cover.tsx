@@ -1,11 +1,12 @@
 import Phaser from 'phaser';
 import { Container, Rectangle, render, Text } from 'phaser-jsx';
 
-import { KEY, LAYOUT, LEVELS, THEME } from '../constants';
+import { KEY, LEVELS, THEME } from '../constants';
 import {
   createBackgroundTexture,
   createPhotoFrame,
   createPhotoTextures,
+  getCoverLayout,
   getQuery,
   loadPhoto,
 } from '../utils';
@@ -28,44 +29,47 @@ export class Cover extends Phaser.Scene {
 
   create() {
     const level = LEVELS[this.level];
+    const layout = getCoverLayout(this.scale.width, this.scale.height);
 
     const background = createBackgroundTexture(this, {
-      width: LAYOUT.COVER.WIDTH,
-      height: LAYOUT.COVER.HEIGHT,
+      width: this.scale.width,
+      height: this.scale.height,
       glow: {
-        x: LAYOUT.COVER.FRAME_X,
-        y: LAYOUT.COVER.FRAME_Y - 30,
+        x: layout.FRAME_X,
+        y: layout.FRAME_Y - 30,
+        radius: layout.FRAME_WIDTH * 0.8,
       },
       panelGlow: null,
     });
     this.add.image(0, 0, background.key).setOrigin(0);
 
     const textures = createPhotoTextures(this, level, 'cover');
-    const frame = this.add.container(
-      LAYOUT.COVER.FRAME_X,
-      LAYOUT.COVER.FRAME_Y,
-    );
+    const frame = this.add.container(layout.FRAME_X, layout.FRAME_Y);
     frame.setRotation(-0.025);
     frame.add(
       createPhotoFrame(this, {
         x: 0,
         y: 0,
-        width: LAYOUT.PHOTO.WIDTH,
-        height: LAYOUT.PHOTO.HEIGHT,
-        border: LAYOUT.COVER.FRAME_BORDER,
+        width: layout.FRAME_WIDTH,
+        height: layout.FRAME_HEIGHT,
+        border: layout.FRAME_BORDER,
       }),
     );
-    frame.add(this.add.image(0, 0, textures.clean.key));
+    frame.add(
+      this.add
+        .image(0, 0, textures.clean.key)
+        .setDisplaySize(layout.FRAME_WIDTH, layout.FRAME_HEIGHT),
+    );
 
     render(
-      <Container x={LAYOUT.COVER.TITLE_X} y={LAYOUT.COVER.TITLE_Y}>
+      <Container x={layout.TITLE_X} y={layout.TITLE_Y}>
         <Text
           x={0}
           y={0}
           text="REZ STORE"
           style={{
             fontFamily: THEME.FONT.SERIF,
-            fontSize: 72,
+            fontSize: layout.TITLE_SIZE,
             color: THEME.TEXT_COLOR.CREAM,
             padding: { bottom: 2 },
           }}
@@ -74,11 +78,11 @@ export class Cover extends Phaser.Scene {
 
         <Text
           x={0}
-          y={104}
+          y={layout.SUBTITLE_Y}
           text="Photo Repair Shop"
           style={{
             fontFamily: THEME.FONT.SERIF,
-            fontSize: 48,
+            fontSize: layout.SUBTITLE_SIZE,
             color: THEME.TEXT_COLOR.GOLD,
             padding: { bottom: 2 },
           }}
@@ -87,8 +91,8 @@ export class Cover extends Phaser.Scene {
 
         <Rectangle
           x={0}
-          y={176}
-          width={140}
+          y={layout.DIVIDER_Y}
+          width={layout.DIVIDER_WIDTH}
           height={2}
           fillColor={THEME.SHAPE_COLOR.GOLD}
           fillAlpha={0.55}

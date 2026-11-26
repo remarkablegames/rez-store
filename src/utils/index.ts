@@ -1,6 +1,7 @@
 export * from './background';
 export * from './canvasTexture';
 export * from './color';
+export * from './cover';
 export * from './dirt';
 export * from './grading';
 export * from './loadPhoto';

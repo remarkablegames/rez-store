@@ -215,7 +215,6 @@ export function Shop({ level, onNext }: ShopProps) {
           if (!owned) {
             return (
               <ShopCard
-                key={brush.id}
                 x={x}
                 kind="BRUSH"
                 name={brush.name}
@@ -237,7 +236,6 @@ export function Shop({ level, onNext }: ShopProps) {
             const effectiveBrush = getBrush(brush.id, progress);
             return (
               <ShopCard
-                key={`${brush.id}-upgrade`}
                 x={x}
                 kind="BRUSH"
                 name={nextTier.name ?? brush.name}
@@ -258,7 +256,6 @@ export function Shop({ level, onNext }: ShopProps) {
           const effectiveBrush = getBrush(brush.id, progress);
           return (
             <ShopCard
-              key={brush.id}
               x={x}
               kind="BRUSH"
               name={brush.name}
@@ -286,7 +283,6 @@ export function Shop({ level, onNext }: ShopProps) {
 
           return (
             <ShopCard
-              key={tier.axis}
               x={x}
               kind="COLOR"
               name={tier.name}
@@ -311,7 +307,6 @@ export function Shop({ level, onNext }: ShopProps) {
 
         return (
           <ShopCard
-            key={tier.id}
             x={x}
             kind="TOOL"
             name={tier.name}

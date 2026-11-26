@@ -52,33 +52,30 @@ export function InspectIcon({ x, y }: InspectIconProps) {
         fillAlpha={0.04}
       />
 
-      {ZONES.map(({ grime, damage, column, row }) => {
-        return (
-          <Rectangle
-            key={`${String(row)}-${String(column)}`}
-            x={-GRID_WIDTH / 2 + column * (CELL + GAP)}
-            y={-GRID_HEIGHT / 2 + row * (CELL + GAP)}
-            width={CELL}
-            height={CELL}
-            originX={0}
-            originY={0}
-            fillColor={
-              damage > 0
-                ? THEME.SHAPE_COLOR.HEATMAP_DIRT
-                : grime > 0
-                  ? THEME.SHAPE_COLOR.INSPECT_GRIME
-                  : THEME.SHAPE_COLOR.TRACK
-            }
-            fillAlpha={
-              damage > 0
-                ? 0.2 + damage * 0.55
-                : grime > 0
-                  ? 0.18 + grime * 0.45
-                  : 0.55
-            }
-          />
-        );
-      })}
+      {ZONES.map(({ grime, damage, column, row }) => (
+        <Rectangle
+          x={-GRID_WIDTH / 2 + column * (CELL + GAP)}
+          y={-GRID_HEIGHT / 2 + row * (CELL + GAP)}
+          width={CELL}
+          height={CELL}
+          originX={0}
+          originY={0}
+          fillColor={
+            damage > 0
+              ? THEME.SHAPE_COLOR.HEATMAP_DIRT
+              : grime > 0
+                ? THEME.SHAPE_COLOR.INSPECT_GRIME
+                : THEME.SHAPE_COLOR.TRACK
+          }
+          fillAlpha={
+            damage > 0
+              ? 0.2 + damage * 0.55
+              : grime > 0
+                ? 0.18 + grime * 0.45
+                : 0.55
+          }
+        />
+      ))}
     </Container>
   );
 }

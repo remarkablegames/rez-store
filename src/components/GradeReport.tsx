@@ -235,7 +235,7 @@ export function GradeReport({ report, onNext, onShop }: GradeReportProps) {
           const damage = report.damageZones[index] ?? 0;
 
           return (
-            <Fragment key={index}>
+            <Fragment>
               <Rectangle
                 x={x}
                 y={y}

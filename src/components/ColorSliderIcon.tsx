@@ -32,7 +32,6 @@ export function ColorSliderIcon({ x, y, axis }: ColorSliderIconProps) {
     <Container x={x} y={y}>
       {colors.map((color, index) => (
         <Rectangle
-          key={index}
           x={-TRACK_WIDTH / 2 + index * segmentWidth}
           y={-TRACK_HEIGHT / 2}
           width={segmentWidth}

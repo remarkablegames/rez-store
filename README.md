@@ -21,6 +21,8 @@ Or download for desktop:
 - [macOS](https://github.com/remarkablegames/rez-store/releases/latest/download/macos.zip)
 - [Linux](https://github.com/remarkablegames/rez-store/releases/latest/download/linux.zip)
 
+Read the [blog post](https://remarkablegames.org/posts/rez-store/) or watch the [YouTube video](https://youtu.be/v2wO1e3kX4k).
+
 ## How to Play
 
 1. Each job can have up to three phases:
